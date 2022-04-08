@@ -17,7 +17,9 @@ import time
 import traceback
 from docopt import docopt
 from core import (Outils,
-                    DossierSource)
+                  DossierSource)
+from module_d import ModuleD
+from imports import Edition
 
 arguments = docopt(__doc__)
 
@@ -30,8 +32,12 @@ else:
     dossier_data = Outils.choisir_dossier()
 dossier_source = DossierSource(dossier_data)
 try:
-    start_time = time.time()
-
-    Outils.affiche_message("OK !!! (" + str(datetime.timedelta(seconds=(time.time() - start_time))).split(".")[0] + ")")
+    if Outils.existe(Outils.chemin([dossier_data, Edition.nom_fichier])):
+        start_time = time.time()
+        ModuleD.run(dossier_source)
+        Outils.affiche_message("OK !!! (" +
+                               str(datetime.timedelta(seconds=(time.time() - start_time))).split(".")[0] + ")")
+    else:
+        Outils.affiche_message("Carnet d'ordre introuvable")
 except Exception as e:
     Outils.fatal(traceback.format_exc(), "Erreur imprévue :\n")
