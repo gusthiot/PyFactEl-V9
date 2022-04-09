@@ -33,6 +33,11 @@ class NoShow(Fichier):
         coms = []
 
         for donnee in self.donnees:
+            donnee['mois'], info = Outils.est_un_entier(donnee['mois'], "le mois ", ligne, 1, 12)
+            msg += info
+            donnee['annee'], info = Outils.est_un_entier(donnee['annee'], "l'annee ", ligne, 2000, 2099)
+            msg += info
+
             if donnee['id_compte'] == "":
                 msg += "le id compte de la ligne " + str(ligne) + " ne peut être vide\n"
             elif comptes.contient_id(donnee['id_compte']) == 0:
