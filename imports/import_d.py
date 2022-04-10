@@ -56,11 +56,16 @@ class ImportD(object):
         self.services = Service(dossier_source)
         self.dossier_source = dossier_source
 
+        if self._verification_coherence_1() > 0:
+            sys.exit("Erreur dans la cohérence")
+
+        plateforme = self.plateformes.donnees[self.edition.plateforme]
+
         if self.edition.filigrane != "":
             chemin = self.generaux.chemin_filigrane
         else:
             chemin = self.generaux.chemin
-        self.dossier_enregistrement = Outils.chemin([chemin, self.edition.plateforme, self.edition.annee,
+        self.dossier_enregistrement = Outils.chemin([chemin, plateforme['abrev_plat'], self.edition.annee,
                                                      Outils.mois_string(self.edition.mois)], self.generaux)
         Outils.existe(self.dossier_enregistrement, True)
 
@@ -70,15 +75,15 @@ class ImportD(object):
         else:
             annee_p = self.edition.annee-1
             mois_p = 12
-        self.dossier_precedent = Outils.chemin([self.generaux.chemin, self.edition.plateforme, annee_p, mois_p, "V0",
-                                                "OUT"])
+        self.dossier_precedent = Outils.chemin([self.generaux.chemin, plateforme['abrev_plat'], annee_p, mois_p, "V0",
+                                                "OUT"], self.generaux)
         if not Outils.existe(self.dossier_precedent, False):
             Outils.fatal(ErreurConsistance(), "le dossier " + self.dossier_precedent + " se doit d'être présent !")
 
         self.grants = Granted(DossierSource(self.dossier_precedent), self.edition)
         self.userlabs = UserLabo(DossierSource(self.dossier_precedent), self.edition)
 
-        if self.verification_coherence() > 0:
+        if self._verification_coherence_2() > 0:
             sys.exit("Erreur dans la cohérence")
 
     def copie_fixes(self, dossier_destination):
@@ -95,9 +100,9 @@ class ImportD(object):
                         self.acces, self.noshows, self.livraisons, self.services]:
             dossier_destination.ecrire(fichier.nom_fichier, self.dossier_source.lire(fichier.nom_fichier))
 
-    def verification_coherence(self):
+    def _verification_coherence_1(self):
         """
-        vérifie la cohérence des données importées
+        vérifie la cohérence des premières données importées
         :return: 0 si ok, sinon le nombre d'échecs à la vérification
         """
         verif = 0
@@ -106,6 +111,15 @@ class ImportD(object):
         verif += self.clients.est_coherent(self.generaux, self.classes)
         verif += self.plateformes.est_coherent(self.clients, self.dossier_source)
         verif += self.edition.est_coherent(self.plateformes)
+
+        return verif
+
+    def _verification_coherence_2(self):
+        """
+        vérifie la cohérence des secondes données importées
+        :return: 0 si ok, sinon le nombre d'échecs à la vérification
+        """
+        verif = 0
         verif += self.users.est_coherent()
         verif += self.categories.est_coherent(self.artsap, self.plateformes)
         verif += self.groupes.est_coherent(self.categories)

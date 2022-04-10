@@ -441,15 +441,15 @@ class Outils(object):
             return "", colonne + delaligne + " doit être un texte\n"
 
     @staticmethod
-    def est_un_nombre(donnee, colonne, ligne=-1, arrondi=-1, min=None, max=None):
+    def est_un_nombre(donnee, colonne, ligne=-1, arrondi=-1, mini=None, maxi=None):
         """
         vérifie que la donnée est bien un nombre
         :param donnee: donnée à vérifier
         :param colonne: colonne contenant la donnée (nom de la variable)
         :param ligne: ligne contenant la donnée (-1 si pas de ligne)
         :param arrondi: arrondi après la virgule (-1 si pas d'arrondi)
-        :param min: borne minimale facultative
-        :param max: borne maximale facultative
+        :param mini: borne minimale facultative
+        :param maxi: borne maximale facultative
         :return: la donnée formatée en nombre et un string vide si ok, 0 et un message d'erreur sinon
         """
         if ligne > -1:
@@ -458,9 +458,9 @@ class Outils(object):
             delaligne = ""
         try:
             fl_d = float(donnee)
-            if min is not None and fl_d < min:
+            if mini is not None and fl_d < mini:
                 return -1, colonne + delaligne + " doit être un nombre >= " + str(min) + "\n"
-            if max is not None and fl_d > max:
+            if maxi is not None and fl_d > maxi:
                 return -1, colonne + delaligne + " doit être un nombre <= " + str(max) + "\n"
             if arrondi > -1:
                 return round(fl_d, arrondi), ""
@@ -470,14 +470,14 @@ class Outils(object):
             return -1, colonne + delaligne + " doit être un nombre\n"
 
     @staticmethod
-    def est_un_entier(donnee, colonne, ligne=-1, min=None, max=None):
+    def est_un_entier(donnee, colonne, ligne=-1, mini=None, maxi=None):
         """
         vérifie que la donnée est bien un nombre entier dans les bornes éventuelles
         :param donnee: donnée à vérifier
         :param colonne: colonne contenant la donnée (nom de la variable)
         :param ligne: ligne contenant la donnée (-1 si pas de ligne)
-        :param min: borne minimale facultative
-        :param max: borne maximale facultative
+        :param mini: borne minimale facultative
+        :param maxi: borne maximale facultative
         :return: la donnée formatée en nombre et un string vide si ok, 0 et un message d'erreur sinon
         """
         if ligne > -1:
@@ -486,9 +486,9 @@ class Outils(object):
             delaligne = ""
         try:
             entier = int(donnee)
-            if min is not None and entier < min:
+            if mini is not None and entier < mini:
                 return -1, colonne + delaligne + " doit être un nombre entier >= " + str(min) + "\n"
-            if max is not None and entier > max:
+            if maxi is not None and entier > maxi:
                 return -1, colonne + delaligne + " doit être un nombre entier <= " + str(max) + "\n"
             return entier, ""
         except ValueError:

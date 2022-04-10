@@ -58,9 +58,12 @@ class Generaux(object):
                                                                          "le chemin filigrane")
         erreurs += err
 
-        for modes in self._donnees['modes'][1:]:
-            modes, err = Outils.est_un_alphanumerique(modes, "le mode d'envoi", vide=True)
+        modes = []
+        for mode in self._donnees['modes'][1:]:
+            mode, err = Outils.est_un_alphanumerique(mode, "le mode d'envoi", vide=True)
+            modes.append(modes)
             erreurs += err
+        self._donnees['modes'][1:] = modes
 
         if erreurs != "":
             Outils.fatal(ErreurConsistance(), self.libelle + "\n" + erreurs)
