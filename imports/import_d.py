@@ -23,6 +23,7 @@ from imports.variables import (Acces,
                                Service,
                                Subside,
                                User)
+from core import (Outils, ErreurConsistance, DossierSource)
 
 
 class ImportD(object):
@@ -40,8 +41,6 @@ class ImportD(object):
         self.clients = Client(dossier_source)
         self.coefprests = CoefPrest(dossier_source)
         self.comptes = Compte(dossier_source)
-        self.grants = Granted(dossier_source, self.edition)
-        self.userlabs = UserLabo(dossier_source, self.edition)
         self.livraisons = Livraison(dossier_source)
         self.machines = Machine(dossier_source)
         self.groupes = Groupe(dossier_source)
@@ -57,14 +56,39 @@ class ImportD(object):
         self.services = Service(dossier_source)
         self.dossier_source = dossier_source
 
+        if self.edition.filigrane != "":
+            chemin = self.generaux.chemin_filigrane
+        else:
+            chemin = self.generaux.chemin
+        self.dossier_enregistrement = Outils.chemin([chemin, self.edition.plateforme, self.edition.annee,
+                                                     Outils.mois_string(self.edition.mois)], self.generaux)
+        Outils.existe(self.dossier_enregistrement, True)
+
+        if self.edition.mois > 1:
+            annee_p = self.edition.annee
+            mois_p = Outils.mois_string(self.edition.mois-1)
+        else:
+            annee_p = self.edition.annee-1
+            mois_p = 12
+        self.dossier_precedent = Outils.chemin([self.generaux.chemin, self.edition.plateforme, annee_p, mois_p, "V0",
+                                                "OUT"])
+        if not Outils.existe(self.dossier_precedent, False):
+            Outils.fatal(ErreurConsistance(), "le dossier " + self.dossier_precedent + " se doit d'être présent !")
+
+        self.grants = Granted(DossierSource(self.dossier_precedent), self.edition)
+        self.userlabs = UserLabo(DossierSource(self.dossier_precedent), self.edition)
+
         if self.verification_coherence() > 0:
             sys.exit("Erreur dans la cohérence")
 
     def copie_fixes(self, dossier_destination):
         for fichier in [self.paramtexte, self.generaux, self.classes, self.plateformes, self.artsap, self.categories,
-                        self.groupes, self.machines, self.categprix, self.coefprests, self.prestations, self.grants,
-                        self.userlabs]:
+                        self.groupes, self.machines, self.categprix, self.coefprests, self.prestations]:
             dossier_destination.ecrire(fichier.nom_fichier, self.dossier_source.lire(fichier.nom_fichier))
+        for fichier in [self.grants,
+                        self.userlabs]:
+            dossier_destination.ecrire(fichier.nom_fichier,
+                                       DossierSource(self.dossier_precedent).lire(fichier.nom_fichier))
 
     def copie_variables(self, dossier_destination):
         for fichier in [self.clients, self.subsides, self.plafonds, self.cles, self.comptes, self.users,
