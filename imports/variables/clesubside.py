@@ -1,5 +1,6 @@
 from imports import Fichier
-from core import Outils
+from core import (Outils,
+                  ErreurConsistance)
 
 
 class CleSubside(Fichier):
@@ -11,45 +12,31 @@ class CleSubside(Fichier):
     cles = ['type', 'id_classe', 'code_client', 'id_machine']
     libelle = "Clés Subsides"
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def est_coherent(self, clients, machines, classes, subsides):
+    def __init__(self, dossier_source, clients, machines, classes, subsides):
         """
-        vérifie que les données du fichier importé sont cohérentes
+        initialisation et importation des données
+        :param dossier_source: Une instance de la classe dossier.DossierSource
         :param clients: clients importés
         :param machines: machines importées
         :param classes: classes clients importées
         :param subsides: subsides importés
-        :return: 1 s'il y a une erreur, 0 sinon
         """
+        super().__init__(dossier_source)
 
-        if self.verifie_coherence == 1:
-            print(self.libelle + ": cohérence déjà vérifiée")
-            return 0
-
+        del self.donnees[0]
         msg = ""
         ligne = 1
         donnees_dict = {}
         quadruplets = []
 
-        del self.donnees[0]
         for donnee in self.donnees:
-            if donnee['type'] == "":
-                msg += "le type de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif subsides.contient_type(donnee['type']) == 0:
-                msg += "le type '" + donnee['type'] + "' de la ligne " + str(ligne) + " n'est pas référencé\n"
+            msg += self._test_id_coherence(donnee['type'], "le type", ligne, subsides)
 
-            if donnee['id_classe'] != "0" and not classes.contient_id(donnee['id_classe']):
-                msg += "l'id classe client de la ligne " + str(ligne) + " n'existe pas\n"
+            msg += self._test_id_coherence(donnee['id_classe'], "l'id classe client", ligne, classes, True)
 
-            if donnee['code_client'] != "0" and donnee['code_client'] not in clients.donnees:
-                msg += "le code client " + donnee['code_client'] + " de la ligne " + str(ligne) + \
-                       " n'est pas référencé\n"
+            msg += self._test_id_coherence(donnee['code_client'], "le code client", ligne, clients, True)
 
-            if donnee['id_machine'] != "0" and machines.contient_id(donnee['id_machine']) == 0:
-                msg += "le machine id '" + donnee['id_machine'] + "' de la ligne " + str(ligne)\
-                       + " n'est pas référencé\n"
+            msg += self._test_id_coherence(donnee['id_machine'], "l'id machine", ligne, machines, True)
 
             quadruplet = donnee['type'] + donnee['id_classe'] + donnee['code_client'] + donnee['id_machine']
 
@@ -74,10 +61,6 @@ class CleSubside(Fichier):
             ligne += 1
 
         self.donnees = donnees_dict
-        self.verifie_coherence = 1
 
         if msg != "":
-            msg = self.libelle + "\n" + msg
-            Outils.affiche_message(msg)
-            return 1
-        return 0
+            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

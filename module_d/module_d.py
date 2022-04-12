@@ -11,7 +11,8 @@ class ModuleD(object):
     @staticmethod
     def run(dossier_source):
         import_d = ImportD(dossier_source)
-
+        grille = import_d.plateforme['grille'] + '.pdf'
+        DossierDestination(import_d.dossier_enregistrement).ecrire(grille, dossier_source.lire(grille))
         dossier_in = Outils.chemin([import_d.dossier_enregistrement, "IN"], import_d.generaux)
         if not Outils.existe(dossier_in, True):
             import_d.copie_fixes(DossierDestination(dossier_in))

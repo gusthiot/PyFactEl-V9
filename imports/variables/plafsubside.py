@@ -1,5 +1,7 @@
 from imports import Fichier
-from core import Outils
+from core import (Outils,
+                  VerifFormat,
+                  ErreurConsistance)
 
 
 class PlafSubside(Fichier):
@@ -11,44 +13,28 @@ class PlafSubside(Fichier):
     cles = ['type', 'id_plateforme', 'id_article', 'pourcentage', 'max_mois', 'max_compte']
     libelle = "Plafonds Subsides"
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def est_coherent(self, subsides, artsap, plateformes):
+    def __init__(self, dossier_source, subsides, artsap, plateformes):
         """
-        vérifie que les données du fichier importé sont cohérentes
+        initialisation et importation des données
+        :param dossier_source: Une instance de la classe dossier.DossierSource
         :param subsides: subsides importés
         :param artsap: articles SAP importés
         :param plateformes: plateformes importées
-        :return: 1 s'il y a une erreur, 0 sinon
         """
+        super().__init__(dossier_source)
 
-        if self.verifie_coherence == 1:
-            print(self.libelle + ": cohérence déjà vérifiée")
-            return 0
-
+        del self.donnees[0]
         msg = ""
         ligne = 1
         donnees_dict = {}
         triplets = []
 
-        del self.donnees[0]
         for donnee in self.donnees:
-            if donnee['type'] == "":
-                msg += "le type de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif subsides.contient_type(donnee['type']) == 0:
-                msg += "le type '" + donnee['type'] + "' de la ligne " + str(ligne) \
-                       + " n'est pas référencé\n"
-            if donnee['id_article'] == "":
-                msg += "l'id article SAP de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif not artsap.contient_id(donnee['id_article']):
-                msg += "l'id article SAP de la ligne " + str(ligne) + " n'existe pas dans les codes D\n"
+            msg += self._test_id_coherence(donnee['type'], "le type", ligne, subsides)
 
-            if donnee['id_plateforme'] == "":
-                msg += "l'id plateforme de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif plateformes.contient_id(donnee['id_plateforme']) == 0:
-                msg += "l'id plateforme '" + donnee['id_plateforme'] + "' de la ligne " + str(ligne) \
-                       + " n'est pas référencé\n"
+            msg += self._test_id_coherence(donnee['id_article'], "l'id article SAP", ligne, artsap)
+
+            msg += self._test_id_coherence(donnee['id_plateforme'], "l'id plateforme", ligne, plateformes)
 
             triplet = [donnee['type'], donnee['id_plateforme'], donnee['id_article']]
             if triplet not in triplets:
@@ -57,24 +43,20 @@ class PlafSubside(Fichier):
                 msg += "Triplet type '" + donnee['type'] + "' id plateforme '" + donnee['id_plateforme'] + \
                        "' et id article SAP '" + donnee['id_article'] + "' de la ligne " + str(ligne) + " pas unique\n"
 
-            donnee['pourcentage'], info = Outils.est_un_nombre(donnee['pourcentage'], "le pourcentage", ligne, 2, 0,
-                                                               100)
+            donnee['pourcentage'], info = VerifFormat.est_un_nombre(donnee['pourcentage'], "le pourcentage", ligne, 2,
+                                                                    0, 100)
             msg += info
 
-            donnee['max_mois'], info = Outils.est_un_nombre(donnee['max_mois'], "le max mensuel", ligne, 2, 0)
+            donnee['max_mois'], info = VerifFormat.est_un_nombre(donnee['max_mois'], "le max mensuel", ligne, 2, 0)
             msg += info
 
-            donnee['max_compte'], info = Outils.est_un_nombre(donnee['max_compte'], "le max compte", ligne, 2, 0)
+            donnee['max_compte'], info = VerifFormat.est_un_nombre(donnee['max_compte'], "le max compte", ligne, 2, 0)
             msg += info
 
             donnees_dict[donnee['type'] + donnee['id_plateforme'] + donnee['id_article']] = donnee
             ligne += 1
 
         self.donnees = donnees_dict
-        self.verifie_coherence = 1
 
         if msg != "":
-            msg = self.libelle + "\n" + msg
-            Outils.affiche_message(msg)
-            return 1
-        return 0
+            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

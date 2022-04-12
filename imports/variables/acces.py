@@ -1,5 +1,7 @@
 from imports import Fichier
-from core import Outils
+from core import (Outils,
+                  VerifFormat,
+                  ErreurConsistance)
 
 
 class Acces(Fichier):
@@ -12,21 +14,15 @@ class Acces(Fichier):
     nom_fichier = "cae.csv"
     libelle = "Contrôle Accès Equipement"
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def est_coherent(self, comptes, machines, users):
+    def __init__(self, dossier_source, comptes, machines, users):
         """
-        vérifie que les données du fichier importé sont cohérentes, et efface les colonnes mois et année
+        initialisation et importation des données
+        :param dossier_source: Une instance de la classe dossier.DossierSource
         :param comptes: comptes importés
         :param machines: machines importées
         :param users: users importés
-        :return: 1 s'il y a une erreur, 0 sinon
         """
-
-        if self.verifie_coherence == 1:
-            print(self.libelle + ": cohérence déjà vérifiée")
-            return 0
+        super().__init__(dossier_source)
 
         del self.donnees[0]
         msg = ""
@@ -35,60 +31,46 @@ class Acces(Fichier):
         coms = []
 
         for donnee in self.donnees:
-            donnee['mois'], info = Outils.est_un_entier(donnee['mois'], "le mois ", ligne, 1, 12)
+            donnee['mois'], info = VerifFormat.est_un_entier(donnee['mois'], "le mois ", ligne, 1, 12)
             msg += info
-            donnee['annee'], info = Outils.est_un_entier(donnee['annee'], "l'annee ", ligne, 2000, 2099)
+            donnee['annee'], info = VerifFormat.est_un_entier(donnee['annee'], "l'annee ", ligne, 2000, 2099)
             msg += info
 
-            if donnee['id_compte'] == "":
-                msg += "le compte id de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif comptes.contient_id(donnee['id_compte']) == 0:
-                msg += "le compte id '" + donnee['id_compte'] + "' de la ligne " + str(ligne) + " n'est pas référencé\n"
-            elif donnee['id_compte'] not in coms:
+            info = self._test_id_coherence(donnee['id_compte'], "l'id compte", ligne, comptes)
+            if info == "" and donnee['id_compte'] not in coms:
                 coms.append(donnee['id_compte'])
+            else:
+                msg += info
 
-            if donnee['id_machine'] == "":
-                msg += "le machine id de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif machines.contient_id(donnee['id_machine']) == 0:
-                msg += "le machine id '" + donnee['id_machine'] + "' de la ligne " + str(ligne)\
-                       + " n'est pas référencé\n"
+            msg += self._test_id_coherence(donnee['id_machine'], "l'id machine", ligne, machines)
 
-            if donnee['id_user'] == "":
-                msg += "le user id de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif users.contient_id(donnee['id_user']) == 0:
-                msg += "le user id '" + donnee['id_user'] + "' de la ligne " + str(ligne) \
-                       + " n'est pas référencé\n"
+            msg += self._test_id_coherence(donnee['id_user'], "l'id user", ligne, users)
 
-            if donnee['id_op'] == "":
-                msg += "l'id opérateur de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif users.contient_id(donnee['id_op']) == 0:
-                msg += "l'id opérateur '" + donnee['id_op'] + "' de la ligne " + str(ligne) \
-                       + " n'est pas référencé\n"
+            msg += self._test_id_coherence(donnee['id_op'], "l'id opérateur", ligne, users)
 
-            donnee['duree_machine_hp'], info = Outils.est_un_nombre(donnee['duree_machine_hp'], "la durée machine hp",
-                                                                    ligne, 4, 0)
+            donnee['duree_machine_hp'], info = VerifFormat.est_un_nombre(donnee['duree_machine_hp'],
+                                                                         "la durée machine hp", ligne, 4, 0)
             msg += info
-            donnee['duree_machine_hc'], info = Outils.est_un_nombre(donnee['duree_machine_hc'], "la durée machine hc",
-                                                                    ligne, 4, 0)
+            donnee['duree_machine_hc'], info = VerifFormat.est_un_nombre(donnee['duree_machine_hc'],
+                                                                         "la durée machine hc", ligne, 4, 0)
             msg += info
-            donnee['duree_run'], info = Outils.est_un_nombre(donnee['duree_run'], "la durée du run",
-                                                             ligne, 4, 0)
+            donnee['duree_run'], info = VerifFormat.est_un_nombre(donnee['duree_run'], "la durée du run", ligne, 4, 0)
             msg += info
-            donnee['duree_operateur'], info = Outils.est_un_nombre(donnee['duree_operateur'], "la durée opérateur",
-                                                                   ligne, 4, 0)
+            donnee['duree_operateur'], info = VerifFormat.est_un_nombre(donnee['duree_operateur'], "la durée opérateur",
+                                                                        ligne, 4, 0)
             msg += info
             if donnee['duree_run'] < (donnee['duree_machine_hc'] + donnee['duree_machine_hp']):
                 msg += "la durée de run de la ligne " + str(ligne) + "ne peut pas être plus petite que HP + HC"
 
-            donnee['date_login'], info = Outils.est_une_date(donnee['date_login'], "la date de login", ligne)
+            donnee['date_login'], info = VerifFormat.est_une_date(donnee['date_login'], "la date de login", ligne)
             msg += info
 
-            donnee['remarque_op'], info = Outils.est_un_texte(donnee['remarque_op'], "la remarque opérateur", ligne,
-                                                              True)
+            donnee['remarque_op'], info = VerifFormat.est_un_texte(donnee['remarque_op'], "la remarque opérateur",
+                                                                   ligne, True)
             msg += info
 
-            donnee['remarque_staff'], info = Outils.est_un_texte(donnee['remarque_staff'], "la remarque staff", ligne,
-                                                                 True)
+            donnee['remarque_staff'], info = VerifFormat.est_un_texte(donnee['remarque_staff'], "la remarque staff",
+                                                                      ligne, True)
             msg += info
 
             donnees_list.append(donnee)
@@ -96,10 +78,5 @@ class Acces(Fichier):
             ligne += 1
 
         self.donnees = donnees_list
-        self.verifie_coherence = 1
-
         if msg != "":
-            msg = self.libelle + "\n" + msg
-            Outils.affiche_message(msg)
-            return 1
-        return 0
+            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

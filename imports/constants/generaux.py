@@ -1,4 +1,5 @@
 from core import (Outils,
+                  VerifFormat,
                   ErreurConsistance)
 
 
@@ -15,7 +16,6 @@ class Generaux(object):
     def __init__(self, dossier_source):
         """
         initialisation et importation des données
-
         :param dossier_source: Une instance de la classe dossier.DossierSource
         """
         self._donnees = {}
@@ -36,32 +36,35 @@ class Generaux(object):
             if cle not in self._donnees:
                 erreurs += "\nClé manquante dans %s: %s" % (self.nom_fichier, cle)
 
-        self._donnees['origine'][1], err = Outils.est_un_alphanumerique(self._donnees['origine'][1], "l'origine")
+        self._donnees['origine'][1], err = VerifFormat.est_un_alphanumerique(self._donnees['origine'][1], "l'origine")
         erreurs += err
-        self._donnees['code_int'][1], err = Outils.est_un_alphanumerique(self._donnees['code_int'][1], "le code INT")
+        self._donnees['code_int'][1], err = VerifFormat.est_un_alphanumerique(self._donnees['code_int'][1],
+                                                                              "le code INT")
         erreurs += err
-        self._donnees['code_ext'][1], err = Outils.est_un_alphanumerique(self._donnees['code_ext'][1], "le code EXT")
+        self._donnees['code_ext'][1], err = VerifFormat.est_un_alphanumerique(self._donnees['code_ext'][1],
+                                                                              "le code EXT")
         erreurs += err
-        self._donnees['commerciale'][1], err = Outils.est_un_alphanumerique(self._donnees['commerciale'][1], "le com.")
+        self._donnees['commerciale'][1], err = VerifFormat.est_un_alphanumerique(self._donnees['commerciale'][1],
+                                                                                 "le com.")
         erreurs += err
-        self._donnees['canal'][1], err = Outils.est_un_alphanumerique(self._donnees['canal'][1], "le canal")
+        self._donnees['canal'][1], err = VerifFormat.est_un_alphanumerique(self._donnees['canal'][1], "le canal")
         erreurs += err
-        self._donnees['secteur'][1], err = Outils.est_un_alphanumerique(self._donnees['secteur'][1], "le secteur")
+        self._donnees['secteur'][1], err = VerifFormat.est_un_alphanumerique(self._donnees['secteur'][1], "le secteur")
         erreurs += err
-        self._donnees['devise'][1], err = Outils.est_un_alphanumerique(self._donnees['devise'][1], "la devise")
+        self._donnees['devise'][1], err = VerifFormat.est_un_alphanumerique(self._donnees['devise'][1], "la devise")
         erreurs += err
-        self._donnees['lien'][1], err = Outils.est_un_chemin(self._donnees['lien'][1], "le lien")
+        self._donnees['lien'][1], err = VerifFormat.est_un_chemin(self._donnees['lien'][1], "le lien")
         erreurs += err
-        self._donnees['chemin'][1], err = Outils.est_un_chemin(self._donnees['chemin'][1], "le chemin")
+        self._donnees['chemin'][1], err = VerifFormat.est_un_chemin(self._donnees['chemin'][1], "le chemin")
         erreurs += err
-        self._donnees['chemin_filigrane'][1], err = Outils.est_un_chemin(self._donnees['chemin_filigrane'][1],
-                                                                         "le chemin filigrane")
+        self._donnees['chemin_filigrane'][1], err = VerifFormat.est_un_chemin(self._donnees['chemin_filigrane'][1],
+                                                                              "le chemin filigrane")
         erreurs += err
 
         modes = []
         for mode in self._donnees['modes'][1:]:
-            mode, err = Outils.est_un_alphanumerique(mode, "le mode d'envoi", vide=True)
-            modes.append(modes)
+            mode, err = VerifFormat.est_un_alphanumerique(mode, "le mode d'envoi", vide=True)
+            modes.append(mode)
             erreurs += err
         self._donnees['modes'][1:] = modes
 

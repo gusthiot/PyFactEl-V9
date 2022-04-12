@@ -1,4 +1,3 @@
-import sys
 from imports import Edition
 from imports.constants import (ArticleSap,
                                Categorie,
@@ -27,47 +26,52 @@ from core import (Outils, ErreurConsistance, DossierSource)
 
 
 class ImportD(object):
+    """
+    Classe pour l'importation des données nécessaires au module D
+    """
 
     def __init__(self, dossier_source):
+        """
+        initialisation et importation des données
+        :param dossier_source: Une instance de la classe dossier.DossierSource
+        """
 
-        self.generaux = Generaux(dossier_source)
-
-        self.edition = Edition(dossier_source)
         self.paramtexte = Paramtexte(dossier_source)
-
-        self.acces = Acces(dossier_source)
-        self.categories = Categorie(dossier_source)
-        self.categprix = CategPrix(dossier_source)
-        self.clients = Client(dossier_source)
-        self.coefprests = CoefPrest(dossier_source)
-        self.comptes = Compte(dossier_source)
-        self.livraisons = Livraison(dossier_source)
-        self.machines = Machine(dossier_source)
-        self.groupes = Groupe(dossier_source)
-        self.noshows = NoShow(dossier_source)
-        self.plafonds = PlafSubside(dossier_source)
-        self.plateformes = Plateforme(dossier_source)
-        self.prestations = Prestation(dossier_source)
-        self.subsides = Subside(dossier_source)
-        self.cles = CleSubside(dossier_source)
-        self.users = User(dossier_source)
+        self.generaux = Generaux(dossier_source)
         self.classes = ClasseClient(dossier_source)
+        self.clients = Client(dossier_source, self.generaux, self.classes)
+        self.plateformes = Plateforme(dossier_source, self.clients)
         self.artsap = ArticleSap(dossier_source)
-        self.services = Service(dossier_source)
-        self.dossier_source = dossier_source
+        self.edition = Edition(dossier_source, self.plateformes)
+        self.categories = Categorie(dossier_source, self.artsap, self.plateformes)
+        self.groupes = Groupe(dossier_source, self.categories)
+        self.machines = Machine(dossier_source, self.groupes, self.edition)
+        self.subsides = Subside(dossier_source)
+        self.plafonds = PlafSubside(dossier_source, self.subsides, self.artsap, self.plateformes)
+        self.cles = CleSubside(dossier_source, self.clients, self.machines, self.classes, self.subsides)
+        self.comptes = Compte(dossier_source, self.clients, self.subsides)
+        self.users = User(dossier_source)
+        self.categprix = CategPrix(dossier_source, self.classes, self.categories)
+        self.coefprests = CoefPrest(dossier_source, self.classes, self.artsap)
+        self.prestations = Prestation(dossier_source, self.artsap, self.coefprests, self.plateformes, self.machines,
+                                      self.edition)
 
-        if self._verification_coherence_1() > 0:
-            sys.exit("Erreur dans la cohérence")
-
-        plateforme = self.plateformes.donnees[self.edition.plateforme]
+        self.plateforme = self.plateformes.donnees[self.edition.plateforme]
 
         if self.edition.filigrane != "":
             chemin = self.generaux.chemin_filigrane
         else:
             chemin = self.generaux.chemin
-        self.dossier_enregistrement = Outils.chemin([chemin, plateforme['abrev_plat'], self.edition.annee,
+        self.dossier_enregistrement = Outils.chemin([chemin, self.plateforme['abrev_plat'], self.edition.annee,
                                                      Outils.mois_string(self.edition.mois)], self.generaux)
+
         Outils.existe(self.dossier_enregistrement, True)
+        self.acces = Acces(dossier_source, self.comptes, self.machines, self.users)
+        self.noshows = NoShow(dossier_source, self.comptes, self.machines, self.users)
+        self.livraisons = Livraison(dossier_source, self.comptes, self.prestations, self.users)
+        self.services = Service(dossier_source, self.comptes, self.categories, self.users)
+
+        self.dossier_source = dossier_source
 
         if self.edition.mois > 1:
             annee_p = self.edition.annee
@@ -75,18 +79,21 @@ class ImportD(object):
         else:
             annee_p = self.edition.annee-1
             mois_p = 12
-        self.dossier_precedent = Outils.chemin([self.generaux.chemin, plateforme['abrev_plat'], annee_p, mois_p, "V0",
+        self.dossier_precedent = Outils.chemin([self.generaux.chemin, self.plateforme['abrev_plat'], annee_p, mois_p, "V0",
                                                 "OUT"], self.generaux)
         if not Outils.existe(self.dossier_precedent, False):
             Outils.fatal(ErreurConsistance(), "le dossier " + self.dossier_precedent + " se doit d'être présent !")
 
-        self.grants = Granted(DossierSource(self.dossier_precedent), self.edition)
-        self.userlabs = UserLabo(DossierSource(self.dossier_precedent), self.edition)
-
-        if self._verification_coherence_2() > 0:
-            sys.exit("Erreur dans la cohérence")
+        self.grants = Granted(DossierSource(self.dossier_precedent), self.edition, self.comptes, self.artsap,
+                              self.plateformes)
+        self.userlabs = UserLabo(DossierSource(self.dossier_precedent), self.edition, self.plateformes, self.clients,
+                                 self.users)
 
     def copie_fixes(self, dossier_destination):
+        """
+        copie des fichiers fixes de base vers la destination de sauvegarde
+        :param dossier_destination: Une instance de la classe dossier.DossierDestination
+        """
         for fichier in [self.paramtexte, self.generaux, self.classes, self.plateformes, self.artsap, self.categories,
                         self.groupes, self.machines, self.categprix, self.coefprests, self.prestations]:
             dossier_destination.ecrire(fichier.nom_fichier, self.dossier_source.lire(fichier.nom_fichier))
@@ -96,46 +103,10 @@ class ImportD(object):
                                        DossierSource(self.dossier_precedent).lire(fichier.nom_fichier))
 
     def copie_variables(self, dossier_destination):
+        """
+        copie des fichiers variables de base vers la destination de sauvegarde
+        :param dossier_destination: Une instance de la classe dossier.DossierDestination
+        """
         for fichier in [self.clients, self.subsides, self.plafonds, self.cles, self.comptes, self.users,
                         self.acces, self.noshows, self.livraisons, self.services]:
             dossier_destination.ecrire(fichier.nom_fichier, self.dossier_source.lire(fichier.nom_fichier))
-
-    def _verification_coherence_1(self):
-        """
-        vérifie la cohérence des premières données importées
-        :return: 0 si ok, sinon le nombre d'échecs à la vérification
-        """
-        verif = 0
-        verif += self.artsap.est_coherent()
-        verif += self.classes.est_coherent()
-        verif += self.clients.est_coherent(self.generaux, self.classes)
-        verif += self.plateformes.est_coherent(self.clients, self.dossier_source)
-        verif += self.edition.est_coherent(self.plateformes)
-
-        return verif
-
-    def _verification_coherence_2(self):
-        """
-        vérifie la cohérence des secondes données importées
-        :return: 0 si ok, sinon le nombre d'échecs à la vérification
-        """
-        verif = 0
-        verif += self.users.est_coherent()
-        verif += self.categories.est_coherent(self.artsap, self.plateformes)
-        verif += self.groupes.est_coherent(self.categories)
-        verif += self.machines.est_coherent(self.groupes)
-        verif += self.categprix.est_coherent(self.classes, self.categories)
-        verif += self.coefprests.est_coherent(self.classes, self.artsap)
-        verif += self.prestations.est_coherent(self.artsap, self.coefprests, self.plateformes, self.machines)
-        verif += self.subsides.est_coherent()
-        verif += self.plafonds.est_coherent(self.subsides, self.artsap, self.plateformes)
-        verif += self.cles.est_coherent(self.clients, self.machines, self.classes, self.subsides)
-        verif += self.comptes.est_coherent(self.clients, self.subsides)
-        verif += self.grants.est_coherent(self.comptes, self.artsap, self.plateformes)
-        verif += self.userlabs.est_coherent(self.plateformes, self.clients, self.users)
-        verif += self.acces.est_coherent(self.comptes, self.machines, self.users)
-        verif += self.noshows.est_coherent(self.comptes, self.machines, self.users)
-        verif += self.livraisons.est_coherent(self.comptes, self.prestations, self.users)
-        verif += self.services.est_coherent(self.comptes, self.categories, self.users)
-
-        return verif

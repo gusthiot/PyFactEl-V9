@@ -530,7 +530,7 @@ class Transactions3(object):
             valeur[self.cles[i]] = donnee[i]
         self.valeurs[unique] = valeur
 
-    def _csv(self, dossier_destination):
+    def csv(self, dossier_destination):
         """
         création du fichier csv à partir de la liste des noms de colonnes
         :param dossier_destination: Une instance de la classe dossier.DossierDestination

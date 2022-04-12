@@ -1,6 +1,7 @@
 from imports import Fichier
 from core import (Outils,
-                  ErreurCoherence)
+                  VerifFormat,
+                  ErreurConsistance)
 
 
 class Machine(Fichier):
@@ -12,43 +13,30 @@ class Machine(Fichier):
     nom_fichier = "machine.csv"
     libelle = "Machines"
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def contient_id(self, id_machine):
+    def __init__(self, dossier_source, groupes, edition):
         """
-        vérifie si une machine contient l'id donné
-        :param id_machine: id à vérifier
-        :return: 1 si id contenu, 0 sinon
+        initialisation et importation des données
+        :param dossier_source: Une instance de la classe dossier.DossierSource
+        :param groupes: groupes importés
+        :param edition: paramètres d'édition
         """
-        if self.verifie_coherence == 1:
-            if id_machine in self.donnees.keys():
-                return 1
-        else:
-            Outils.fatal(ErreurCoherence(),
-                         self.libelle + ": la consistance de " + self.nom_fichier +
-                         " doit être vérifiée avant d'en utiliser les données")
-        return 0
-
-    def est_coherent(self, groupes):
-        """
-        vérifie que les données du fichier importé sont cohérentes, et efface les colonnes mois et année
-        :param categories: catégories importées
-        :return: 1 s'il y a une erreur, 0 sinon
-        """
-
-        if self.verifie_coherence == 1:
-            print(self.libelle + ": cohérence déjà vérifiée")
-            return 0
+        super().__init__(dossier_source)
 
         del self.donnees[0]
         msg = ""
         ligne = 1
-        ids = []
         donnees_dict = {}
+        ids = []
 
         for donnee in self.donnees:
-            donnee['id_machine'], info = Outils.est_un_alphanumerique(donnee['id_machine'], "l'id machine", ligne)
+            donnee['mois'], info = VerifFormat.est_un_entier(donnee['mois'], "le mois ", ligne, 1, 12)
+            msg += info
+            donnee['annee'], info = VerifFormat.est_un_entier(donnee['annee'], "l'annee ", ligne, 2000, 2099)
+            msg += info
+            if donnee['mois'] != edition.mois or donnee['annee'] != edition.annee:
+                msg += "date incorrect ligne " + str(ligne) + "\n"
+
+            donnee['id_machine'], info = VerifFormat.est_un_alphanumerique(donnee['id_machine'], "l'id machine", ligne)
             msg += info
             if info == "":
                 if donnee['id_machine'] not in ids:
@@ -57,16 +45,12 @@ class Machine(Fichier):
                     msg += "l'id machine '" + donnee['id_machine'] + "' de la ligne " + str(ligne) +\
                            " n'est pas unique\n"
 
-            if donnee['id_groupe'] == "":
-                msg += "l'id groupe de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif groupes.contient_id(donnee['id_groupe']) == 0:
-                msg += "l'id groupe '" + donnee['id_groupe'] + "' de la ligne " + str(ligne) \
-                       + " n'est pas référencé\n"
+            msg += self._test_id_coherence(donnee['id_groupe'], "l'id groupe", ligne, groupes)
 
-            donnee['tx_rabais_hc'], info = Outils.est_un_nombre(donnee['tx_rabais_hc'], "le rabais heures creuses",
-                                                                ligne, min=0, max=100)
+            donnee['tx_rabais_hc'], info = VerifFormat.est_un_nombre(donnee['tx_rabais_hc'], "le rabais heures creuses",
+                                                                ligne, mini=0, maxi=100)
             msg += info
-            donnee['nom'], info = Outils.est_un_texte(donnee['nom'], "le nom machine", ligne)
+            donnee['nom'], info = VerifFormat.est_un_texte(donnee['nom'], "le nom machine", ligne)
             msg += info
 
             del donnee['annee']
@@ -75,10 +59,6 @@ class Machine(Fichier):
             ligne += 1
 
         self.donnees = donnees_dict
-        self.verifie_coherence = 1
 
         if msg != "":
-            msg = self.libelle + "\n" + msg
-            Outils.affiche_message(msg)
-            return 1
-        return 0
+            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

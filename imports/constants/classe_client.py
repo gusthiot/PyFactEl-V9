@@ -1,6 +1,7 @@
 from imports import Fichier
 from core import (Outils,
-                  ErreurCoherence)
+                  VerifFormat,
+                  ErreurConsistance)
 
 
 class ClasseClient(Fichier):
@@ -12,32 +13,12 @@ class ClasseClient(Fichier):
     nom_fichier = "classeclient.csv"
     libelle = "Classes Clients"
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def contient_id(self, id_classe):
+    def __init__(self, dossier_source):
         """
-        vérifie si une classe contient l'id donné
-        :param id_classe: id à vérifier
-        :return: la classe si id contenu, None sinon
+        initialisation et importation des données
+        :param dossier_source: Une instance de la classe dossier.DossierSource
         """
-        if self.verifie_coherence == 1:
-            if id_classe in self.donnees.keys():
-                return self.donnees[id_classe]
-        else:
-            Outils.fatal(ErreurCoherence(),
-                         self.libelle + ": la consistance de " + self.nom_fichier +
-                         " doit être vérifiée avant d'en utiliser les données")
-
-    def est_coherent(self):
-        """
-        vérifie que les données du fichier importé sont cohérentes
-        :return: 1 s'il y a une erreur, 0 sinon
-        """
-
-        if self.verifie_coherence == 1:
-            print(self.libelle + ": cohérence déjà vérifiée")
-            return 0
+        super().__init__(dossier_source)
 
         del self.donnees[0]
         msg = ""
@@ -46,18 +27,19 @@ class ClasseClient(Fichier):
         ids = []
 
         for donnee in self.donnees:
-            donnee['id_classe'], info = Outils.est_un_alphanumerique(donnee['id_classe'], "l'id de classe", ligne)
+            donnee['id_classe'], info = VerifFormat.est_un_alphanumerique(donnee['id_classe'], "l'id classe client",
+                                                                          ligne)
             msg += info
             if info == "":
                 if donnee['id_classe'] not in ids:
                     ids.append(donnee['id_classe'])
                 else:
-                    msg += "l'id de classe '" + donnee['id_classe'] + "' de la ligne " + str(ligne) +\
+                    msg += "l'id classe client '" + donnee['id_classe'] + "' de la ligne " + str(ligne) + \
                            " n'est pas unique\n"
 
-            donnee['code_n'], info = Outils.est_un_alphanumerique(donnee['code_n'], "le code N", ligne)
+            donnee['code_n'], info = VerifFormat.est_un_alphanumerique(donnee['code_n'], "le code N", ligne)
             msg += info
-            donnee['intitule'], info = Outils.est_un_texte(donnee['intitule'], "l'intitulé", ligne)
+            donnee['intitule'], info = VerifFormat.est_un_texte(donnee['intitule'], "l'intitulé", ligne)
             msg += info
             if donnee['ref_fact'] != 'INT' and donnee['ref_fact'] != 'EXT':
                 msg += "le code référence client de la ligne " + str(ligne) + " doit être INT ou EXT\n"
@@ -74,10 +56,6 @@ class ClasseClient(Fichier):
             ligne += 1
 
         self.donnees = donnees_dict
-        self.verifie_coherence = 1
 
         if msg != "":
-            msg = self.libelle + "\n" + msg
-            Outils.affiche_message(msg)
-            return 1
-        return 0
+            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

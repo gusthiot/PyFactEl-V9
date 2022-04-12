@@ -1,6 +1,7 @@
 from imports import Fichier
 from core import (Outils,
-                  ErreurCoherence)
+                  VerifFormat,
+                  ErreurConsistance)
 
 
 class CoefPrest(Fichier):
@@ -12,61 +13,35 @@ class CoefPrest(Fichier):
     nom_fichier = "coeffprestation.csv"
     libelle = "Coefficients Prestations"
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def contient_article(self, id_article):
+    def __init__(self, dossier_source, classes, artsap):
         """
-        vérifie si l'id de l'article SAP est présent
-        :param id_article: l'id article à vérifier
-        :return: 1 si présente, 0 sinon
-        """
-        if self.verifie_coherence == 1:
-            for cle, coefprest in self.donnees.items():
-                if coefprest['id_article'] == id_article:
-                    return 1
-        else:
-            Outils.fatal(ErreurCoherence(),
-                         self.libelle + ": la consistance de " + self.nom_fichier +
-                         " doit être vérifiée avant d'en utiliser les données")
-        return 0
-
-    def est_coherent(self, classes, artsap):
-        """
-        vérifie que les données du fichier importé sont cohérentes (si couple catégorie - classe de tarif est unique),
-        et efface les colonnes mois et année
+        initialisation et importation des données
+        :param dossier_source: Une instance de la classe dossier.DossierSource
         :param classes: classes clients importées
         :param artsap: articles SAP importés
-        :return: 1 s'il y a une erreur, 0 sinon
         """
-
-        if self.verifie_coherence == 1:
-            print(self.libelle + ": cohérence déjà vérifiée")
-            return 0
-
-        msg = ""
-        ligne = 1
-        articles = []
-        couples = []
-        donnees_dict = {}
-        clas = []
+        super().__init__(dossier_source)
 
         del self.donnees[0]
-        for donnee in self.donnees:
-            if donnee['id_classe'] == "":
-                msg += "l'id classe client de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif not classes.contient_id(donnee['id_classe']):
-                msg += "l'id classe client de la ligne " + str(ligne) + " n'existe pas dans les codes N\n"
-            elif donnee['id_classe'] not in clas:
-                if donnee['id_classe'] not in clas:
-                    clas.append(donnee['id_classe'])
+        msg = ""
+        ligne = 1
+        donnees_dict = {}
+        articles = []
+        couples = []
+        clas = []
 
-            if donnee['id_article'] == "":
-                msg += "l'id article SAP de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif not artsap.contient_id(donnee['id_article']):
-                msg += "l'id article SAP de la ligne " + str(ligne) + " n'existe pas dans les codes D\n"
-            elif donnee['id_article'] not in articles:
+        for donnee in self.donnees:
+            info = self._test_id_coherence(donnee['id_classe'], "l'id classe client", ligne, classes)
+            if info == "" and donnee['id_classe'] not in clas:
+                clas.append(donnee['id_classe'])
+            else:
+                msg += info
+
+            info = self._test_id_coherence(donnee['id_article'], "l'id article SAP", ligne, artsap)
+            if info == "" and donnee['id_article'] not in articles:
                 articles.append(donnee['id_article'])
+            else:
+                msg += info
 
             couple = [donnee['id_article'], donnee['id_classe']]
             if couple not in couples:
@@ -75,14 +50,14 @@ class CoefPrest(Fichier):
                 msg += "Couple id article SAP '" + donnee['id_article'] + "' et id classe client '" + \
                        donnee['id_classe'] + "' de la ligne " + str(ligne) + " pas unique\n"
 
-            donnee['coefficient'], info = Outils.est_un_nombre(donnee['coefficient'], "le coefficient", ligne, 2, 0)
+            donnee['coefficient'], info = VerifFormat.est_un_nombre(donnee['coefficient'], "le coefficient", ligne, 2,
+                                                                    0)
             msg += info
 
             donnees_dict[donnee['id_classe'] + donnee['id_article']] = donnee
             ligne += 1
 
         self.donnees = donnees_dict
-        self.verifie_coherence = 1
 
         for id_article in artsap.ids_d3:
             if id_article not in articles:
@@ -102,7 +77,15 @@ class CoefPrest(Fichier):
                            id_classe + "' n'existe pas\n"
 
         if msg != "":
-            msg = self.libelle + "\n" + msg
-            Outils.affiche_message(msg)
-            return 1
-        return 0
+            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)
+
+    def contient_article(self, id_article):
+        """
+        vérifie si l'id de l'article SAP est présent
+        :param id_article: l'id article à vérifier
+        :return: True si présente, False sinon
+        """
+        for cle, coefprest in self.donnees.items():
+            if coefprest['id_article'] == id_article:
+                return True
+        return False

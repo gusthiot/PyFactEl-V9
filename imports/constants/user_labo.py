@@ -1,5 +1,6 @@
 from imports import Fichier
-from core import Outils
+from core import (Outils,
+                  ErreurConsistance)
 
 
 class UserLabo(Fichier):
@@ -11,56 +12,37 @@ class UserLabo(Fichier):
             'client-class', 'user-id', 'user-sciper', 'user-name', 'user-first']
     libelle = "User labo"
 
-    def __init__(self, dossier_source, edition):
+    def __init__(self, dossier_source, edition, plateformes, clients, users):
+        """
+        initialisation et importation des données
+        :param dossier_source: Une instance de la classe dossier.DossierSource
+        :param edition: paramètres d'édition
+        :param plateformes: plateformes importées
+        :param clients: clients importés
+        :param users: users importés
+        """
         if edition.mois > 1:
             self.nom_fichier = "User-labo_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois-1) + ".csv"
         else:
             self.nom_fichier = "User-labo_" + str(edition.annee-1) + "_" + Outils.mois_string(12) + ".csv"
         super().__init__(dossier_source)
 
-    def est_coherent(self, plateformes, clients, users):
-        """
-        vérifie que les données du fichier importé sont cohérentes
-        :param plateformes: plateformes importées
-        :param clients: clients importés
-        :param users: users importés
-        :return: 1 s'il y a une erreur, 0 sinon
-        """
-
-        if self.verifie_coherence == 1:
-            print(self.libelle + ": cohérence déjà vérifiée")
-            return 0
-
+        del self.donnees[0]
         msg = ""
         ligne = 1
         donnees_list = []
 
-        del self.donnees[0]
         for donnee in self.donnees:
-            if donnee['platf-code'] == "":
-                msg += "l'id plateforme de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif plateformes.contient_id(donnee['platf-code']) == 0:
-                msg += "l'id plateforme '" + donnee['platf-code'] + "' de la ligne " + str(ligne) \
-                       + " n'est pas référencé\n"
-            if donnee['client-code'] == "":
-                msg += "le code client de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif donnee['client-code'] not in clients.donnees:
-                msg += "le code client " + donnee['client-code'] + " de la ligne " + str(ligne) + \
-                       " n'est pas référencé\n"
-            if donnee['user-id'] == "":
-                msg += "le user id de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif users.contient_id(donnee['user-id']) == 0:
-                msg += "le user id '" + donnee['user-id'] + "' de la ligne " + str(ligne) \
-                       + " n'est pas référencé\n"
+            msg += self._test_id_coherence(donnee['platf-code'], "l'id plateforme", ligne, plateformes)
+
+            msg += self._test_id_coherence(donnee['client-code'], "le code client", ligne, clients)
+
+            msg += self._test_id_coherence(donnee['user-id'], "l'id user", ligne, users)
 
             donnees_list.append(donnee)
             ligne += 1
 
         self.donnees = donnees_list
-        self.verifie_coherence = 1
 
         if msg != "":
-            msg = self.libelle + "\n" + msg
-            Outils.affiche_message(msg)
-            return 1
-        return 0
+            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

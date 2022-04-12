@@ -1,6 +1,7 @@
 from imports import Fichier
 from core import (Outils,
-                  ErreurCoherence)
+                  VerifFormat,
+                  ErreurConsistance)
 
 
 class Subside(Fichier):
@@ -12,56 +13,35 @@ class Subside(Fichier):
     cles = ['type', 'intitule', 'debut', 'fin']
     libelle = "Subsides"
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def contient_type(self, ty):
+    def __init__(self, dossier_source):
         """
-        vérifie si un subside contient le type donné
-        :param ty: type à vérifier
-        :return: 1 si id contenu, 0 sinon
+        initialisation et importation des données
+        :param dossier_source: Une instance de la classe dossier.DossierSource
         """
-        if self.verifie_coherence == 1:
-            if ty in self.donnees.keys():
-                return 1
-        else:
-            Outils.fatal(ErreurCoherence(),
-                         self.libelle + ": la consistance de " + self.nom_fichier +
-                         " doit être vérifiée avant d'en utiliser les données")
-        return 0
+        super().__init__(dossier_source)
 
-    def est_coherent(self):
-        """
-        vérifie que les données du fichier importé sont cohérentes
-        :return: 1 s'il y a une erreur, 0 sinon
-        """
-
-        if self.verifie_coherence == 1:
-            print(self.libelle + ": cohérence déjà vérifiée")
-            return 0
-
+        del self.donnees[0]
         msg = ""
         ligne = 1
         donnees_dict = {}
         types = []
 
-        del self.donnees[0]
         for donnee in self.donnees:
-            donnee['type'], info = Outils.est_un_alphanumerique(donnee['type'], "le type subside", ligne)
+            donnee['type'], info = VerifFormat.est_un_alphanumerique(donnee['type'], "le type subside", ligne)
             msg += info
             if info == "":
                 if donnee['type'] not in types:
                     types.append(donnee['type'])
                 else:
                     msg += "le type de la ligne " + str(ligne) + " n'est pas unique\n"
-            donnee['intitule'], info = Outils.est_un_texte(donnee['intitule'], "l'intitulé", ligne)
+            donnee['intitule'], info = VerifFormat.est_un_texte(donnee['intitule'], "l'intitulé", ligne)
             msg += info
 
             if donnee['debut'] != 'NULL':
-                donnee['debut'], info = Outils.est_une_date(donnee['debut'], "la date de début", ligne)
+                donnee['debut'], info = VerifFormat.est_une_date(donnee['debut'], "la date de début", ligne)
                 msg += info
             if donnee['fin'] != 'NULL':
-                donnee['fin'], info = Outils.est_une_date(donnee['fin'], "la date de fin", ligne)
+                donnee['fin'], info = VerifFormat.est_une_date(donnee['fin'], "la date de fin", ligne)
                 msg += info
             if donnee['debut'] != 'NULL' and donnee['fin'] != 'NULL':
                 if donnee['debut'] > donnee['fin']:
@@ -72,10 +52,6 @@ class Subside(Fichier):
             ligne += 1
 
         self.donnees = donnees_dict
-        self.verifie_coherence = 1
 
         if msg != "":
-            msg = self.libelle + "\n" + msg
-            Outils.affiche_message(msg)
-            return 1
-        return 0
+            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

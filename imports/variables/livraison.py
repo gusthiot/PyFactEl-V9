@@ -1,5 +1,7 @@
 from imports import Fichier
-from core import Outils
+from core import (Outils,
+                  VerifFormat,
+                  ErreurConsistance)
 
 
 class Livraison(Fichier):
@@ -12,21 +14,15 @@ class Livraison(Fichier):
     nom_fichier = "lvr.csv"
     libelle = "Livraison Prestations"
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def est_coherent(self, comptes, prestations, users):
+    def __init__(self, dossier_source, comptes, prestations, users):
         """
-        vérifie que les données du fichier importé sont cohérentes, et efface les colonnes mois et année
+        initialisation et importation des données
+        :param dossier_source: Une instance de la classe dossier.DossierSource
         :param comptes: comptes importés
         :param prestations: prestations importées
         :param users: users importés
-        :return: 1 s'il y a une erreur, 0 sinon
         """
-
-        if self.verifie_coherence == 1:
-            print(self.libelle + ": cohérence déjà vérifiée")
-            return 0
+        super().__init__(dossier_source)
 
         del self.donnees[0]
         msg = ""
@@ -35,50 +31,38 @@ class Livraison(Fichier):
         coms = []
 
         for donnee in self.donnees:
-            donnee['mois'], info = Outils.est_un_entier(donnee['mois'], "le mois ", ligne, 1, 12)
+            donnee['mois'], info = VerifFormat.est_un_entier(donnee['mois'], "le mois ", ligne, 1, 12)
             msg += info
-            donnee['annee'], info = Outils.est_un_entier(donnee['annee'], "l'annee ", ligne, 2000, 2099)
+            donnee['annee'], info = VerifFormat.est_un_entier(donnee['annee'], "l'annee ", ligne, 2000, 2099)
             msg += info
 
-            if donnee['id_compte'] == "":
-                msg += "le compte id de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif comptes.contient_id(donnee['id_compte']) == 0:
-                msg += "le compte id '" + donnee['id_compte'] + "' de la ligne " + str(ligne) + " n'est pas référencé\n"
-            elif donnee['id_compte'] not in coms:
+            info = self._test_id_coherence(donnee['id_compte'], "l'id compte", ligne, comptes)
+            if info == "" and donnee['id_compte'] not in coms:
                 coms.append(donnee['id_compte'])
+            else:
+                msg += info
 
-            if donnee['id_prestation'] == "":
-                msg += "le prestation id de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif prestations.contient_id(donnee['id_prestation']) == 0:
-                msg += "le prestation id '" + donnee['id_prestation'] + "' de la ligne " + str(ligne) +\
-                       " n'est pas référencé\n"
+            msg += self._test_id_coherence(donnee['id_prestation'], "l'id prestation", ligne, prestations)
 
-            if donnee['id_user'] == "":
-                msg += "le user id de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif users.contient_id(donnee['id_user']) == 0:
-                msg += "le user id '" + donnee['id_user'] + "' de la ligne " + str(ligne) \
-                       + " n'est pas référencé\n"
+            msg += self._test_id_coherence(donnee['id_user'], "l'id user", ligne, users)
 
-            if donnee['id_operateur'] == "":
-                msg += "l'id opérateur de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif users.contient_id(donnee['id_operateur']) == 0:
-                msg += "l'id opérateur '" + donnee['id_operateur'] + "' de la ligne " + str(ligne) \
-                       + " n'est pas référencé\n"
+            msg += self._test_id_coherence(donnee['id_operateur'], "l'id opérateur", ligne, users)
 
-            donnee['quantite'], info = Outils.est_un_nombre(donnee['quantite'], "la quantité", ligne, 1, 0)
+            donnee['quantite'], info = VerifFormat.est_un_nombre(donnee['quantite'], "la quantité", ligne, 1, 0)
             msg += info
-            donnee['rabais'], info = Outils.est_un_nombre(donnee['rabais'], "le rabais", ligne, 2, 0)
+            donnee['rabais'], info = VerifFormat.est_un_nombre(donnee['rabais'], "le rabais", ligne, 2, 0)
             msg += info
 
-            donnee['date_livraison'], info = Outils.est_une_date(donnee['date_livraison'], "la date de livraison",
-                                                                 ligne)
+            donnee['date_livraison'], info = VerifFormat.est_une_date(donnee['date_livraison'], "la date de livraison",
+                                                                      ligne)
             msg += info
-            donnee['date_commande'], info = Outils.est_une_date(donnee['date_commande'], "la date de commande", ligne)
+            donnee['date_commande'], info = VerifFormat.est_une_date(donnee['date_commande'], "la date de commande",
+                                                                     ligne)
             msg += info
 
-            donnee['id_livraison'], info = Outils.est_un_texte(donnee['id_livraison'], "l'id livraison", ligne)
+            donnee['id_livraison'], info = VerifFormat.est_un_texte(donnee['id_livraison'], "l'id livraison", ligne)
             msg += info
-            donnee['remarque'], info = Outils.est_un_texte(donnee['remarque'], "la remarque", ligne, True)
+            donnee['remarque'], info = VerifFormat.est_un_texte(donnee['remarque'], "la remarque", ligne, True)
             msg += info
 
             donnees_list.append(donnee)
@@ -86,10 +70,5 @@ class Livraison(Fichier):
             ligne += 1
 
         self.donnees = donnees_list
-        self.verifie_coherence = 1
-
         if msg != "":
-            msg = self.libelle + "\n" + msg
-            Outils.affiche_message(msg)
-            return 1
-        return 0
+            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

@@ -1,4 +1,5 @@
 from core import (Outils,
+                  VerifFormat,
                   ErreurConsistance)
 
 
@@ -46,7 +47,6 @@ class Paramtexte(object):
     def __init__(self, dossier_source):
         """
         initialisation et importation des données
-
         :param dossier_source: Une instance de la classe dossier.DossierSource
         """
         fichier_reader = dossier_source.reader(self.nom_fichier)
@@ -60,11 +60,11 @@ class Paramtexte(object):
                 if ligne[0] in labels:
                     Outils.fatal(ErreurConsistance(), self.libelle + ": le label '" + ligne[0] + "' n'est pas unique\n")
 
-                ligne[0], err = Outils.est_un_alphanumerique(ligne[0], "le label", chevrons=True)
+                ligne[0], err = VerifFormat.est_un_alphanumerique(ligne[0], "le label", chevrons=True)
                 if err != "":
                     Outils.fatal(ErreurConsistance(), self.libelle + ": " + err)
 
-                ligne[1], err = Outils.est_un_texte(ligne[1], "l'entête")
+                ligne[1], err = VerifFormat.est_un_texte(ligne[1], "l'entête")
                 if err != "":
                     Outils.fatal(ErreurConsistance(), self.libelle + ": pour le label '" + ligne[0] + "', " + err)
 

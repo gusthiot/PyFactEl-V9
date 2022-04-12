@@ -1,6 +1,7 @@
 from imports import Fichier
 from core import (Outils,
-                  ErreurCoherence)
+                  VerifFormat,
+                  ErreurConsistance)
 
 
 class User(Fichier):
@@ -12,35 +13,12 @@ class User(Fichier):
     nom_fichier = "user.csv"
     libelle = "Users"
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def contient_id(self, id_user):
+    def __init__(self, dossier_source):
         """
-        vérifie si un user contient l'id donné
-        :param id_user: id à vérifier
-        :return: 1 si id contenu, 0 sinon
+        initialisation et importation des données
+        :param dossier_source: Une instance de la classe dossier.DossierSource
         """
-        ligne = 1
-        if self.verifie_coherence == 1:
-            for cle, user in self.donnees.items():
-                if user['id_user'] == id_user:
-                    return ligne
-                ligne += 1
-        else:
-            Outils.fatal(ErreurCoherence(),
-                         self.libelle + ": la consistance de " + self.nom_fichier +
-                         " doit être vérifiée avant d'en utiliser les données")
-        return 0
-
-    def est_coherent(self):
-        """
-        vérifie que les données du fichier importé sont cohérentes, et efface les colonnes mois et année
-        :return: 1 s'il y a une erreur, 0 sinon
-        """
-        if self.verifie_coherence == 1:
-            print(self.libelle + ": cohérence déjà vérifiée")
-            return 0
+        super().__init__(dossier_source)
 
         del self.donnees[0]
         msg = ""
@@ -50,7 +28,7 @@ class User(Fichier):
         # scipers = []
 
         for donnee in self.donnees:
-            donnee['id_user'], info = Outils.est_un_alphanumerique(donnee['id_user'], "l'id user", ligne)
+            donnee['id_user'], info = VerifFormat.est_un_alphanumerique(donnee['id_user'], "l'id user", ligne)
             msg += info
             if donnee['id_user'] == "":
                 msg += "l'id user de la ligne " + str(ligne) + " ne peut être vide\n"
@@ -60,7 +38,7 @@ class User(Fichier):
                 msg += "l'id user '" + donnee['id_user'] + "' de la ligne " + str(ligne) +\
                        " n'est pas unique\n"
 
-            donnee['sciper'], info = Outils.est_un_alphanumerique(donnee['sciper'], "le sciper", ligne)
+            donnee['sciper'], info = VerifFormat.est_un_alphanumerique(donnee['sciper'], "le sciper", ligne)
             msg += info
             # if donnee['sciper'] == "":
             #     msg += "le sciper de la ligne " + str(ligne) + " ne peut être vide\n"
@@ -70,19 +48,15 @@ class User(Fichier):
             #     msg += "le sciper '" + donnee['sciper'] + "' de la ligne " + str(ligne) +\
             #            " n'est pas unique\n"
 
-            donnee['nom'], info = Outils.est_un_texte(donnee['nom'], "le nom", ligne)
+            donnee['nom'], info = VerifFormat.est_un_texte(donnee['nom'], "le nom", ligne)
             msg += info
-            donnee['prenom'], info = Outils.est_un_texte(donnee['prenom'], "le prénom", ligne)
+            donnee['prenom'], info = VerifFormat.est_un_texte(donnee['prenom'], "le prénom", ligne)
             msg += info
 
             donnees_dict[donnee['id_user']] = donnee
             ligne += 1
 
         self.donnees = donnees_dict
-        self.verifie_coherence = 1
 
         if msg != "":
-            msg = self.libelle + "\n" + msg
-            Outils.affiche_message(msg)
-            return 1
-        return 0
+            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

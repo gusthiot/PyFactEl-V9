@@ -15,24 +15,21 @@ class Fichier(object):
     def __init__(self, dossier_source):
         """
         initialisation et importation des données
-
         :param dossier_source: Une instance de la classe dossier.DossierSource
         """
         try:
             fichier_reader = dossier_source.reader(self.nom_fichier)
             donnees_csv = []
             for ligne in fichier_reader:
-                donnees_ligne = self.extraction_ligne(ligne)
+                donnees_ligne = self._extraction_ligne(ligne)
                 if donnees_ligne == -1:
                     continue
                 donnees_csv.append(donnees_ligne)
             self.donnees = donnees_csv
-            self.verifie_date = 0
-            self.verifie_coherence = 0
         except IOError as e:
             Outils.fatal(e, "impossible d'ouvrir le fichier : "+self.nom_fichier)
 
-    def extraction_ligne(self, ligne):
+    def _extraction_ligne(self, ligne):
         """
         extracte une ligne de données du csv
         :param ligne: ligne lue du fichier
@@ -47,3 +44,15 @@ class Fichier(object):
         for xx in range(0, num):
             donnees_ligne[self.cles[xx]] = ligne[xx]
         return donnees_ligne
+
+    @staticmethod
+    def _test_id_coherence(donnee, nom, ligne, corpus, zero=False):
+        msg = ""
+        if donnee == "":
+            msg += nom + " de la ligne " + str(ligne) + " ne peut être vide\n"
+        elif (not zero or donnee != "0") and donnee not in corpus.donnees.keys():
+            msg += nom + " '" + donnee + "' de la ligne " + str(ligne) + " n'est pas référencé"
+            if zero:
+                msg += " ni égal à 0"
+            msg += "\n"
+        return msg

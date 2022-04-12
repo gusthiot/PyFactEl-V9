@@ -1,5 +1,7 @@
 from imports import Fichier
-from core import Outils
+from core import (Outils,
+                  VerifFormat,
+                  ErreurConsistance)
 
 
 class CategPrix(Fichier):
@@ -11,21 +13,16 @@ class CategPrix(Fichier):
     cles = ['id_classe', 'id_categorie', 'prix_unit']
     libelle = "Catégories Prix"
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def est_coherent(self, classes, categories):
+    def __init__(self, dossier_source, classes, categories):
         """
-        vérifie que les données du fichier importé sont cohérentes
+        initialisation et importation des données
+        :param dossier_source: Une instance de la classe dossier.DossierSource
         :param classes: classes clients importées
         :param categories: catégories importées
-        :return: 1 s'il y a une erreur, 0 sinon
         """
+        super().__init__(dossier_source)
 
-        if self.verifie_coherence == 1:
-            print(self.libelle + ": cohérence déjà vérifiée")
-            return 0
-
+        del self.donnees[0]
         msg = ""
         ligne = 1
         donnees_dict = {}
@@ -33,21 +30,18 @@ class CategPrix(Fichier):
         couples = []
         ids = []
 
-        del self.donnees[0]
         for donnee in self.donnees:
-            if donnee['id_classe'] == "":
-                msg += "l'id de classe client de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif not classes.contient_id(donnee['id_classe']):
-                msg += "l'id de classe client de la ligne " + str(ligne) + " n'existe pas dans les codes N\n"
-            elif donnee['id_classe'] not in clas:
+            info = self._test_id_coherence(donnee['id_classe'], "l'id classe client", ligne, classes)
+            if info == "" and donnee['id_classe'] not in clas:
                 clas.append(donnee['id_classe'])
+            else:
+                msg += info
 
-            if donnee['id_categorie'] == "":
-                msg += "l'id catégorie " + str(ligne) + " ne peut être vide\n"
-            elif categories.contient_id(donnee['id_categorie']) == 0:
-                msg += "l'id catégorie de la ligne " + str(ligne) + " n'existe pas dans les catégories \n"
-            elif donnee['id_categorie'] not in ids:
+            info = self._test_id_coherence(donnee['id_categorie'], "l'id catégorie", ligne, categories)
+            if info == "" and donnee['id_categorie'] not in ids:
                 ids.append(donnee['id_categorie'])
+            else:
+                msg += info
 
             if (donnee['id_categorie'] != "") and (donnee['id_classe'] != ""):
                 couple = [donnee['id_categorie'], donnee['id_classe']]
@@ -57,14 +51,13 @@ class CategPrix(Fichier):
                     msg += "Couple id catégorie '" + donnee['id_categorie'] + "' et id classe '" + \
                            donnee['id_classe'] + "' de la ligne " + str(ligne) + " pas unique\n"
 
-            donnee['prix_unit'], info = Outils.est_un_nombre(donnee['prix_unit'], "le prix unitaire ", ligne, 2)
+            donnee['prix_unit'], info = VerifFormat.est_un_nombre(donnee['prix_unit'], "le prix unitaire ", ligne, 2)
             msg += info
 
             donnees_dict[donnee['id_classe'] + donnee['id_categorie']] = donnee
             ligne += 1
 
         self.donnees = donnees_dict
-        self.verifie_coherence = 1
 
         for id_classe in classes.donnees.keys():
             if id_classe not in clas:
@@ -83,7 +76,4 @@ class CategPrix(Fichier):
                            classe + "' n'existe pas\n"
 
         if msg != "":
-            msg = self.libelle + "\n" + msg
-            Outils.affiche_message(msg)
-            return 1
-        return 0
+            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)
