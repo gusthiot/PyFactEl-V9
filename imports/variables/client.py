@@ -14,11 +14,11 @@ class Client(Fichier):
     nom_fichier = "client.csv"
     libelle = "Clients"
 
-    def __init__(self, dossier_source, generaux, classes):
+    def __init__(self, dossier_source, facturation, classes):
         """
         initialisation et importation des données
         :param dossier_source: Une instance de la classe dossier.DossierSource
-        :param generaux: paramètres généraux
+        :param facturation: paramètres de facturation
         :param classes: classes clients importées
         """
         super().__init__(dossier_source)
@@ -66,7 +66,7 @@ class Client(Fichier):
                         donnee['bh'] = 1
                         donnee['rh'] = 0
 
-            if (donnee['mode'] != "") and (donnee['mode'] not in generaux.obtenir_modes_envoi()):
+            if (donnee['mode'] != "") and (donnee['mode'] not in facturation.modes):
                 msg += "le mode d'envoi '" + donnee['mode'] + "' de la ligne " + str(ligne) +\
                     " n'existe pas dans les modes d'envoi généraux\n"
 

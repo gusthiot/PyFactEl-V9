@@ -159,32 +159,32 @@ class Outils(object):
             return "/"
 
     @staticmethod
-    def separateur_lien(texte, generaux):
+    def separateur_lien(texte, facturation):
         """
-        remplace le séparateur de chemin logique en fonction du lien donné dans les paramètres généraux
+        remplace le séparateur de chemin logique en fonction du lien donné dans les paramètres de facturation
         :param texte: texte à traiter
-        :param generaux: paramètres généraux
+        :param facturation: paramètres de facturation
         :return: séparateur, string
         """
-        if "\\" in generaux.lien:
-            if "/" in generaux.lien:
-                Outils.affiche_message("'/' et '\\' présents dans le lien des paramètres généraux !!! ")
+        if "\\" in facturation.lien:
+            if "/" in facturation.lien:
+                Outils.affiche_message("'/' et '\\' présents dans le lien des paramètres de facturation !!! ")
             texte = texte.replace("/", "\\")
         else:
             texte = texte.replace("\\", "/")
         return texte.replace("//", "/").replace("\\" + "\\", "\\")
 
     @staticmethod
-    def separateur_dossier(texte, generaux):
+    def separateur_dossier(texte, edition):
         """
-        remplace le séparateur de chemin logique en fonction du chemin donné dans les paramètres généraux
+        remplace le séparateur de chemin logique en fonction du chemin donné dans les paramètres d'édition
         :param texte: texte à traiter
-        :param generaux: paramètres généraux
+        :param edition: paramètres d'édition
         :return: séparateur, string
         """
-        if "\\" in generaux.chemin:
-            if "/" in generaux.chemin or "/" in generaux.chemin_filigrane:
-                Outils.affiche_message("'/' et '\\' présents dans les chemins des paramètres généraux !!! ")
+        if "\\" in edition.chemin:
+            if "/" in edition.chemin or "/" in edition.chemin_filigrane:
+                Outils.affiche_message("'/' et '\\' présents dans les chemins d'enregistrement' !!! ")
             texte = texte.replace("/", "\\")
             """
             if "\\" != Outils.separateur_os():
@@ -212,11 +212,11 @@ class Outils(object):
         return texte.replace("//", "/").replace("\\" + "\\", "\\")
 
     @staticmethod
-    def chemin(structure, generaux=None):
+    def chemin(structure, edition=None):
         """
         construit le chemin pour dossier/fichier
         :param structure: éléments du chemin
-        :param generaux: paramètres généraux
+        :param edition: paramètres d'édition
         :return: chemin logique complet pour dossier/fichier
         """
         chemin = ""
@@ -227,10 +227,10 @@ class Outils(object):
             else:
                 first = False
             chemin += str(element)
-        if generaux is None:
+        if edition is None:
             return Outils.eliminer_double_separateur(chemin)
         else:
-            return Outils.eliminer_double_separateur(Outils.separateur_dossier(chemin, generaux))
+            return Outils.eliminer_double_separateur(Outils.separateur_dossier(chemin, edition))
 
     @staticmethod
     def renommer_dossier(ancienne_structure, nouvelle_structure):
@@ -285,17 +285,17 @@ class Outils(object):
         return existe
 
     @staticmethod
-    def lien_dossier(structure, generaux):
+    def lien_dossier(structure, facturation):
         """
         construit le chemin pour enregistrer les données sans vérifier son existence
         :param structure: éléments du chemin
-        :param generaux: paramètres généraux
+        :param facturation: paramètres de facturation
         :return:chemin logique complet pour dossier
         """
         chemin = ""
         for element in structure:
             chemin += str(element) + Outils.separateur_os()
-        return Outils.eliminer_double_separateur(Outils.separateur_lien(chemin, generaux))
+        return Outils.eliminer_double_separateur(Outils.separateur_lien(chemin, facturation))
 
     @staticmethod
     def format_2_dec(nombre):

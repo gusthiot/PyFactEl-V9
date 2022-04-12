@@ -3,7 +3,7 @@ from .categorie import Categorie
 from .categprix import CategPrix
 from .classe_client import ClasseClient
 from .coefprest import CoefPrest
-from .generaux import Generaux
+from .facturation import Facturation
 from .granted import Granted
 from .groupe import Groupe
 from .machine import Machine

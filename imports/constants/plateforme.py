@@ -13,11 +13,13 @@ class Plateforme(Fichier):
     cles = ['id_plateforme', 'code_p', 'centre', 'fonds', 'abrev_plat', 'int_plat', 'grille']
     libelle = "Plateformes"
 
-    def __init__(self, dossier_source, clients):
+    def __init__(self, dossier_source, clients, edition, chemin_grille):
         """
         initialisation et importation des données
         :param dossier_source: Une instance de la classe dossier.DossierSource
         :param clients: clients importés
+        :param edition: paramètres d'édition
+        :param chemin_grille: dossier devant contenir la grille tarifaire
         """
         super().__init__(dossier_source)
 
@@ -55,7 +57,7 @@ class Plateforme(Fichier):
             donnee['grille'], info = VerifFormat.est_un_document(donnee['grille'], "la grille tarifaire", ligne, True)
             msg += info
             if donnee['grille'] != "":
-                if not Outils.existe(Outils.chemin([dossier_source.chemin, donnee['grille'] + '.pdf'])):
+                if not Outils.existe(Outils.chemin([chemin_grille, donnee['grille'] + '.pdf'])):
                     msg += "la grille de la ligne " + str(ligne) + " n'existe pas dans le dossier d'entrée \n"
 
             donnees_dict[donnee['id_plateforme']] = donnee
@@ -65,3 +67,7 @@ class Plateforme(Fichier):
 
         if msg != "":
             Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)
+
+        if edition.plateforme not in self.donnees.keys():
+            Outils.fatal(ErreurConsistance(),
+                         edition.libelle + "\n" + "l'id plateforme '" + edition.plateforme + "' n'est pas référencé\n")
