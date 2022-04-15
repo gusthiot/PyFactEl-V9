@@ -16,7 +16,7 @@ class Articles(CsvBase):
         initialisation des données
         :param imports: données importées
         """
-        super().__init__(imports.edition)
+        super().__init__(imports)
         self.nom = "article_" + str(imports.edition.annee) + "_" + Outils.mois_string(imports.edition.mois) + ".csv"
 
         for key in imports.categories.donnees.keys():

@@ -5,23 +5,20 @@ class CsvBase(object):
     Classe de base pour les fichiers csv récapitulatifs
     """
 
-    def __init__(self, edition):
+    def __init__(self, imports):
         """
         initialisation des données et stockage des paramètres d'édition
-        :param edition: paramètres d'édition
+        :param imports: données importées
         """
-        self.annee = edition.annee
-        self.mois = edition.mois
-        self.nom = ""
+        self.imports = imports
         self.valeurs = {}
 
-    def csv(self, dossier_destination, paramtexte):
+    def csv(self, dossier_destination):
         """
         création du fichier csv à partir de la liste des noms de colonnes
         :param dossier_destination: Une instance de la classe dossier.DossierDestination
-        :param paramtexte: paramètres textuels
         """
-        pt = paramtexte.donnees
+        pt = self.imports.paramtexte.donnees
 
         with dossier_destination.writer(self.nom) as fichier_writer:
             ligne = []
@@ -31,7 +28,7 @@ class CsvBase(object):
 
             for key in self.valeurs.keys():
                 valeur = self.valeurs[key]
-                ligne = [self.annee, self.mois]
+                ligne = [self.imports.edition.annee, self.imports.edition.mois]
                 for i in range(2, len(self.cles)):
                     ligne.append(valeur[self.cles[i]])
                 fichier_writer.writerow(ligne)

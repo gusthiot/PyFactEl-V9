@@ -1,4 +1,4 @@
-from core import (Outils)
+from core import Outils
 
 
 class Transactions3(object):
@@ -17,7 +17,7 @@ class Transactions3(object):
             'subsid-name', 'subsid-start', 'subsid-end', 'subsid-ok', 'subsid-pourcent', 'subsid-maxproj',
             'subsid-maxmois', 'subsid-reste', 'subsid-CHF', 'deduct-CHF', 'subsid-deduct', 'total-fact',
             'discount-bonus', 'subsid-bonus']
-    
+
     def __init__(self, imports, version, articles, tarifs):
         """
         initialisation des données

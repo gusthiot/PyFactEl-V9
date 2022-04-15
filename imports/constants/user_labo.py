@@ -1,5 +1,5 @@
 from imports import Fichier
-from core import (Outils,
+from core import (Outils, VerifFormat,
                   ErreurConsistance)
 
 
@@ -33,6 +33,11 @@ class UserLabo(Fichier):
         donnees_list = []
 
         for donnee in self.donnees:
+            donnee['year'], info = VerifFormat.est_un_entier(donnee['year'], "l'année", ligne, mini=2000, maxi=2099)
+            msg += info
+            donnee['month'], info = VerifFormat.est_un_entier(donnee['month'], "le mois", ligne, mini=1, maxi=12)
+            msg += info
+
             msg += self._test_id_coherence(donnee['platf-code'], "l'id plateforme", ligne, plateformes)
 
             msg += self._test_id_coherence(donnee['client-code'], "le code client", ligne, clients)

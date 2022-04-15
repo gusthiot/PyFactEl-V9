@@ -25,9 +25,9 @@ from imports.variables import (Acces,
 from core import (Outils, ErreurConsistance, DossierSource, DossierDestination)
 
 
-class ImportD(object):
+class Imports(object):
     """
-    Classe pour l'importation des données nécessaires au module D
+    Classe pour l'importation et la strcuturation des données
     """
 
     def __init__(self, dossier_source):
@@ -48,22 +48,32 @@ class ImportD(object):
                                                     Outils.mois_string(self.edition.mois)], self.edition)
         Outils.existe(self.chemin_enregistrement, True)
 
-        chemin_in = Outils.chemin([self.chemin_enregistrement, "IN"], self.edition)
+        self.chemin_in = Outils.chemin([self.chemin_enregistrement, "IN"], self.edition)
         self.version = 0
         while True:
             self.chemin_version = Outils.chemin([self.chemin_enregistrement, "V"+str(self.version)], self.edition)
-            if Outils.existe(self.chemin_version, True):
+            if Outils.existe(self.chemin_version, False):
                 self.version = self.version + 1
             else:
                 break
+
+        self.chemin_prix = Outils.chemin([self.chemin_enregistrement, "Prix"], self.edition)
+        Outils.existe(self.chemin_prix, True)
+
+        self.chemin_bilans = Outils.chemin([self.chemin_version, "Bilans_Stats"], self.edition)
+        Outils.existe(self.chemin_bilans, True)
+
+        self.chemin_out = Outils.chemin([self.chemin_version, "OUT"], self.edition)
+        Outils.existe(self.chemin_out, True)
+
         if self.version == 0:
-            Outils.existe(chemin_in, True)
+            Outils.existe(self.chemin_in, True)
             dossier_fixe = dossier_source
             chemin_grille = dossier_source.chemin
         else:
-            if not Outils.existe(chemin_in, False):
-                Outils.fatal(ErreurConsistance(), "le dossier " + chemin_in + " se doit d'être présent !")
-            dossier_fixe = DossierSource(chemin_in)
+            if not Outils.existe(self.chemin_in, False):
+                Outils.fatal(ErreurConsistance(), "le dossier " + self.chemin_in + " se doit d'être présent !")
+            dossier_fixe = DossierSource(self.chemin_in)
             chemin_grille = self.chemin_enregistrement
 
         self.paramtexte = Paramtexte(dossier_fixe)
@@ -109,7 +119,7 @@ class ImportD(object):
                                  self.users)
 
         if self.version == 0:
-            dossier_destination = DossierDestination(chemin_in)
+            dossier_destination = DossierDestination(self.chemin_in)
             for fichier in [self.paramtexte, self.facturation, self.classes, self.plateformes, self.artsap,
                             self.categories, self.groupes, self.machines, self.categprix, self.coefprests,
                             self.prestations]:
@@ -127,3 +137,13 @@ class ImportD(object):
         for fichier in [self.clients, self.subsides, self.plafonds, self.cles, self.comptes, self.users,
                         self.acces, self.noshows, self.livraisons, self.services]:
             dossier_destination.ecrire(fichier.nom_fichier, self.dossier_source.lire(fichier.nom_fichier))
+
+        # dossier_lien = Outils.lien_dossier([import_d.facturation.lien, plateforme, annee, Outils.mois_string(mois)],
+        #                                    import_d.facturation)
+        #
+        # dossier_pannexes = Outils.chemin([dossier_enregistrement, "Annexes_PDF"], import_d.facturation)
+        # Outils.existe(dossier_pannexes, True)
+        #
+        # dossier_cannexes = Outils.chemin([dossier_version, "Annexes_CSV"], import_d.facturation)
+        # Outils.existe(dossier_cannexes, True)
+        #
