@@ -1,6 +1,7 @@
 from imports import Fichier
-from core import (Outils,
-                  VerifFormat,
+from core import (Interface,
+                  Format,
+                  Chemin,
                   ErreurConsistance)
 
 
@@ -40,24 +41,24 @@ class Plateforme(Fichier):
             else:
                 msg += "l'id plateforme de la ligne " + str(ligne) + " n'est pas unique \n"
 
-            donnee['code_p'], info = VerifFormat.est_un_alphanumerique(donnee['code_p'], "le code P", ligne)
+            donnee['code_p'], info = Format.est_un_alphanumerique(donnee['code_p'], "le code P", ligne)
             msg += info
-            donnee['centre'], info = VerifFormat.est_un_alphanumerique(donnee['centre'], "le centre financier", ligne)
+            donnee['centre'], info = Format.est_un_alphanumerique(donnee['centre'], "le centre financier", ligne)
             msg += info
-            donnee['fonds'], info = VerifFormat.est_un_alphanumerique(donnee['fonds'], "les fonds à créditer", ligne)
+            donnee['fonds'], info = Format.est_un_alphanumerique(donnee['fonds'], "les fonds à créditer", ligne)
             msg += info
-            donnee['abrev_plat'], info = VerifFormat.est_un_alphanumerique(donnee['abrev_plat'], "l'abréviation", ligne)
+            donnee['abrev_plat'], info = Format.est_un_alphanumerique(donnee['abrev_plat'], "l'abréviation", ligne)
             msg += info
             if donnee['abrev_plat'] not in abrevs:
                 abrevs.append(donnee['abrev_plat'])
             else:
                 msg += "l'abréviation plateforme de la ligne " + str(ligne) + " n'est pas unique \n"
-            donnee['int_plat'], info = VerifFormat.est_un_texte(donnee['int_plat'], "l'intitulé", ligne)
+            donnee['int_plat'], info = Format.est_un_texte(donnee['int_plat'], "l'intitulé", ligne)
             msg += info
-            donnee['grille'], info = VerifFormat.est_un_document(donnee['grille'], "la grille tarifaire", ligne, True)
+            donnee['grille'], info = Format.est_un_document(donnee['grille'], "la grille tarifaire", ligne, True)
             msg += info
             if donnee['grille'] != "":
-                if not Outils.existe(Outils.chemin([chemin_grille, donnee['grille'] + '.pdf'])):
+                if not Chemin.existe(Chemin.chemin([chemin_grille, donnee['grille'] + '.pdf'])):
                     msg += "la grille de la ligne " + str(ligne) + " n'existe pas dans le dossier d'entrée \n"
 
             donnees_dict[donnee['id_plateforme']] = donnee
@@ -66,8 +67,9 @@ class Plateforme(Fichier):
         self.donnees = donnees_dict
 
         if msg != "":
-            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)
+            Interface.fatal(ErreurConsistance(), self.libelle + "\n" + msg)
 
         if edition.plateforme not in self.donnees.keys():
-            Outils.fatal(ErreurConsistance(),
-                         edition.libelle + "\n" + "l'id plateforme '" + edition.plateforme + "' n'est pas référencé\n")
+            Interface.fatal(ErreurConsistance(),
+                            edition.libelle + "\n" + "l'id plateforme '" + edition.plateforme +
+                            "' n'est pas référencé\n")

@@ -1,9 +1,10 @@
-from core import Outils
+from core import (Format,
+                  CsvList)
 from calendar import monthrange
 from datetime import datetime
 
 
-class StatNbUser(object):
+class StatNbUser(CsvList):
     """
     Classe pour la création du csv des stats nombre user
     """
@@ -17,14 +18,11 @@ class StatNbUser(object):
         :param imports: données importées
         :param par_ul: tri des users labo
         """
+        super().__init__(imports)
 
-        self.imports = imports
-        self.plateforme = imports.plateformes.donnees[imports.edition.plateforme]
+        self.nom = "Stat-nbre-user_" + str(imports.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + "_" \
+                   + Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
 
-        self.nom = "Stat-nbre-user_" + str(self.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + "_" \
-                   + Outils.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
-
-        self.lignes = []
         jour_de_semaine, nb_de_jours = monthrange(imports.edition.annee, imports.edition.mois)
         for jour in range(1, nb_de_jours+1):
             nb_user_d = 0
@@ -75,20 +73,3 @@ class StatNbUser(object):
             ligne = [imports.edition.annee, imports.edition.mois, jour, semaine, nb_user_d, nb_user_w, nb_user_m,
                      nb_user_3m, nb_user_6m, nb_user_12m]
             self.lignes.append(ligne)
-
-    def csv(self, dossier_destination):
-        """
-        création du fichier csv à partir de la liste des noms de colonnes
-        :param dossier_destination: Une instance de la classe dossier.DossierDestination
-        """
-
-        pt = self.imports.paramtexte.donnees
-
-        with dossier_destination.writer(self.nom) as fichier_writer:
-            ligne = []
-            for cle in self.cles:
-                ligne.append(pt[cle])
-            fichier_writer.writerow(ligne)
-
-            for ligne in self.lignes:
-                fichier_writer.writerow(ligne)

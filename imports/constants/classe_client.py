@@ -1,6 +1,6 @@
 from imports import Fichier
-from core import (Outils,
-                  VerifFormat,
+from core import (Interface,
+                  Format,
                   ErreurConsistance)
 
 
@@ -27,8 +27,7 @@ class ClasseClient(Fichier):
         ids = []
 
         for donnee in self.donnees:
-            donnee['id_classe'], info = VerifFormat.est_un_alphanumerique(donnee['id_classe'], "l'id classe client",
-                                                                          ligne)
+            donnee['id_classe'], info = Format.est_un_alphanumerique(donnee['id_classe'], "l'id classe client", ligne)
             msg += info
             if info == "":
                 if donnee['id_classe'] not in ids:
@@ -37,9 +36,9 @@ class ClasseClient(Fichier):
                     msg += "l'id classe client '" + donnee['id_classe'] + "' de la ligne " + str(ligne) + \
                            " n'est pas unique\n"
 
-            donnee['code_n'], info = VerifFormat.est_un_alphanumerique(donnee['code_n'], "le code N", ligne)
+            donnee['code_n'], info = Format.est_un_alphanumerique(donnee['code_n'], "le code N", ligne)
             msg += info
-            donnee['intitule'], info = VerifFormat.est_un_texte(donnee['intitule'], "l'intitulé", ligne)
+            donnee['intitule'], info = Format.est_un_texte(donnee['intitule'], "l'intitulé", ligne)
             msg += info
             if donnee['ref_fact'] != 'INT' and donnee['ref_fact'] != 'EXT':
                 msg += "le code référence client de la ligne " + str(ligne) + " doit être INT ou EXT\n"
@@ -58,4 +57,4 @@ class ClasseClient(Fichier):
         self.donnees = donnees_dict
 
         if msg != "":
-            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)
+            Interface.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

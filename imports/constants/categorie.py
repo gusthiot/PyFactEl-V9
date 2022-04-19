@@ -1,6 +1,6 @@
 from imports import Fichier
-from core import (Outils,
-                  VerifFormat,
+from core import (Interface,
+                  Format,
                   ErreurConsistance)
 
 
@@ -29,8 +29,7 @@ class Categorie(Fichier):
         ids = []
 
         for donnee in self.donnees:
-            donnee['id_categorie'], info = VerifFormat.est_un_alphanumerique(donnee['id_categorie'], "l'id catégorie",
-                                                                             ligne)
+            donnee['id_categorie'], info = Format.est_un_alphanumerique(donnee['id_categorie'], "l'id catégorie", ligne)
             msg += info
             if info == "":
                 if donnee['id_categorie'] not in ids:
@@ -43,12 +42,12 @@ class Categorie(Fichier):
 
             msg += self._test_id_coherence(donnee['id_plateforme'], "l'id plateforme", ligne, plateformes)
 
-            donnee['no_categorie'], info = VerifFormat.est_un_alphanumerique(donnee['no_categorie'], "le no catégorie",
-                                                                             ligne)
+            donnee['no_categorie'], info = Format.est_un_alphanumerique(donnee['no_categorie'], "le no catégorie",
+                                                                        ligne)
             msg += info
-            donnee['intitule'], info = VerifFormat.est_un_texte(donnee['intitule'], "l'intitulé", ligne)
+            donnee['intitule'], info = Format.est_un_texte(donnee['intitule'], "l'intitulé", ligne)
             msg += info
-            donnee['unite'], info = VerifFormat.est_un_texte(donnee['unite'], "l'unité", ligne)
+            donnee['unite'], info = Format.est_un_texte(donnee['unite'], "l'unité", ligne)
             msg += info
 
             donnees_dict[donnee['id_categorie']] = donnee
@@ -57,4 +56,4 @@ class Categorie(Fichier):
         self.donnees = donnees_dict
 
         if msg != "":
-            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)
+            Interface.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

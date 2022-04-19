@@ -1,6 +1,6 @@
 from imports import Fichier
-from core import (Outils,
-                  VerifFormat,
+from core import (Interface,
+                  Format,
                   ErreurConsistance)
 import re
 
@@ -30,11 +30,10 @@ class Client(Fichier):
         codes = []
 
         for donnee in self.donnees:
-            donnee['code_sap'], info = VerifFormat.est_un_alphanumerique(donnee['code_sap'], "le code client sap",
-                                                                         ligne)
+            donnee['code_sap'], info = Format.est_un_alphanumerique(donnee['code_sap'], "le code client sap", ligne)
             msg += info
 
-            donnee['code'], info = VerifFormat.est_un_alphanumerique(donnee['code'], "le code client", ligne)
+            donnee['code'], info = Format.est_un_alphanumerique(donnee['code'], "le code client", ligne)
             msg += info
             if info == "":
                 if donnee['code'] not in codes:
@@ -43,13 +42,13 @@ class Client(Fichier):
                     msg += "le code client '" + donnee['code'] + "' de la ligne " + str(ligne) +\
                            " n'est pas unique\n"
 
-            donnee['abrev_labo'], info = VerifFormat.est_un_alphanumerique(donnee['abrev_labo'], "l'abrev. labo", ligne)
+            donnee['abrev_labo'], info = Format.est_un_alphanumerique(donnee['abrev_labo'], "l'abrev. labo", ligne)
             msg += info
-            donnee['nom2'], info = VerifFormat.est_un_texte(donnee['nom2'], "le nom 2", ligne, True)
+            donnee['nom2'], info = Format.est_un_texte(donnee['nom2'], "le nom 2", ligne, True)
             msg += info
-            donnee['nom3'], info = VerifFormat.est_un_texte(donnee['nom3'], "le nom 3", ligne, True)
+            donnee['nom3'], info = Format.est_un_texte(donnee['nom3'], "le nom 3", ligne, True)
             msg += info
-            donnee['ref'], info = VerifFormat.est_un_texte(donnee['ref'], "la référence", ligne, True)
+            donnee['ref'], info = Format.est_un_texte(donnee['ref'], "la référence", ligne, True)
             msg += info
 
             if donnee['id_classe'] == "":
@@ -80,4 +79,4 @@ class Client(Fichier):
         self.donnees = donnees_dict
 
         if msg != "":
-            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)
+            Interface.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

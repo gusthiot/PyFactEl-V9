@@ -1,7 +1,7 @@
-from core import Outils
+from core import (Format, CsvDict)
 
 
-class Transactions3(object):
+class Transactions3(CsvDict):
     """
     Classe pour la création des transactions
     """
@@ -18,19 +18,16 @@ class Transactions3(object):
             'subsid-maxmois', 'subsid-reste', 'subsid-CHF', 'deduct-CHF', 'subsid-deduct', 'total-fact',
             'discount-bonus', 'subsid-bonus']
 
-    def __init__(self, imports, version, articles, tarifs):
+    def __init__(self, imports, articles, tarifs):
         """
         initialisation des données
         :param imports: données importées
-        :param version: version de la facturation
         :param articles: articles générés
         :param tarifs: tarifs générés
         """
-        self.imports = imports
-        self.version = version
-        self.plateforme = imports.plateformes.donnees[imports.edition.plateforme]
-        self.nom = "Transaction3_" + str(self.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + "_" \
-                   + Outils.mois_string(imports.edition.mois) + "_" + str(version) + ".csv"
+        super().__init__(imports)
+        self.nom = "Transaction3_" + str(imports.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + "_" \
+                   + Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
         self.comptabilises = {}
         self.valeurs = {}
 
@@ -59,7 +56,7 @@ class Transactions3(object):
                 id_groupe = groupe['id_cat_plat']
                 if id_groupe != '0' and duree_op == 0:
                     article = articles.valeurs[id_groupe]
-                    if self.plateforme['id_plateforme'] == article['platf-code']:
+                    if imports.plateforme['id_plateforme'] == article['platf-code']:
                         ref_client = self._ref_client(entree['annee'], entree['mois'], classe, client, compte, article)
                         tarif = tarifs.valeurs[id_classe + id_groupe]
                         art = self._art_plate(article, "K3", pt['item-K3'], pt['item-K3a'])
@@ -82,7 +79,7 @@ class Transactions3(object):
                 id_groupe = groupe['id_cat_fixe']
                 if id_groupe != '0':
                     article = articles.valeurs[id_groupe]
-                    if self.plateforme['id_plateforme'] == article['platf-code']:
+                    if imports.plateforme['id_plateforme'] == article['platf-code']:
                         ref_client = self._ref_client(entree['annee'], entree['mois'], classe, client, compte, article)
                         tarif = tarifs.valeurs[id_classe + id_groupe]
                         art = self._art_plate(article, "K7", pt['item-K7'], pt['item-K7a'])
@@ -106,7 +103,7 @@ class Transactions3(object):
                     prix_extra = imports.categprix.donnees[id_classe + id_groupe]['prix_unit']
                     if prix_extra > 0:
                         article = articles.valeurs[id_groupe]
-                        if self.plateforme['id_plateforme'] == article['platf-code']:
+                        if imports.plateforme['id_plateforme'] == article['platf-code']:
                             ref_client = self._ref_client(entree['annee'], entree['mois'], classe, client, compte,
                                                           article)
                             tarif = tarifs.valeurs[id_classe + id_groupe]
@@ -131,7 +128,7 @@ class Transactions3(object):
             id_groupe = groupe['id_cat_mach']
             if id_groupe != '0':
                 article = articles.valeurs[id_groupe]
-                if self.plateforme['id_plateforme'] == article['platf-code']:
+                if imports.plateforme['id_plateforme'] == article['platf-code']:
                     ref_client = self._ref_client(entree['annee'], entree['mois'], classe, client, compte, article)
                     tarif = tarifs.valeurs[id_classe + id_groupe]
 
@@ -184,7 +181,7 @@ class Transactions3(object):
             id_groupe = groupe['id_cat_mo']
             if id_groupe != '0' and duree_op > 0:
                 article = articles.valeurs[id_groupe]
-                if self.plateforme['id_plateforme'] == article['platf-code']:
+                if imports.plateforme['id_plateforme'] == article['platf-code']:
                     ref_client = self._ref_client(entree['annee'], entree['mois'], classe, client, compte, article)
                     tarif = tarifs.valeurs[id_classe + id_groupe]
                     art = self._art_plate(article, "K2", pt['item-K2'], pt['item-K2a'])
@@ -231,7 +228,7 @@ class Transactions3(object):
 
             if id_groupe != '0':
                 article = articles.valeurs[id_groupe]
-                if self.plateforme['id_plateforme'] == article['platf-code']:
+                if imports.plateforme['id_plateforme'] == article['platf-code']:
                     ref_client = self._ref_client(entree['annee'], entree['mois'], classe, client, compte, article)
                     tarif = tarifs.valeurs[id_classe + id_groupe]
                     ope = ["", "", "", "", id_machine, machine['nom'], ""]
@@ -252,7 +249,7 @@ class Transactions3(object):
             operateur = imports.users.donnees[entree['id_operateur']]
             id_machine = prestation['id_machine']
             article = articles.valeurs[id_prestation]
-            if self.plateforme['id_plateforme'] == article['platf-code']:
+            if imports.plateforme['id_plateforme'] == article['platf-code']:
                 ref_client = self._ref_client(entree['annee'], entree['mois'], classe, client, compte, article)
                 tarif = tarifs.valeurs[id_classe + id_prestation]
                 if id_machine == "0":
@@ -289,7 +286,7 @@ class Transactions3(object):
             classe = imports.classes.donnees[id_classe]
             operateur = imports.users.donnees[entree['id_op']]
             article = articles.valeurs[id_categorie]
-            if self.plateforme['id_plateforme'] == article['platf-code']:
+            if imports.plateforme['id_plateforme'] == article['platf-code']:
                 ref_client = self._ref_client(entree['annee'], entree['mois'], classe, client, compte, article)
                 tarif = tarifs.valeurs[id_classe + id_categorie]
                 ope = [entree['id_op'], operateur['prenom'] + " " + operateur['nom'], "", entree['remarque_staff'],
@@ -348,12 +345,13 @@ class Transactions3(object):
         """
         id_artsap = article['item-idsap']
         artsap = self.imports.artsap.donnees[id_artsap]
+        plateforme = self.imports.plateforme
         if (classe['ref_fact'] == 'INT' and classe['avantage_HC'] == 'BONUS' and artsap['eligible'] == 'OUI' and
-                compte['type_subside'] == "0" and self.plateforme['grille'] != "" and classe['grille'] == 'OUI'):
+                compte['type_subside'] == "0" and plateforme['grille'] != "" and classe['grille'] == 'OUI'):
             icf = compte['id_compte']
         else:
             icf = "0"
-        return [str(annee), Outils.mois_string(mois), self.version, icf, client['code'], client['code_sap'],
+        return [str(annee), Format.mois_string(mois), self.imports.version, icf, client['code'], client['code_sap'],
                 client['abrev_labo'], client['id_classe'], classe['code_n'], classe['intitule']]
 
     def _util_proj(self, id_user, compte, flux):
@@ -377,10 +375,11 @@ class Transactions3(object):
         :param texte2_k: texte 2 catégorie
         :return tableau contenant les valeurs de l'article et de la plateforme
         """
+        plateforme = self.imports.plateforme
         return [article['item-id'], code_k, texte_k, texte2_k, article['item-nbr'], article['item-name'],
                 article['item-unit'], article['item-idsap'], article['item-codeD'], article['item-flag-usage'],
                 article['item-flag-conso'], article['item-eligible'], article['item-order'], article['item-labelcode'],
-                article['item-extra'], article['platf-code'], self.plateforme['code_p'], self.plateforme['abrev_plat']]
+                article['item-extra'], article['platf-code'], plateforme['code_p'], plateforme['abrev_plat']]
 
     def _subsides(self, transact, article):
         """
@@ -395,12 +394,10 @@ class Transactions3(object):
         montant = transact['val'][4]
         id_machine = transact['ope'][4]
         date = transact['trans'][0]
-        trans_date = transact['rc'][0] + "-" + transact['rc'][1]
-        fact_date = str(self.imports.edition.annee) + "-" + Outils.mois_string(self.imports.edition.mois)
         type_s = compte['type_subside']
         result = ["", "", "", "", "", 0, 0, 0, 0, 0]
         if type_s != "0":
-            if trans_date == fact_date:
+            if self.imports.edition.annee == transact['rc'][0] and self.imports.edition.mois == transact['rc'][1]:
                 if type_s in self.imports.subsides.donnees.keys():
                     subside = self.imports.subsides.donnees[type_s]
                     result[0] = subside['type']
@@ -422,11 +419,11 @@ class Transactions3(object):
                                         result[4] = "YES"
                                         cg_id = compte['id_compte'] + article['platf-code'] + article['item-idsap']
                                         if cg_id in self.imports.grants.donnees.keys():
-                                            grant = self.imports.grants.donnees[cg_id]['montant']
+                                            grant = self.imports.grants.donnees[cg_id]['subsid-alrdygrant']
                                         else:
                                             grant = 0
                                         if cg_id in self.comptabilises.keys():
-                                            comptabilise = self.comptabilises[cg_id]['montant']
+                                            comptabilise = self.comptabilises[cg_id]['subsid-alrdygrant']
                                         else:
                                             comptabilise = 0
                                         res_compte = plafond['max_compte'] - (grant + comptabilise)
@@ -435,13 +432,13 @@ class Transactions3(object):
                                         max_mo = round(montant * plafond['pourcentage'] / 100, 2)
                                         mo = min(max_mo, res)
                                         if cg_id not in self.comptabilises.keys():
-                                            self.comptabilises[cg_id] = {'id_compte': compte['id_compte'],
-                                                                         'id_plateforme': article['platf-code'],
-                                                                         'id_article': article['item-idsap'],
-                                                                         'montant': mo}
+                                            self.comptabilises[cg_id] = {'proj-id': compte['id_compte'],
+                                                                         'platf-code': article['platf-code'],
+                                                                         'item-idsap': article['item-idsap'],
+                                                                         'subsid-alrdygrant': mo}
                                         else:
-                                            self.comptabilises[cg_id]['montant'] = \
-                                                self.comptabilises[cg_id]['montant'] + mo
+                                            self.comptabilises[cg_id]['subsid-alrdygrant'] = \
+                                                self.comptabilises[cg_id]['subsid-alrdygrant'] + mo
                                         result[8] = res
                                         result[9] = mo
             else:
@@ -518,34 +515,3 @@ class Transactions3(object):
             transacts[fact_date][trans[0]] = []
         transacts[fact_date][trans[0]].append({'rc': ref_client, 'ope': ope, 'up': util_proj, 'art': art,
                                                'trans': trans, 'val': val})
-
-    def _ajouter_valeur(self, donnee, unique):
-        """
-        ajout d'une ligne au csv
-        :param donnee: contenu de la ligne
-        :param unique: clé d'identification unique de la ligne
-        """
-        valeur = {}
-        for i in range(0, len(donnee)):
-            valeur[self.cles[i]] = donnee[i]
-        self.valeurs[unique] = valeur
-
-    def csv(self, dossier_destination):
-        """
-        création du fichier csv à partir de la liste des noms de colonnes
-        :param dossier_destination: Une instance de la classe dossier.DossierDestination
-        """
-        pt = self.imports.paramtexte.donnees
-
-        with dossier_destination.writer(self.nom) as fichier_writer:
-            ligne = []
-            for cle in self.cles:
-                ligne.append(pt[cle])
-            fichier_writer.writerow(ligne)
-
-            for key in self.valeurs.keys():
-                valeur = self.valeurs[key]
-                ligne = []
-                for i in range(0, len(self.cles)):
-                    ligne.append(valeur[self.cles[i]])
-                fichier_writer.writerow(ligne)

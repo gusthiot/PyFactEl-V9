@@ -4,10 +4,8 @@ from .categprix import CategPrix
 from .classe_client import ClasseClient
 from .coefprest import CoefPrest
 from .facturation import Facturation
-from .granted import Granted
 from .groupe import Groupe
 from .machine import Machine
 from .paramtexte import Paramtexte
 from .plateforme import Plateforme
 from .prestation import Prestation
-from .user_labo import UserLabo

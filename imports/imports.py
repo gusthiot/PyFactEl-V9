@@ -5,13 +5,11 @@ from imports.constants import (ArticleSap,
                                ClasseClient,
                                CoefPrest,
                                Facturation,
-                               Granted,
                                Groupe,
                                Machine,
                                Paramtexte,
                                Plateforme,
-                               Prestation,
-                               UserLabo)
+                               Prestation)
 from imports.variables import (Acces,
                                CleSubside,
                                Client,
@@ -22,7 +20,15 @@ from imports.variables import (Acces,
                                Service,
                                Subside,
                                User)
-from core import (Outils, ErreurConsistance, DossierSource, DossierDestination)
+from imports.construits import (Numero,
+                                Granted,
+                                UserLabo)
+from core import (Interface,
+                  Chemin,
+                  Format,
+                  ErreurConsistance,
+                  DossierSource,
+                  DossierDestination)
 
 
 class Imports(object):
@@ -40,41 +46,41 @@ class Imports(object):
 
         self.edition = Edition(dossier_source)
 
+        # création de l'arobrescence
+
         if self.edition.filigrane != "":
             chemin = self.edition.chemin_filigrane
         else:
             chemin = self.edition.chemin
-        self.chemin_enregistrement = Outils.chemin([chemin, self.edition.plateforme, self.edition.annee,
-                                                    Outils.mois_string(self.edition.mois)], self.edition)
-        Outils.existe(self.chemin_enregistrement, True)
+        self.chemin_enregistrement = Chemin.chemin([chemin, self.edition.plateforme, self.edition.annee,
+                                                    Format.mois_string(self.edition.mois)], self.edition)
 
-        self.chemin_in = Outils.chemin([self.chemin_enregistrement, "IN"], self.edition)
         self.version = 0
-        while True:
-            self.chemin_version = Outils.chemin([self.chemin_enregistrement, "V"+str(self.version)], self.edition)
-            if Outils.existe(self.chemin_version, False):
-                self.version = self.version + 1
-            else:
-                break
+        dossier_fixe = dossier_source
+        chemin_grille = dossier_source.chemin
+        self.chemin_in = Chemin.chemin([self.chemin_enregistrement, "IN"], self.edition)
+        self.chemin_version = Chemin.chemin([self.chemin_enregistrement, "V0"], self.edition)
+        if Chemin.existe(self.chemin_enregistrement, False):
+            while True:
+                if Chemin.existe(self.chemin_version, False):
+                    self.version = self.version + 1
+                    self.chemin_version = Chemin.chemin([self.chemin_enregistrement, "V"+str(self.version)],
+                                                        self.edition)
+                else:
+                    break
 
-        self.chemin_prix = Outils.chemin([self.chemin_enregistrement, "Prix"], self.edition)
-        Outils.existe(self.chemin_prix, True)
+            if self.version > 0:
+                if not Chemin.existe(self.chemin_in, False):
+                    Interface.fatal(ErreurConsistance(), "le dossier " + self.chemin_in + " se doit d'être présent !")
+                dossier_fixe = DossierSource(self.chemin_in)
+                chemin_grille = self.chemin_enregistrement
 
-        self.chemin_bilans = Outils.chemin([self.chemin_version, "Bilans_Stats"], self.edition)
-        Outils.existe(self.chemin_bilans, True)
+        self.chemin_out = Chemin.chemin([self.chemin_version, "OUT"], self.edition)
+        self.chemin_bilans = Chemin.chemin([self.chemin_version, "Bilans_Stats"], self.edition)
+        self.chemin_prix = Chemin.chemin([self.chemin_enregistrement, "Prix"], self.edition)
+        self.chemin_cannexes = Chemin.chemin([self.chemin_version, "Annexes_CSV"], self.edition)
 
-        self.chemin_out = Outils.chemin([self.chemin_version, "OUT"], self.edition)
-        Outils.existe(self.chemin_out, True)
-
-        if self.version == 0:
-            Outils.existe(self.chemin_in, True)
-            dossier_fixe = dossier_source
-            chemin_grille = dossier_source.chemin
-        else:
-            if not Outils.existe(self.chemin_in, False):
-                Outils.fatal(ErreurConsistance(), "le dossier " + self.chemin_in + " se doit d'être présent !")
-            dossier_fixe = DossierSource(self.chemin_in)
-            chemin_grille = self.chemin_enregistrement
+        # importation et vérification des données d'entrée
 
         self.paramtexte = Paramtexte(dossier_fixe)
         self.facturation = Facturation(dossier_fixe)
@@ -104,19 +110,48 @@ class Imports(object):
 
         if self.edition.mois > 1:
             annee_p = self.edition.annee
-            mois_p = Outils.mois_string(self.edition.mois-1)
+            mois_p = Format.mois_string(self.edition.mois-1)
         else:
             annee_p = self.edition.annee-1
             mois_p = 12
-        self.chemin_precedent = Outils.chemin([self.edition.chemin, self.edition.plateforme, annee_p, mois_p, "V0",
-                                               "OUT"], self.edition)
-        if not Outils.existe(self.chemin_precedent, False):
-            Outils.fatal(ErreurConsistance(), "le dossier " + self.chemin_precedent + " se doit d'être présent !")
+
+        old_ver = 0
+        while True:
+            self.chemin_old_ver = Chemin.chemin([self.edition.chemin, self.edition.plateforme, annee_p, mois_p,
+                                                 "V"+str(old_ver)], self.edition)
+            if Chemin.existe(self.chemin_old_ver, False):
+                old_ver = old_ver + 1
+            else:
+                old_ver = old_ver - 1
+                break
+
+        self.chemin_precedent = Chemin.chemin([self.edition.chemin, self.edition.plateforme, annee_p, mois_p,
+                                               "V"+str(old_ver), "OUT"], self.edition)
+        if not Chemin.existe(self.chemin_precedent, False):
+            Interface.fatal(ErreurConsistance(), "le dossier " + self.chemin_precedent + " se doit d'être présent !")
 
         self.grants = Granted(DossierSource(self.chemin_precedent), self.edition, self.comptes, self.artsap,
                               self.plateformes)
         self.userlabs = UserLabo(DossierSource(self.chemin_precedent), self.edition, self.plateformes, self.clients,
                                  self.users)
+        if self.version > 0:
+            self.chemin_vprec = Chemin.chemin([self.chemin_enregistrement, "V"+str(self.version-1), "OUT"],
+                                              self.edition)
+            if not Chemin.existe(self.chemin_vprec, False):
+                Interface.fatal(ErreurConsistance(), "le dossier " + self.chemin_vprec + " se doit d'être présent !")
+            self.numeros = Numero(DossierSource(self.chemin_vprec), self.edition, self.comptes, self.clients,
+                                  self.version-1)
+
+        # vérification terminée, création des dossiers de sauvegarde
+
+        if self.version == 0:
+            Chemin.existe(self.chemin_in, True)
+        Chemin.existe(self.chemin_prix, True)
+        Chemin.existe(self.chemin_bilans, True)
+        Chemin.existe(self.chemin_out, True)
+        Chemin.existe(self.chemin_cannexes, True)
+
+        # sauvegarde des bruts
 
         if self.version == 0:
             dossier_destination = DossierDestination(self.chemin_in)
@@ -131,19 +166,19 @@ class Imports(object):
             grille = self.plateforme['grille'] + '.pdf'
             DossierDestination(self.chemin_enregistrement).ecrire(grille, dossier_source.lire(grille))
 
-        chemin_vin = Outils.chemin([self.chemin_version, "IN"], self.edition)
-        Outils.existe(chemin_vin, True)
+        chemin_vin = Chemin.chemin([self.chemin_version, "IN"], self.edition)
+        Chemin.existe(chemin_vin, True)
         dossier_destination = DossierDestination(chemin_vin)
         for fichier in [self.clients, self.subsides, self.plafonds, self.cles, self.comptes, self.users,
                         self.acces, self.noshows, self.livraisons, self.services]:
             dossier_destination.ecrire(fichier.nom_fichier, self.dossier_source.lire(fichier.nom_fichier))
+        if self.version > 0:
+            dossier_vprec = DossierSource(self.chemin_vprec)
+            dossier_destination.ecrire(self.numeros.nom_fichier, dossier_vprec.lire(self.numeros.nom_fichier))
 
         # dossier_lien = Outils.lien_dossier([import_d.facturation.lien, plateforme, annee, Outils.mois_string(mois)],
         #                                    import_d.facturation)
         #
-        # dossier_pannexes = Outils.chemin([dossier_enregistrement, "Annexes_PDF"], import_d.facturation)
-        # Outils.existe(dossier_pannexes, True)
-        #
-        # dossier_cannexes = Outils.chemin([dossier_version, "Annexes_CSV"], import_d.facturation)
-        # Outils.existe(dossier_cannexes, True)
+        # dossier_pannexes = Chemin.chemin([dossier_enregistrement, "Annexes_PDF"], import_d.facturation)
+        # Chemin.existe(dossier_pannexes, True)
         #

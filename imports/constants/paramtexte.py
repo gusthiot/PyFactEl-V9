@@ -1,5 +1,5 @@
-from core import (Outils,
-                  VerifFormat,
+from core import (Interface,
+                  Format,
                   ErreurConsistance)
 
 
@@ -55,26 +55,28 @@ class Paramtexte(object):
         try:
             for ligne in fichier_reader:
                 if len(ligne) != 2:
-                    Outils.fatal(ErreurConsistance(),
-                                 self.libelle + ": nombre de colonnes incorrect : " + str(len(ligne)) + ", attendu : 2")
+                    Interface.fatal(ErreurConsistance(),
+                                    self.libelle + ": nombre de colonnes incorrect : " + str(len(ligne)) +
+                                    ", attendu : 2")
                 if ligne[0] in labels:
-                    Outils.fatal(ErreurConsistance(), self.libelle + ": le label '" + ligne[0] + "' n'est pas unique\n")
+                    Interface.fatal(ErreurConsistance(),
+                                    self.libelle + ": le label '" + ligne[0] + "' n'est pas unique\n")
 
-                ligne[0], err = VerifFormat.est_un_alphanumerique(ligne[0], "le label", chevrons=True)
+                ligne[0], err = Format.est_un_alphanumerique(ligne[0], "le label", chevrons=True)
                 if err != "":
-                    Outils.fatal(ErreurConsistance(), self.libelle + ": " + err)
+                    Interface.fatal(ErreurConsistance(), self.libelle + ": " + err)
 
-                ligne[1], err = VerifFormat.est_un_texte(ligne[1], "l'entête")
+                ligne[1], err = Format.est_un_texte(ligne[1], "l'entête")
                 if err != "":
-                    Outils.fatal(ErreurConsistance(), self.libelle + ": pour le label '" + ligne[0] + "', " + err)
+                    Interface.fatal(ErreurConsistance(), self.libelle + ": pour le label '" + ligne[0] + "', " + err)
 
                 labels.append(ligne[0])
                 self.donnees[ligne[0]] = ligne[1]
 
             for cle in self.cles:
                 if cle not in labels:
-                    Outils.fatal(ErreurConsistance(),
-                                 self.libelle + ": la clé '" + cle + "' n'est pas présente dans paramtext.csv")
+                    Interface.fatal(ErreurConsistance(),
+                                    self.libelle + ": la clé '" + cle + "' n'est pas présente dans paramtext.csv")
 
         except IOError as e:
-            Outils.fatal(e, "impossible d'ouvrir le fichier : "+self.nom_fichier)
+            Interface.fatal(e, "impossible d'ouvrir le fichier : "+self.nom_fichier)

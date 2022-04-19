@@ -1,5 +1,5 @@
-from core import (Outils,
-                  VerifFormat,
+from core import (Interface,
+                  Format,
                   ErreurConsistance)
 
 
@@ -22,32 +22,31 @@ class Edition(object):
             for ligne in dossier_source.reader(self.nom_fichier):
                 cle = ligne[0]
                 if cle not in self.cles:
-                    Outils.fatal(ErreurConsistance(),
-                                 "Clé inconnue dans %s: %s" % (self.nom_fichier, cle))
+                    Interface.fatal(ErreurConsistance(), "Clé inconnue dans %s: %s" % (self.nom_fichier, cle))
                 donnees_csv[cle] = ligne[1]
         except IOError as e:
-            Outils.fatal(e, "impossible d'ouvrir le fichier : "+self.nom_fichier)
+            Interface.fatal(e, "impossible d'ouvrir le fichier : "+self.nom_fichier)
 
         msg = ""
         for cle in self.cles:
             if cle not in donnees_csv:
                 msg += "\nClé manquante dans %s: %s" % (self.nom_fichier, cle)
 
-        self.annee, err = VerifFormat.est_un_entier(donnees_csv['année'], "l'année", mini=2000, maxi=2099)
+        self.annee, err = Format.est_un_entier(donnees_csv['année'], "l'année", mini=2000, maxi=2099)
         msg += err
 
-        self.mois, err = VerifFormat.est_un_entier(donnees_csv['mois'], "le mois", mini=1, maxi=12)
+        self.mois, err = Format.est_un_entier(donnees_csv['mois'], "le mois", mini=1, maxi=12)
         msg += err
 
-        self.plateforme, err = VerifFormat.est_un_alphanumerique(donnees_csv['Id-Plateforme'], "l'id plateforme")
+        self.plateforme, err = Format.est_un_alphanumerique(donnees_csv['Id-Plateforme'], "l'id plateforme")
         msg += err
 
-        self.filigrane, err = VerifFormat.est_un_texte(donnees_csv['filigrane'], "le filigrane", vide=True)
+        self.filigrane, err = Format.est_un_texte(donnees_csv['filigrane'], "le filigrane", vide=True)
         msg += err
 
-        self.chemin, err = VerifFormat.est_un_chemin(donnees_csv['chemin'], "le chemin")
+        self.chemin, err = Format.est_un_chemin(donnees_csv['chemin'], "le chemin")
         msg += err
-        self.chemin_filigrane, err = VerifFormat.est_un_chemin(donnees_csv['chemin_filigrane'], "le chemin filigrane")
+        self.chemin_filigrane, err = Format.est_un_chemin(donnees_csv['chemin_filigrane'], "le chemin filigrane")
         msg += err
 
         jours = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
@@ -71,4 +70,4 @@ class Edition(object):
         self.mois_txt = mois_fr[self.mois-1]
 
         if msg != "":
-            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)
+            Interface.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

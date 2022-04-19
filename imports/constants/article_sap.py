@@ -1,6 +1,6 @@
 from imports import Fichier
-from core import (Outils,
-                  VerifFormat,
+from core import (Interface,
+                  Format,
                   ErreurConsistance)
 
 
@@ -31,8 +31,7 @@ class ArticleSap(Fichier):
         ids = []
 
         for donnee in self.donnees:
-            donnee['id_article'], info = VerifFormat.est_un_alphanumerique(donnee['id_article'], "l'id article SAP",
-                                                                           ligne)
+            donnee['id_article'], info = Format.est_un_alphanumerique(donnee['id_article'], "l'id article SAP", ligne)
             msg += info
             if info == "":
                 if donnee['id_article'] not in ids:
@@ -41,24 +40,24 @@ class ArticleSap(Fichier):
                     msg += "l'id article SAP '" + donnee['id_article'] + "' de la ligne " + str(ligne) +\
                            " n'est pas unique\n"
 
-            donnee['code_d'], info = VerifFormat.est_un_alphanumerique(donnee['code_d'], "le code D", ligne)
+            donnee['code_d'], info = Format.est_un_alphanumerique(donnee['code_d'], "le code D", ligne)
             msg += info
-            donnee['intitule'], info = VerifFormat.est_un_texte(donnee['intitule'], "l'intitulé", ligne)
+            donnee['intitule'], info = Format.est_un_texte(donnee['intitule'], "l'intitulé", ligne)
             msg += info
-            donnee['code_sap'], info = VerifFormat.est_un_entier(donnee['code_sap'], "le code sap", ligne, 1)
+            donnee['code_sap'], info = Format.est_un_entier(donnee['code_sap'], "le code sap", ligne, 1)
             msg += info
-            donnee['quantite'], info = VerifFormat.est_un_nombre(donnee['quantite'], "la quantité", ligne, 3, 0)
+            donnee['quantite'], info = Format.est_un_nombre(donnee['quantite'], "la quantité", ligne, 3, 0)
             msg += info
-            donnee['unite'], info = VerifFormat.est_un_texte(donnee['unite'], "l'unité", ligne)
+            donnee['unite'], info = Format.est_un_texte(donnee['unite'], "l'unité", ligne)
             msg += info
-            donnee['ordre'], info = VerifFormat.est_un_entier(donnee['ordre'], "l'ordre annexe", ligne, 1)
+            donnee['ordre'], info = Format.est_un_entier(donnee['ordre'], "l'ordre annexe", ligne, 1)
             msg += info
-            donnee['type_prix'], info = VerifFormat.est_un_alphanumerique(donnee['type_prix'], "le type de prix", ligne)
+            donnee['type_prix'], info = Format.est_un_alphanumerique(donnee['type_prix'], "le type de prix", ligne)
             msg += info
-            donnee['type_rabais'], info = VerifFormat.est_un_alphanumerique(donnee['type_rabais'], "le type de rabais",
-                                                                            ligne)
+            donnee['type_rabais'], info = Format.est_un_alphanumerique(donnee['type_rabais'], "le type de rabais",
+                                                                       ligne)
             msg += info
-            donnee['texte_sap'], info = VerifFormat.est_un_texte(donnee['texte_sap'], "le texte sap", ligne, True)
+            donnee['texte_sap'], info = Format.est_un_texte(donnee['texte_sap'], "le texte sap", ligne, True)
             msg += info
             if donnee['flag_usage'] != 'OUI' and donnee['flag_usage'] != 'NON':
                 msg += "le flag usage de la ligne " + str(ligne) + " doit être OUI ou NON\n"
@@ -82,4 +81,4 @@ class ArticleSap(Fichier):
         self.donnees = donnees_dict
 
         if msg != "":
-            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)
+            Interface.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

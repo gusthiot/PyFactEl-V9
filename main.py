@@ -16,7 +16,8 @@ import datetime
 import time
 import traceback
 from docopt import docopt
-from core import (Outils,
+from core import (Interface,
+                  Chemin,
                   DossierSource,
                   DossierDestination)
 from module_d import (Articles,
@@ -31,21 +32,26 @@ from module_c import (UserLaboNew,
                       StatUser,
                       StatClient,
                       SommesUL)
+from module_b import (GrantedNew,
+                      NumeroNew,
+                      AnnexeDetails,
+                      AnnexeSubsides,
+                      BilanSubsides)
 from imports import (Edition,
                      Imports)
 
 arguments = docopt(__doc__)
 
 if arguments["--sansgraphiques"]:
-    Outils.interface_graphique(False)
+    Interface.interface_graphique(False)
 
 if arguments["--entrees"]:
     dossier_data = arguments["--entrees"]
 else:
-    dossier_data = Outils.choisir_dossier()
+    dossier_data = Interface.choisir_dossier()
 dossier_source = DossierSource(dossier_data)
 try:
-    if Outils.existe(Outils.chemin([dossier_data, Edition.nom_fichier])):
+    if Chemin.existe(Chemin.chemin([dossier_data, Edition.nom_fichier])):
         start_time = time.time()
         # Module D
         imports = Imports(dossier_source)
@@ -53,9 +59,9 @@ try:
         tarifs = Tarifs(imports)
         articles.csv(DossierDestination(imports.chemin_prix))
         tarifs.csv(DossierDestination(imports.chemin_prix))
-        transactions = Transactions3(imports, imports.version, articles, tarifs)
+        transactions = Transactions3(imports, articles, tarifs)
         transactions.csv(DossierDestination(imports.chemin_bilans))
-        sommes = Sommes(transactions)
+        sommes = Sommes(imports, transactions)
 
         # Module C
         usr_lab = UserLaboNew(imports, transactions, sommes.par_user)
@@ -75,10 +81,20 @@ try:
         stat_mach.csv(DossierDestination(imports.chemin_bilans))
 
         # Module B
+        new_grants = GrantedNew(imports, transactions)
+        new_grants.csv(DossierDestination(imports.chemin_out))
+        new_numeros = NumeroNew(imports, transactions)
+        new_numeros.csv(DossierDestination(imports.chemin_out))
+        ann_dets = AnnexeDetails(imports, transactions, sommes.par_client, new_numeros, imports.chemin_cannexes)
+        ann_subs = AnnexeSubsides(imports, transactions, sommes.par_client, imports.chemin_cannexes,
+                                  ann_dets.csv_fichiers)
+        Chemin.csv_files_in_zip(ann_subs.csv_fichiers, imports.chemin_cannexes)
+        bil_subs = BilanSubsides(imports, transactions, sommes.par_client)
+        bil_subs.csv(DossierDestination(imports.chemin_bilans))
 
-        Outils.affiche_message("OK !!! (" +
-                               str(datetime.timedelta(seconds=(time.time() - start_time))).split(".")[0] + ")")
+        Interface.affiche_message("OK !!! (" +
+                                  str(datetime.timedelta(seconds=(time.time() - start_time))).split(".")[0] + ")")
     else:
-        Outils.affiche_message("Carnet d'ordre introuvable")
+        Interface.affiche_message("Carnet d'ordre introuvable")
 except Exception as e:
-    Outils.fatal(traceback.format_exc(), "Erreur imprévue :\n")
+    Interface.fatal(traceback.format_exc(), "Erreur imprévue :\n")

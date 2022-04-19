@@ -1,6 +1,6 @@
 from imports import Fichier
-from core import (Outils,
-                  VerifFormat,
+from core import (Interface,
+                  Format,
                   ErreurConsistance)
 
 
@@ -30,9 +30,9 @@ class NoShow(Fichier):
         coms = []
 
         for donnee in self.donnees:
-            donnee['mois'], info = VerifFormat.est_un_entier(donnee['mois'], "le mois ", ligne, 1, 12)
+            donnee['mois'], info = Format.est_un_entier(donnee['mois'], "le mois ", ligne, 1, 12)
             msg += info
-            donnee['annee'], info = VerifFormat.est_un_entier(donnee['annee'], "l'annee ", ligne, 2000, 2099)
+            donnee['annee'], info = Format.est_un_entier(donnee['annee'], "l'annee ", ligne, 2000, 2099)
             msg += info
 
             info = self._test_id_coherence(donnee['id_compte'], "l'id compte", ligne, comptes)
@@ -50,10 +50,10 @@ class NoShow(Fichier):
             elif donnee['type'] != "HP" and donnee['type'] != "HC":
                 msg += "HP/HC " + str(ligne) + " doit être égal à HP ou HC\n"
 
-            donnee['penalite'], info = VerifFormat.est_un_nombre(donnee['penalite'], "la pénalité", ligne, 2, 0)
+            donnee['penalite'], info = Format.est_un_nombre(donnee['penalite'], "la pénalité", ligne, 2, 0)
             msg += info
 
-            donnee['date_debut'], info = VerifFormat.est_une_date(donnee['date_debut'], "la date de début", ligne)
+            donnee['date_debut'], info = Format.est_une_date(donnee['date_debut'], "la date de début", ligne)
             msg += info
 
             donnees_list.append(donnee)
@@ -62,4 +62,4 @@ class NoShow(Fichier):
 
         self.donnees = donnees_list
         if msg != "":
-            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)
+            Interface.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

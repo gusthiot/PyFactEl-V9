@@ -1,6 +1,6 @@
 from imports import Fichier
-from core import (Outils,
-                  VerifFormat,
+from core import (Interface,
+                  Format,
                   ErreurConsistance)
 
 
@@ -33,15 +33,15 @@ class Prestation(Fichier):
         ids = []
 
         for donnee in self.donnees:
-            donnee['mois'], info = VerifFormat.est_un_entier(donnee['mois'], "le mois ", ligne, 1, 12)
+            donnee['mois'], info = Format.est_un_entier(donnee['mois'], "le mois ", ligne, 1, 12)
             msg += info
-            donnee['annee'], info = VerifFormat.est_un_entier(donnee['annee'], "l'annee ", ligne, 2000, 2099)
+            donnee['annee'], info = Format.est_un_entier(donnee['annee'], "l'annee ", ligne, 2000, 2099)
             msg += info
             if donnee['mois'] != edition.mois or donnee['annee'] != edition.annee:
                 msg += "date incorrect ligne " + str(ligne) + "\n"
 
-            donnee['id_prestation'], info = VerifFormat.est_un_alphanumerique(donnee['id_prestation'],
-                                                                              "l'id prestation", ligne)
+            donnee['id_prestation'], info = Format.est_un_alphanumerique(donnee['id_prestation'], "l'id prestation",
+                                                                         ligne)
             msg += info
             if info == "":
                 if donnee['id_prestation'] not in ids:
@@ -53,14 +53,13 @@ class Prestation(Fichier):
             if donnee['no_prestation'] == "":
                 msg += "le numéro de prestation de la ligne " + str(ligne) + " ne peut être vide\n"
             else:
-                donnee['no_prestation'], info = VerifFormat.est_un_alphanumerique(donnee['no_prestation'],
-                                                                                  "le no prestation", ligne)
+                donnee['no_prestation'], info = Format.est_un_alphanumerique(donnee['no_prestation'],
+                                                                             "le no prestation", ligne)
                 msg += info
 
-            donnee['designation'], info = VerifFormat.est_un_texte(donnee['designation'], "la désignation", ligne)
+            donnee['designation'], info = Format.est_un_texte(donnee['designation'], "la désignation", ligne)
             msg += info
-            donnee['unite_prest'], info = VerifFormat.est_un_texte(donnee['unite_prest'], "l'unité prestation", ligne,
-                                                                   True)
+            donnee['unite_prest'], info = Format.est_un_texte(donnee['unite_prest'], "l'unité prestation", ligne, True)
             msg += info
 
             if donnee['id_article'] == "":
@@ -75,7 +74,7 @@ class Prestation(Fichier):
 
             msg += self._test_id_coherence(donnee['id_machine'], "l'id machine", ligne, machines, True)
 
-            donnee['prix_unit'], info = VerifFormat.est_un_nombre(donnee['prix_unit'], "le prix unitaire", ligne, 2, 0)
+            donnee['prix_unit'], info = Format.est_un_nombre(donnee['prix_unit'], "le prix unitaire", ligne, 2, 0)
             msg += info
 
             del donnee['annee']
@@ -85,4 +84,4 @@ class Prestation(Fichier):
 
         self.donnees = donnees_dict
         if msg != "":
-            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)
+            Interface.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

@@ -1,6 +1,6 @@
 from imports import Fichier
-from core import (Outils,
-                  VerifFormat,
+from core import (Interface,
+                  Format,
                   ErreurConsistance)
 
 
@@ -28,7 +28,7 @@ class User(Fichier):
         # scipers = []
 
         for donnee in self.donnees:
-            donnee['id_user'], info = VerifFormat.est_un_alphanumerique(donnee['id_user'], "l'id user", ligne)
+            donnee['id_user'], info = Format.est_un_alphanumerique(donnee['id_user'], "l'id user", ligne)
             msg += info
             if donnee['id_user'] == "":
                 msg += "l'id user de la ligne " + str(ligne) + " ne peut être vide\n"
@@ -38,7 +38,7 @@ class User(Fichier):
                 msg += "l'id user '" + donnee['id_user'] + "' de la ligne " + str(ligne) +\
                        " n'est pas unique\n"
 
-            donnee['sciper'], info = VerifFormat.est_un_alphanumerique(donnee['sciper'], "le sciper", ligne)
+            donnee['sciper'], info = Format.est_un_alphanumerique(donnee['sciper'], "le sciper", ligne)
             msg += info
             # if donnee['sciper'] == "":
             #     msg += "le sciper de la ligne " + str(ligne) + " ne peut être vide\n"
@@ -48,9 +48,9 @@ class User(Fichier):
             #     msg += "le sciper '" + donnee['sciper'] + "' de la ligne " + str(ligne) +\
             #            " n'est pas unique\n"
 
-            donnee['nom'], info = VerifFormat.est_un_texte(donnee['nom'], "le nom", ligne)
+            donnee['nom'], info = Format.est_un_texte(donnee['nom'], "le nom", ligne)
             msg += info
-            donnee['prenom'], info = VerifFormat.est_un_texte(donnee['prenom'], "le prénom", ligne)
+            donnee['prenom'], info = Format.est_un_texte(donnee['prenom'], "le prénom", ligne)
             msg += info
 
             donnees_dict[donnee['id_user']] = donnee
@@ -59,4 +59,4 @@ class User(Fichier):
         self.donnees = donnees_dict
 
         if msg != "":
-            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)
+            Interface.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

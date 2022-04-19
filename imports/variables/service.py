@@ -1,6 +1,6 @@
 from imports import Fichier
-from core import (Outils,
-                  VerifFormat,
+from core import (Interface,
+                  Format,
                   ErreurConsistance)
 
 
@@ -30,9 +30,9 @@ class Service(Fichier):
         coms = []
 
         for donnee in self.donnees:
-            donnee['mois'], info = VerifFormat.est_un_entier(donnee['mois'], "le mois ", ligne, 1, 12)
+            donnee['mois'], info = Format.est_un_entier(donnee['mois'], "le mois ", ligne, 1, 12)
             msg += info
-            donnee['annee'], info = VerifFormat.est_un_entier(donnee['annee'], "l'annee ", ligne, 2000, 2099)
+            donnee['annee'], info = Format.est_un_entier(donnee['annee'], "l'annee ", ligne, 2000, 2099)
             msg += info
 
             info = self._test_id_coherence(donnee['id_compte'], "l'id compte", ligne, comptes)
@@ -47,14 +47,14 @@ class Service(Fichier):
 
             msg += self._test_id_coherence(donnee['id_op'], "l'id opérateur", ligne, users)
 
-            donnee['quantite'], info = VerifFormat.est_un_nombre(donnee['quantite'], "la quantité", ligne, 3, 0)
+            donnee['quantite'], info = Format.est_un_nombre(donnee['quantite'], "la quantité", ligne, 3, 0)
             msg += info
 
-            donnee['date'], info = VerifFormat.est_une_date(donnee['date'], "la date", ligne)
+            donnee['date'], info = Format.est_une_date(donnee['date'], "la date", ligne)
             msg += info
 
-            donnee['remarque_staff'], info = VerifFormat.est_un_texte(donnee['remarque_staff'], "la remarque staff",
-                                                                      ligne, True)
+            donnee['remarque_staff'], info = Format.est_un_texte(donnee['remarque_staff'], "la remarque staff", ligne,
+                                                                 True)
             msg += info
 
             donnees_list.append(donnee)
@@ -63,4 +63,4 @@ class Service(Fichier):
 
         self.donnees = donnees_list
         if msg != "":
-            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)
+            Interface.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

@@ -1,6 +1,6 @@
 from imports import Fichier
-from core import (Outils,
-                  VerifFormat,
+from core import (Interface,
+                  Format,
                   ErreurConsistance)
 
 
@@ -31,11 +31,11 @@ class Compte(Fichier):
         for donnee in self.donnees:
             msg += self._test_id_coherence(donnee['code_client'], "le code client", ligne, clients)
 
-            donnee['numero'], info = VerifFormat.est_un_alphanumerique(donnee['numero'], "le numéro de compte", ligne)
+            donnee['numero'], info = Format.est_un_alphanumerique(donnee['numero'], "le numéro de compte", ligne)
             msg += info
-            donnee['intitule'], info = VerifFormat.est_un_texte(donnee['intitule'], "l'intitulé", ligne)
+            donnee['intitule'], info = Format.est_un_texte(donnee['intitule'], "l'intitulé", ligne)
             msg += info
-            donnee['id_compte'], info = VerifFormat.est_un_alphanumerique(donnee['id_compte'], "l'id compte", ligne)
+            donnee['id_compte'], info = Format.est_un_alphanumerique(donnee['id_compte'], "l'id compte", ligne)
             msg += info
             if info == "":
                 if donnee['id_compte'] not in ids:
@@ -54,4 +54,4 @@ class Compte(Fichier):
         self.donnees = donnees_dict
 
         if msg != "":
-            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)
+            Interface.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

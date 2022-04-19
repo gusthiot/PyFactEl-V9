@@ -1,6 +1,6 @@
 from imports import Fichier
-from core import (Outils,
-                  VerifFormat,
+from core import (Interface,
+                  Format,
                   ErreurConsistance)
 
 
@@ -27,21 +27,21 @@ class Subside(Fichier):
         types = []
 
         for donnee in self.donnees:
-            donnee['type'], info = VerifFormat.est_un_alphanumerique(donnee['type'], "le type subside", ligne)
+            donnee['type'], info = Format.est_un_alphanumerique(donnee['type'], "le type subside", ligne)
             msg += info
             if info == "":
                 if donnee['type'] not in types:
                     types.append(donnee['type'])
                 else:
                     msg += "le type de la ligne " + str(ligne) + " n'est pas unique\n"
-            donnee['intitule'], info = VerifFormat.est_un_texte(donnee['intitule'], "l'intitulé", ligne)
+            donnee['intitule'], info = Format.est_un_texte(donnee['intitule'], "l'intitulé", ligne)
             msg += info
 
             if donnee['debut'] != 'NULL':
-                donnee['debut'], info = VerifFormat.est_une_date(donnee['debut'], "la date de début", ligne)
+                donnee['debut'], info = Format.est_une_date(donnee['debut'], "la date de début", ligne)
                 msg += info
             if donnee['fin'] != 'NULL':
-                donnee['fin'], info = VerifFormat.est_une_date(donnee['fin'], "la date de fin", ligne)
+                donnee['fin'], info = Format.est_une_date(donnee['fin'], "la date de fin", ligne)
                 msg += info
             if donnee['debut'] != 'NULL' and donnee['fin'] != 'NULL':
                 if donnee['debut'] > donnee['fin']:
@@ -54,4 +54,4 @@ class Subside(Fichier):
         self.donnees = donnees_dict
 
         if msg != "":
-            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)
+            Interface.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

@@ -1,8 +1,8 @@
-from core import (Outils,
-                  CsvBase)
+from core import (Format,
+                  CsvDict)
 
 
-class Articles(CsvBase):
+class Articles(CsvDict):
     """
     Classe pour la création du listing des articles
     """
@@ -17,15 +17,15 @@ class Articles(CsvBase):
         :param imports: données importées
         """
         super().__init__(imports)
-        self.nom = "article_" + str(imports.edition.annee) + "_" + Outils.mois_string(imports.edition.mois) + ".csv"
+        self.nom = "article_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + ".csv"
 
         for key in imports.categories.donnees.keys():
             cat = imports.categories.donnees[key]
             art = imports.artsap.donnees[cat['id_article']]
-            donnee = [cat['id_categorie'], cat['no_categorie'], cat['intitule'], cat['unite'], cat['id_article'],
-                      art['code_d'], art['flag_usage'], art['flag_conso'], art['eligible'], art['ordre'],
-                      art['intitule'], cat['id_plateforme'], "FALSE"]
-            self.ajouter_valeur(donnee, cat['id_categorie'])
+            donnee = [self.imports.edition.annee, self.imports.edition.mois, cat['id_categorie'], cat['no_categorie'],
+                      cat['intitule'], cat['unite'], cat['id_article'], art['code_d'], art['flag_usage'],
+                      art['flag_conso'], art['eligible'], art['ordre'], art['intitule'], cat['id_plateforme'], "FALSE"]
+            self._ajouter_valeur(donnee, cat['id_categorie'])
 
         for key in imports.prestations.donnees.keys():
             prest = imports.prestations.donnees[key]
@@ -34,7 +34,8 @@ class Articles(CsvBase):
                 extra = "FALSE"
             else:
                 extra = "TRUE"
-            donnee = [prest['id_prestation'], prest['no_prestation'], prest['designation'],
-                      prest['unite_prest'], prest['id_article'], art['code_d'], art['flag_usage'], art['flag_conso'],
-                      art['eligible'], art['ordre'], art['intitule'], prest['id_plateforme'], extra]
-            self.ajouter_valeur(donnee, prest['id_prestation'])
+            donnee = [self.imports.edition.annee, self.imports.edition.mois, prest['id_prestation'],
+                      prest['no_prestation'], prest['designation'], prest['unite_prest'], prest['id_article'],
+                      art['code_d'], art['flag_usage'], art['flag_conso'], art['eligible'], art['ordre'],
+                      art['intitule'], prest['id_plateforme'], extra]
+            self._ajouter_valeur(donnee, prest['id_prestation'])

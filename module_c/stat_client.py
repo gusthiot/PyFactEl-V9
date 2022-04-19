@@ -1,7 +1,8 @@
-from core import Outils
+from core import (Format,
+                  CsvList)
 
 
-class StatClient(object):
+class StatClient(CsvList):
     """
     Classe pour la création du csv des stats nombre user
     """
@@ -18,12 +19,10 @@ class StatClient(object):
         :param par_ul: tri des users labo
         :param par_client: tri des transactions
         """
+        super().__init__(imports)
 
-        self.imports = imports
-        self.plateforme = imports.plateformes.donnees[imports.edition.plateforme]
-
-        self.nom = "Stat-client_" + str(self.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + "_" \
-                   + Outils.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
+        self.nom = "Stat-client_" + str(imports.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + "_" \
+                   + Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
 
         stats_clients = {}
 
@@ -53,13 +52,9 @@ class StatClient(object):
                             if idd not in stats_clients[code]['12m']:
                                 stats_clients[code]['12m'].append(idd)
 
-        self.lignes = []
-        plate_name = ""
         for code in par_client.keys():
             tbtr = par_client[code]['transactions']
             base = transactions.valeurs[tbtr[0]]
-            if plate_name == "":
-                plate_name = base['platf-name']
             ligne = [imports.edition.annee, imports.edition.mois]
             for cle in range(2, len(self.cles)-6):
                 ligne.append(base[self.cles[cle]])
@@ -70,20 +65,3 @@ class StatClient(object):
             stats = stats_clients[code]
             ligne += [len(tbtr), stat_run, stats['1m'], len(stats['3m']), len(stats['6m']), len(stats['12m'])]
             self.lignes.append(ligne)
-
-    def csv(self, dossier_destination):
-        """
-        création du fichier csv à partir de la liste des noms de colonnes
-        :param dossier_destination: Une instance de la classe dossier.DossierDestination
-        """
-
-        pt = self.imports.paramtexte.donnees
-
-        with dossier_destination.writer(self.nom) as fichier_writer:
-            ligne = []
-            for cle in self.cles:
-                ligne.append(pt[cle])
-            fichier_writer.writerow(ligne)
-
-            for ligne in self.lignes:
-                fichier_writer.writerow(ligne)

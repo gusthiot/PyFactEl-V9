@@ -2,10 +2,22 @@ from datetime import datetime
 import re
 
 
-class VerifFormat(object):
+class Format(object):
     """
-    Classe contenant des méthodes pour vérifier le format des données d'entrée
+    Classe contenant des méthodes pour vérifier ou adapter le format des données
     """
+    @staticmethod
+    def mois_string(mois):
+        """
+        prend un mois comme nombre, et le retourne comme string, avec un '0' devant si plus petit que 10
+        :param mois: mois formaté en nombre
+        :return: mois formaté en string
+        """
+        if mois < 10:
+            return "0" + str(mois)
+        else:
+            return str(mois)
+
     @staticmethod
     def est_un_texte(donnee, colonne, ligne=-1, vide=False):
         """

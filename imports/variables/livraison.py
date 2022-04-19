@@ -1,6 +1,6 @@
 from imports import Fichier
-from core import (Outils,
-                  VerifFormat,
+from core import (Interface,
+                  Format,
                   ErreurConsistance)
 
 
@@ -31,9 +31,9 @@ class Livraison(Fichier):
         coms = []
 
         for donnee in self.donnees:
-            donnee['mois'], info = VerifFormat.est_un_entier(donnee['mois'], "le mois ", ligne, 1, 12)
+            donnee['mois'], info = Format.est_un_entier(donnee['mois'], "le mois ", ligne, 1, 12)
             msg += info
-            donnee['annee'], info = VerifFormat.est_un_entier(donnee['annee'], "l'annee ", ligne, 2000, 2099)
+            donnee['annee'], info = Format.est_un_entier(donnee['annee'], "l'annee ", ligne, 2000, 2099)
             msg += info
 
             info = self._test_id_coherence(donnee['id_compte'], "l'id compte", ligne, comptes)
@@ -48,21 +48,20 @@ class Livraison(Fichier):
 
             msg += self._test_id_coherence(donnee['id_operateur'], "l'id opérateur", ligne, users)
 
-            donnee['quantite'], info = VerifFormat.est_un_nombre(donnee['quantite'], "la quantité", ligne, 1, 0)
+            donnee['quantite'], info = Format.est_un_nombre(donnee['quantite'], "la quantité", ligne, 1, 0)
             msg += info
-            donnee['rabais'], info = VerifFormat.est_un_nombre(donnee['rabais'], "le rabais", ligne, 2, 0)
-            msg += info
-
-            donnee['date_livraison'], info = VerifFormat.est_une_date(donnee['date_livraison'], "la date de livraison",
-                                                                      ligne)
-            msg += info
-            donnee['date_commande'], info = VerifFormat.est_une_date(donnee['date_commande'], "la date de commande",
-                                                                     ligne)
+            donnee['rabais'], info = Format.est_un_nombre(donnee['rabais'], "le rabais", ligne, 2, 0)
             msg += info
 
-            donnee['id_livraison'], info = VerifFormat.est_un_texte(donnee['id_livraison'], "l'id livraison", ligne)
+            donnee['date_livraison'], info = Format.est_une_date(donnee['date_livraison'], "la date de livraison",
+                                                                 ligne)
             msg += info
-            donnee['remarque'], info = VerifFormat.est_un_texte(donnee['remarque'], "la remarque", ligne, True)
+            donnee['date_commande'], info = Format.est_une_date(donnee['date_commande'], "la date de commande", ligne)
+            msg += info
+
+            donnee['id_livraison'], info = Format.est_un_texte(donnee['id_livraison'], "l'id livraison", ligne)
+            msg += info
+            donnee['remarque'], info = Format.est_un_texte(donnee['remarque'], "la remarque", ligne, True)
             msg += info
 
             donnees_list.append(donnee)
@@ -71,4 +70,4 @@ class Livraison(Fichier):
 
         self.donnees = donnees_list
         if msg != "":
-            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)
+            Interface.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

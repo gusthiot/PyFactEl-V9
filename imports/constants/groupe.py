@@ -1,6 +1,6 @@
 from imports import Fichier
-from core import (Outils,
-                  VerifFormat,
+from core import (Interface,
+                  Format,
                   ErreurConsistance)
 
 
@@ -30,7 +30,7 @@ class Groupe(Fichier):
         ids = []
 
         for donnee in self.donnees:
-            donnee['id_groupe'], info = VerifFormat.est_un_alphanumerique(donnee['id_groupe'], "l'id groupe", ligne)
+            donnee['id_groupe'], info = Format.est_un_alphanumerique(donnee['id_groupe'], "l'id groupe", ligne)
             msg += info
             if info == "":
                 if donnee['id_groupe'] not in ids:
@@ -51,4 +51,4 @@ class Groupe(Fichier):
         self.donnees = donnees_dict
 
         if msg != "":
-            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)
+            Interface.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

@@ -1,6 +1,6 @@
 from imports import Fichier
-from core import (Outils,
-                  VerifFormat,
+from core import (Interface,
+                  Format,
                   ErreurConsistance)
 
 
@@ -29,14 +29,14 @@ class Machine(Fichier):
         ids = []
 
         for donnee in self.donnees:
-            donnee['mois'], info = VerifFormat.est_un_entier(donnee['mois'], "le mois ", ligne, 1, 12)
+            donnee['mois'], info = Format.est_un_entier(donnee['mois'], "le mois ", ligne, 1, 12)
             msg += info
-            donnee['annee'], info = VerifFormat.est_un_entier(donnee['annee'], "l'annee ", ligne, 2000, 2099)
+            donnee['annee'], info = Format.est_un_entier(donnee['annee'], "l'annee ", ligne, 2000, 2099)
             msg += info
             if donnee['mois'] != edition.mois or donnee['annee'] != edition.annee:
                 msg += "date incorrect ligne " + str(ligne) + "\n"
 
-            donnee['id_machine'], info = VerifFormat.est_un_alphanumerique(donnee['id_machine'], "l'id machine", ligne)
+            donnee['id_machine'], info = Format.est_un_alphanumerique(donnee['id_machine'], "l'id machine", ligne)
             msg += info
             if info == "":
                 if donnee['id_machine'] not in ids:
@@ -47,10 +47,10 @@ class Machine(Fichier):
 
             msg += self._test_id_coherence(donnee['id_groupe'], "l'id groupe", ligne, groupes)
 
-            donnee['tx_rabais_hc'], info = VerifFormat.est_un_nombre(donnee['tx_rabais_hc'], "le rabais heures creuses",
+            donnee['tx_rabais_hc'], info = Format.est_un_nombre(donnee['tx_rabais_hc'], "le rabais heures creuses",
                                                                 ligne, mini=0, maxi=100)
             msg += info
-            donnee['nom'], info = VerifFormat.est_un_texte(donnee['nom'], "le nom machine", ligne)
+            donnee['nom'], info = Format.est_un_texte(donnee['nom'], "le nom machine", ligne)
             msg += info
 
             del donnee['annee']
@@ -61,4 +61,4 @@ class Machine(Fichier):
         self.donnees = donnees_dict
 
         if msg != "":
-            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)
+            Interface.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

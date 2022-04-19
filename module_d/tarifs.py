@@ -1,8 +1,8 @@
-from core import (Outils,
-                  CsvBase)
+from core import (Format,
+                  CsvDict)
 
 
-class Tarifs(CsvBase):
+class Tarifs(CsvDict):
     """
     Classe pour la création du listing des tarifs
     """
@@ -15,20 +15,22 @@ class Tarifs(CsvBase):
         :param imports: données importées
         """
         super().__init__(imports)
-        self.nom = "tarif_" + str(imports.edition.annee) + "_" + Outils.mois_string(imports.edition.mois) + ".csv"
+        self.nom = "tarif_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + ".csv"
 
         for key in imports.categories.donnees.keys():
             cat = imports.categories.donnees[key]
             for id_classe in imports.classes.donnees.keys():
                 unique = id_classe + cat['id_categorie']
                 prix_unit = imports.categprix.donnees[unique]['prix_unit']
-                donnee = [cat['id_categorie'], id_classe, prix_unit]
-                self.ajouter_valeur(donnee, unique)
+                donnee = [self.imports.edition.annee, self.imports.edition.mois, cat['id_categorie'], id_classe,
+                          prix_unit]
+                self._ajouter_valeur(donnee, unique)
 
         for key in imports.prestations.donnees.keys():
             prest = imports.prestations.donnees[key]
             for id_classe in imports.classes.donnees.keys():
                 coefprest = imports.coefprests.donnees[id_classe + prest['id_article']]
                 prix_unit = round(prest['prix_unit'] * coefprest['coefficient'], 2)
-                donnee = [prest['id_prestation'], id_classe, prix_unit]
-                self.ajouter_valeur(donnee, id_classe + prest['id_prestation'])
+                donnee = [self.imports.edition.annee, self.imports.edition.mois, prest['id_prestation'], id_classe,
+                          prix_unit]
+                self._ajouter_valeur(donnee, id_classe + prest['id_prestation'])

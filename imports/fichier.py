@@ -1,4 +1,4 @@
-from core import (Outils,
+from core import (Interface,
                   ErreurConsistance)
 
 
@@ -11,6 +11,9 @@ class Fichier(object):
          libelle        Un intitulé pour les messages d'erreur
          cles           La liste des colonnes à charger
     """
+    nom_fichier = ""
+    cles = []
+    libelle = ""
 
     def __init__(self, dossier_source):
         """
@@ -27,7 +30,7 @@ class Fichier(object):
                 donnees_csv.append(donnees_ligne)
             self.donnees = donnees_csv
         except IOError as e:
-            Outils.fatal(e, "impossible d'ouvrir le fichier : "+self.nom_fichier)
+            Interface.fatal(e, "impossible d'ouvrir le fichier : "+self.nom_fichier)
 
     def _extraction_ligne(self, ligne):
         """
@@ -37,7 +40,7 @@ class Fichier(object):
         """
         num = len(self.cles)
         if len(ligne) != num:
-            Outils.fatal(ErreurConsistance(),
+            Interface.fatal(ErreurConsistance(),
                          self.libelle + ": nombre de lignes incorrect : " +
                          str(len(ligne)) + ", attendu : " + str(num))
         donnees_ligne = {}

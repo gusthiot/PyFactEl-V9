@@ -1,7 +1,8 @@
-from core import Outils
+from core import (Format,
+                  CsvList)
 
 
-class StatUser(object):
+class StatUser(CsvList):
     """
     Classe pour la création du csv des stats nombre user
     """
@@ -17,14 +18,11 @@ class StatUser(object):
         :param transactions: transactions générées
         :param par_user: tri des transactions
         """
+        super().__init__(imports)
 
-        self.imports = imports
-        self.plateforme = imports.plateformes.donnees[imports.edition.plateforme]
+        self.nom = "Stat-user_" + str(imports.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + "_" \
+                   + Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
 
-        self.nom = "Stat-user_" + str(self.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + "_" \
-                   + Outils.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
-
-        self.lignes = []
         for id_user in par_user.keys():
             par_client = par_user[id_user]
             for code in par_client.keys():
@@ -42,20 +40,3 @@ class StatUser(object):
                         stat_run += 1
                 ligne += [stat_trans, stat_run]
                 self.lignes.append(ligne)
-
-    def csv(self, dossier_destination):
-        """
-        création du fichier csv à partir de la liste des noms de colonnes
-        :param dossier_destination: Une instance de la classe dossier.DossierDestination
-        """
-
-        pt = self.imports.paramtexte.donnees
-
-        with dossier_destination.writer(self.nom) as fichier_writer:
-            ligne = []
-            for cle in self.cles:
-                ligne.append(pt[cle])
-            fichier_writer.writerow(ligne)
-
-            for ligne in self.lignes:
-                fichier_writer.writerow(ligne)

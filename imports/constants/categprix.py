@@ -1,6 +1,6 @@
 from imports import Fichier
-from core import (Outils,
-                  VerifFormat,
+from core import (Interface,
+                  Format,
                   ErreurConsistance)
 
 
@@ -51,7 +51,7 @@ class CategPrix(Fichier):
                     msg += "Couple id catégorie '" + donnee['id_categorie'] + "' et id classe '" + \
                            donnee['id_classe'] + "' de la ligne " + str(ligne) + " pas unique\n"
 
-            donnee['prix_unit'], info = VerifFormat.est_un_nombre(donnee['prix_unit'], "le prix unitaire ", ligne, 2)
+            donnee['prix_unit'], info = Format.est_un_nombre(donnee['prix_unit'], "le prix unitaire ", ligne, 2)
             msg += info
 
             donnees_dict[donnee['id_classe'] + donnee['id_categorie']] = donnee
@@ -76,4 +76,4 @@ class CategPrix(Fichier):
                            classe + "' n'existe pas\n"
 
         if msg != "":
-            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)
+            Interface.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

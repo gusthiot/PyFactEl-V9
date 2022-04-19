@@ -1,5 +1,5 @@
 from imports import Fichier
-from core import (Outils,
+from core import (Interface,
                   ErreurConsistance)
 
 
@@ -63,4 +63,4 @@ class CleSubside(Fichier):
         self.donnees = donnees_dict
 
         if msg != "":
-            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)
+            Interface.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

@@ -1,6 +1,6 @@
 from imports import Fichier
-from core import (Outils,
-                  VerifFormat,
+from core import (Interface,
+                  Format,
                   ErreurConsistance)
 
 
@@ -43,14 +43,14 @@ class PlafSubside(Fichier):
                 msg += "Triplet type '" + donnee['type'] + "' id plateforme '" + donnee['id_plateforme'] + \
                        "' et id article SAP '" + donnee['id_article'] + "' de la ligne " + str(ligne) + " pas unique\n"
 
-            donnee['pourcentage'], info = VerifFormat.est_un_nombre(donnee['pourcentage'], "le pourcentage", ligne, 2,
-                                                                    0, 100)
+            donnee['pourcentage'], info = Format.est_un_nombre(donnee['pourcentage'], "le pourcentage", ligne, 2, 0,
+                                                               100)
             msg += info
 
-            donnee['max_mois'], info = VerifFormat.est_un_nombre(donnee['max_mois'], "le max mensuel", ligne, 2, 0)
+            donnee['max_mois'], info = Format.est_un_nombre(donnee['max_mois'], "le max mensuel", ligne, 2, 0)
             msg += info
 
-            donnee['max_compte'], info = VerifFormat.est_un_nombre(donnee['max_compte'], "le max compte", ligne, 2, 0)
+            donnee['max_compte'], info = Format.est_un_nombre(donnee['max_compte'], "le max compte", ligne, 2, 0)
             msg += info
 
             donnees_dict[donnee['type'] + donnee['id_plateforme'] + donnee['id_article']] = donnee
@@ -59,4 +59,4 @@ class PlafSubside(Fichier):
         self.donnees = donnees_dict
 
         if msg != "":
-            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)
+            Interface.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

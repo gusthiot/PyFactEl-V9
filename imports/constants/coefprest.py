@@ -1,6 +1,6 @@
 from imports import Fichier
-from core import (Outils,
-                  VerifFormat,
+from core import (Interface,
+                  Format,
                   ErreurConsistance)
 
 
@@ -50,8 +50,7 @@ class CoefPrest(Fichier):
                 msg += "Couple id article SAP '" + donnee['id_article'] + "' et id classe client '" + \
                        donnee['id_classe'] + "' de la ligne " + str(ligne) + " pas unique\n"
 
-            donnee['coefficient'], info = VerifFormat.est_un_nombre(donnee['coefficient'], "le coefficient", ligne, 2,
-                                                                    0)
+            donnee['coefficient'], info = Format.est_un_nombre(donnee['coefficient'], "le coefficient", ligne, 2, 0)
             msg += info
 
             donnees_dict[donnee['id_classe'] + donnee['id_article']] = donnee
@@ -77,7 +76,7 @@ class CoefPrest(Fichier):
                            id_classe + "' n'existe pas\n"
 
         if msg != "":
-            Outils.fatal(ErreurConsistance(), self.libelle + "\n" + msg)
+            Interface.fatal(ErreurConsistance(), self.libelle + "\n" + msg)
 
     def contient_article(self, id_article):
         """
