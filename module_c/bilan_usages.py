@@ -24,8 +24,7 @@ class BilanUsages(CsvList):
                    Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
 
         trans_vals = transactions.valeurs
-        for item in par_item.keys():
-            tbtr = par_item[item]
+        for tbtr in par_item.values():
             base = trans_vals[tbtr[0]]
             if base['item-flag-usage'] == "OUI":
                 ligne = [imports.edition.annee, imports.edition.mois]
@@ -51,5 +50,5 @@ class BilanUsages(CsvList):
                     for rt in rts:
                         somme += math.pow(rt-avg, 2)
                     stddev = math.sqrt(1 / nn * somme)
-                ligne += [round(usage, 4), round(runtime, 4), nn, round(avg, 4), round(stddev, 4)]
+                ligne += [round(usage, 3), round(runtime, 3), nn, round(avg, 3), round(stddev, 3)]
                 self.lignes.append(ligne)

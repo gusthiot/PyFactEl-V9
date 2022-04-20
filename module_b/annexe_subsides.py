@@ -28,8 +28,7 @@ class AnnexeSubsides(object):
         self.csv_fichiers = csv_fichiers
 
         clients_comptes = {}
-        for id_compte in imports.comptes.donnees.keys():
-            compte = imports.comptes.donnees[id_compte]
+        for id_compte, compte in imports.comptes.donnees.items():
             type_s = compte['type_subside']
             if type_s != "":
                 if type_s in imports.subsides.donnees.keys():
@@ -55,8 +54,7 @@ class AnnexeSubsides(object):
                                 clients_comptes[code_client] = []
                             clients_comptes[code_client].append(id_compte)
 
-        for code in clients_comptes.keys():
-            cc = clients_comptes[code]
+        for code, cc in clients_comptes.items():
             ii = 0
             lignes = []
             client = imports.clients.donnees[code]
@@ -73,16 +71,15 @@ class AnnexeSubsides(object):
                 type_s = compte['type_subside']
                 subside = imports.subsides.donnees[type_s]
 
-                for id_article in imports.artsap.donnees.keys():
+                for id_article, artsap in imports.artsap.donnees.items():
                     plaf = type_s + imports.plateforme['id_plateforme'] + id_article
                     if plaf in imports.plafonds.donnees.keys():
                         plafond = imports.plafonds.donnees[plaf]
                         ligne = [imports.edition.annee, imports.edition.mois, imports.version,
                                  imports.plateforme['abrev_plat'], client['code'], client['abrev_labo'],
                                  compte['id_compte'], compte['intitule'], id_article,
-                                 imports.artsap.donnees[id_article]['intitule'], subside['type'],
-                                 subside['intitule'], subside['debut'], subside['fin'], plafond['pourcentage'],
-                                 plafond['max_compte'], plafond['max_mois']]
+                                 artsap['intitule'], subside['type'], subside['intitule'], subside['debut'],
+                                 subside['fin'], plafond['pourcentage'], plafond['max_compte'], plafond['max_mois']]
                         subs = 0
                         g_id = id_compte + imports.plateforme['id_plateforme'] + id_article
                         if g_id in imports.grants.donnees.keys():
@@ -97,7 +94,9 @@ class AnnexeSubsides(object):
                             if id_article in par_code.keys():
                                 tbtr = par_code[id_article]
                                 for indice in tbtr:
-                                    subs += transactions.valeurs[indice]['subsid-CHF']
+                                    trans = transactions.valeurs[indice]
+                                    if trans['subsid-code'] != "" and trans['subsid-maxproj'] > 0:
+                                        subs += trans['subsid-CHF']
 
                         reste = plafond['max_compte'] - grant - subs
                         ligne += [round(grant, 2), round(subs, 2), round(reste, 2)]

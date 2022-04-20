@@ -24,10 +24,8 @@ class BilanSubsides(CsvList):
         self.nom = "Bilan-subsides_" + str(imports.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + \
                    "_" + Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
 
-        for code in par_client.keys():
-            par_code = par_client[code]['articles']
-            for code_d in par_code.keys():
-                tbtr = par_code[code_d]
+        for par_code in par_client.values():
+            for tbtr in par_code['articles'].values():
                 base = transactions.valeurs[tbtr[0]]
                 ligne = [imports.edition.annee, imports.edition.mois]
                 for cle in range(2, len(self.cles)-7):

@@ -106,16 +106,15 @@ class Chemin(object):
         :param chemin_destination: dossier de sauvegarde des fichiers csv et du zip
         """
 
-        for code in csv_fichiers.keys():
-
-            fichier_zip = zipfile.ZipFile(chemin_destination + "/" + csv_fichiers[code]['nom'], 'w')
-            for file in csv_fichiers[code]['fichiers']:
+        for client in csv_fichiers.values():
+            fichier_zip = zipfile.ZipFile(chemin_destination + "/" + client['nom'], 'w')
+            for file in client['fichiers']:
                 fichier_zip.write(os.path.join(chemin_destination, file),
                                   os.path.relpath(os.path.join(chemin_destination, file), chemin_destination),
                                   compress_type=zipfile.ZIP_DEFLATED)
             fichier_zip.close()
             try:
-                for file in csv_fichiers[code]['fichiers']:
+                for file in client['fichiers']:
                     os.unlink(os.path.join(chemin_destination, file))
             except IOError as err:
                 Interface.affiche_message("IOError: {0}".format(err))

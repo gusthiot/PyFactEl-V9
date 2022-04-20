@@ -17,8 +17,7 @@ class Tarifs(CsvDict):
         super().__init__(imports)
         self.nom = "tarif_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + ".csv"
 
-        for key in imports.categories.donnees.keys():
-            cat = imports.categories.donnees[key]
+        for cat in imports.categories.donnees.values():
             for id_classe in imports.classes.donnees.keys():
                 unique = id_classe + cat['id_categorie']
                 prix_unit = imports.categprix.donnees[unique]['prix_unit']
@@ -26,8 +25,7 @@ class Tarifs(CsvDict):
                           prix_unit]
                 self._ajouter_valeur(donnee, unique)
 
-        for key in imports.prestations.donnees.keys():
-            prest = imports.prestations.donnees[key]
+        for prest in imports.prestations.donnees.values():
             for id_classe in imports.classes.donnees.keys():
                 coefprest = imports.coefprests.donnees[id_classe + prest['id_article']]
                 prix_unit = round(prest['prix_unit'] * coefprest['coefficient'], 2)

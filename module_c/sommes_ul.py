@@ -13,8 +13,7 @@ class SommesUL(object):
         """
 
         self.par_ul = {'annees': {}, 'semaines': {}}
-        for gross_key in usr_lab.valeurs.keys():
-            valeur = usr_lab.valeurs[gross_key]
+        for valeur in usr_lab.valeurs.values():
             annee = valeur['year']
             mois = valeur['month']
             pan = self.par_ul['annees']

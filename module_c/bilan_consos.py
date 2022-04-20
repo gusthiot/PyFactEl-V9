@@ -23,10 +23,8 @@ class BilanConsos(CsvList):
         self.nom = "Bilan-conso-propre_" + str(imports.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + \
                    "_" + Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
 
-        for id_projet in par_projet.keys():
-            par_item = par_projet[id_projet]
-            for item in par_item.keys():
-                tbtr = par_item[item]
+        for par_item in par_projet.values():
+            for tbtr in par_item.values():
                 base = transactions.valeurs[tbtr[0]]
                 if base['item-flag-conso'] == "OUI":
                     ligne = [imports.edition.annee, imports.edition.mois]

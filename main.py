@@ -36,7 +36,8 @@ from module_b import (GrantedNew,
                       NumeroNew,
                       AnnexeDetails,
                       AnnexeSubsides,
-                      BilanSubsides)
+                      BilanSubsides,
+                      Transactions2)
 from imports import (Edition,
                      Imports)
 
@@ -91,6 +92,8 @@ try:
         Chemin.csv_files_in_zip(ann_subs.csv_fichiers, imports.chemin_cannexes)
         bil_subs = BilanSubsides(imports, transactions, sommes.par_client)
         bil_subs.csv(DossierDestination(imports.chemin_bilans))
+        transactions2 = Transactions2(imports, transactions, sommes.par_client, new_numeros)
+        transactions2.csv((DossierDestination(imports.chemin_bilans)))
 
         Interface.affiche_message("OK !!! (" +
                                   str(datetime.timedelta(seconds=(time.time() - start_time))).split(".")[0] + ")")

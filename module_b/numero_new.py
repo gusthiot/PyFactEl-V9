@@ -1,5 +1,6 @@
 from core import (Format,
                   CsvList)
+from imports.construits import Numero
 
 
 class NumeroNew(CsvList):
@@ -16,11 +17,12 @@ class NumeroNew(CsvList):
         super().__init__(imports)
         self.nom = "Table-numeros-factures_" + str(imports.edition.annee) + "_" + \
                    Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
+        self.cles = Numero.cles
+
         self.couples = {}
         id_facture = 1000
         if imports.version > 0:
-            for key in imports.numeros.donnees.keys():
-                numero = imports.numeros.donnees[key]
+            for key, numero in imports.numeros.donnees.items():
                 if key > id_facture:
                     id_facture = key
                 code = numero['client-code']
@@ -30,8 +32,7 @@ class NumeroNew(CsvList):
                 self.couples[code][icf] = key
                 self.lignes.append([key, code, icf])
 
-        for key in transactions.valeurs.keys():
-            transaction = transactions.valeurs[key]
+        for transaction in transactions.valeurs.values():
             if (imports.edition.annee == transaction['invoice-year'] and
                     imports.edition.mois == transaction['invoice-month']):
                 code = transaction['client-code']

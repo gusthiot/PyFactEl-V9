@@ -28,7 +28,7 @@ class AnnexeDetails(object):
         pt = imports.paramtexte.donnees
         self.csv_fichiers = {}
 
-        for code in par_client.keys():
+        for code, pc in par_client.items():
 
             client = imports.clients.donnees[code]
             nom_zip = "Annexes_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + "_" + \
@@ -36,8 +36,8 @@ class AnnexeDetails(object):
             prefixe_csv = "Details_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + \
                           "_" + str(imports.version)
 
-            for icf in par_client[code]['projets']:
-                tbtr = par_client[code]['projets'][icf]
+            for icf in pc['projets']:
+                tbtr = pc['projets'][icf]['transactions']
                 id_fact = numeros.couples[code][icf]
                 nom_csv = prefixe_csv + "_" + str(id_fact) + "_" + client['abrev_labo'] + "_" + str(icf) + ".csv"
                 if code not in self.csv_fichiers:

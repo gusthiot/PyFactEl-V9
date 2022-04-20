@@ -41,13 +41,10 @@ class UserLaboNew(CsvDict):
                 print(self.valeurs[key])
             self._ajouter_valeur(valeur, key)
 
-        for id_user in par_user.keys():
-            par_client = par_user[id_user]
-            for code in par_client.keys():
-                par_jour = par_client[code]['days']
-                for jour in par_jour.keys():
-                    key = par_jour[jour]
-                    trans = transactions.valeurs[key]
+        for id_user, par_client in par_user.items():
+            for code, par_code in par_client.items():
+                for jour in par_code['days'].values():
+                    trans = transactions.valeurs[jour]
                     valeur = [imports.edition.annee, imports.edition.mois]
                     for cle in range(2, len(UserLabo.cles)):
                         if UserLabo.cles[cle] == 'day':

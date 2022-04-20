@@ -37,8 +37,7 @@ class CsvDict(_CsvBase):
                 ligne.append(pt[cle])
             fichier_writer.writerow(ligne)
 
-            for key in self.valeurs.keys():
-                valeur = self.valeurs[key]
+            for valeur in self.valeurs.values():
                 ligne = []
                 for i in range(0, len(self.cles)):
                     ligne.append(valeur[self.cles[i]])

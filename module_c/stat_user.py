@@ -23,10 +23,9 @@ class StatUser(CsvList):
         self.nom = "Stat-user_" + str(imports.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + "_" \
                    + Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
 
-        for id_user in par_user.keys():
-            par_client = par_user[id_user]
-            for code in par_client.keys():
-                tbtr = par_client[code]['transactions']
+        for par_client in par_user.values():
+            for par_code in par_client.values():
+                tbtr = par_code['transactions']
                 ligne = [imports.edition.annee, imports.edition.mois]
                 stat_trans = 0
                 stat_run = 0

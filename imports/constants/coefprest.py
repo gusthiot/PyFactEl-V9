@@ -84,7 +84,7 @@ class CoefPrest(Fichier):
         :param id_article: l'id article à vérifier
         :return: True si présente, False sinon
         """
-        for cle, coefprest in self.donnees.items():
+        for coefprest in self.donnees.values():
             if coefprest['id_article'] == id_article:
                 return True
         return False

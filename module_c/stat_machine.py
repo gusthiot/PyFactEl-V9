@@ -24,10 +24,9 @@ class StatMachine(CsvList):
         self.nom = "Stat-machine_" + str(imports.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + "_" \
                    + Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
 
-        for id_machine in par_machine.keys():
-            for item in par_machine[id_machine]:
+        for par_item in par_machine.values():
+            for tbtr in par_item.values():
                 ligne = [imports.edition.annee, imports.edition.mois]
-                tbtr = par_machine[id_machine][item]
                 base = transactions.valeurs[tbtr[0]]
                 for cle in range(2, len(self.cles)-6):
                     ligne.append(base[self.cles[cle]])
@@ -53,6 +52,6 @@ class StatMachine(CsvList):
                     for rt in rts:
                         somme += math.pow(rt-avg, 2)
                     stddev = math.sqrt(1 / nn * somme)
-                ligne += [round(quantity, 4), round(usage, 4), round(runtime, 4), nn, round(avg, 4),
-                          round(stddev, 4)]
+                ligne += [round(quantity, 3), round(usage, 3), round(runtime, 3), nn, round(avg, 3),
+                          round(stddev, 3)]
                 self.lignes.append(ligne)
