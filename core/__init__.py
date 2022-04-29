@@ -5,4 +5,5 @@ from .format import Format
 from .interface import Interface
 from .chemin import Chemin
 from .outils import Outils
+from .csv_import import CsvImport
 

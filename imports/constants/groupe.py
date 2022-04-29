@@ -1,10 +1,10 @@
-from imports import Fichier
+from core import CsvImport
 from core import (Interface,
                   Format,
                   ErreurConsistance)
 
 
-class Groupe(Fichier):
+class Groupe(CsvImport):
     """
     Classe pour l'importation des données de Machines Cmi
     """

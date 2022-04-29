@@ -1,17 +1,12 @@
 from core import (Format,
-                  CsvList)
+                  CsvDict)
+from imports.construits import Transactions2
 
 
-class Transactions2(CsvList):
+class Transactions2New(CsvDict):
     """
     Classe pour la création du csv de bilan subsides
     """
-
-    cles = ['invoice-year', 'invoice-month', 'invoice-version', 'invoice-id', 'platf-name', 'client-code', 'client-sap',
-            'client-name', 'client-idclass', 'client-class', 'client-labelclass', 'proj-id', 'proj-nbr', 'proj-name',
-            'user-id', 'user-name-f', 'date-start-y', 'date-start-m', 'date-end-y', 'date-end-m', 'item-idsap',
-            'item-codeD', 'item-order', 'item-labelcode', 'item-id', 'item-nbr', 'item-name', 'transac-quantity',
-            'item-unit', 'valuation-price', 'deduct-CHF', 'total-fact']
 
     def __init__(self, imports, transactions, par_client, numeros):
         """
@@ -25,7 +20,9 @@ class Transactions2(CsvList):
 
         self.nom = "Transaction2_" + str(imports.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + \
                    "_" + Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
+        self.cles = Transactions2.cles
 
+        i = 0
         for code, par_code in par_client.items():
             for icf in par_code['projets']:
                 par_fact = par_code['projets'][icf]
@@ -66,5 +63,5 @@ class Transactions2(CsvList):
                                 ligne.append(base[self.cles[cle]])
                             ligne += [round(quantity, 3), base['item-unit'], base['valuation-price'], round(deduct, 2),
                                       round(total, 2)]
-
-                            self.lignes.append(ligne)
+                            self._ajouter_valeur(ligne, i)
+                            i = i + 1

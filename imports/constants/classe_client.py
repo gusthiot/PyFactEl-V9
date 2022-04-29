@@ -1,10 +1,10 @@
-from imports import Fichier
+from core import CsvImport
 from core import (Interface,
                   Format,
                   ErreurConsistance)
 
 
-class ClasseClient(Fichier):
+class ClasseClient(CsvImport):
     """
     Classe pour l'importation des données de Classes Clients
     """

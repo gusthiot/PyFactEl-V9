@@ -1,10 +1,10 @@
-from imports import Fichier
+from core import CsvImport
 from core import (Interface,
                   Format,
                   ErreurConsistance)
 
 
-class NoShow(Fichier):
+class NoShow(CsvImport):
     """
     Classe pour l'importation des données de No Show
     """

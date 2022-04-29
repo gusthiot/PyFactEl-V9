@@ -1,10 +1,10 @@
-from imports import Fichier
+from core import CsvImport
 from core import (Interface,
                   Format,
                   ErreurConsistance)
 
 
-class ArticleSap(Fichier):
+class ArticleSap(CsvImport):
     """
     Classe pour l'importation des données des Articles SAP
     """

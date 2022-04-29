@@ -1,10 +1,10 @@
-from imports import Fichier
+from core import CsvImport
 from core import (Interface,
                   Format,
                   ErreurConsistance)
 
 
-class User(Fichier):
+class User(CsvImport):
     """
     Classe pour l'importation des données de Users
     """

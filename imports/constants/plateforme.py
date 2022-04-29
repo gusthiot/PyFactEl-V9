@@ -1,11 +1,11 @@
-from imports import Fichier
+from core import CsvImport
 from core import (Interface,
                   Format,
                   Chemin,
                   ErreurConsistance)
 
 
-class Plateforme(Fichier):
+class Plateforme(CsvImport):
     """
     Classe pour l'importation des données de Plateformes
     """

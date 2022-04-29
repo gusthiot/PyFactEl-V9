@@ -18,7 +18,6 @@ class Sommes(object):
         self.par_projet = {}
 
         for key, transaction in transactions.valeurs.items():
-            transaction = transactions.valeurs[key]
             code_client = transaction['client-code']
             id_compte = transaction['proj-id']
             user_id = transaction['user-id']

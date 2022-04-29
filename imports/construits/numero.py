@@ -1,10 +1,10 @@
-from imports import Fichier
+from core import CsvImport
 from core import (Interface,
                   Format,
                   ErreurConsistance)
 
 
-class Numero(Fichier):
+class Numero(CsvImport):
     """
     Classe pour l'importation des données des numéros de facture
     """

@@ -1,11 +1,11 @@
-from imports import Fichier
+from core import CsvImport
 from core import (Interface,
                   Format,
                   ErreurConsistance)
 import re
 
 
-class Client(Fichier):
+class Client(CsvImport):
     """
     Classe pour l'importation des données de Clients Cmi
     """

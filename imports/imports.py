@@ -22,7 +22,9 @@ from imports.variables import (Acces,
                                User)
 from imports.construits import (Numero,
                                 Granted,
-                                UserLabo)
+                                UserLabo,
+                                Version,
+                                Transactions2)
 from core import (Interface,
                   Chemin,
                   Format,
@@ -108,6 +110,8 @@ class Imports(object):
         self.livraisons = Livraison(dossier_source, self.comptes, self.prestations, self.users)
         self.services = Service(dossier_source, self.comptes, self.categories, self.users)
 
+        # importation des données du mois précédent
+
         if self.edition.mois > 1:
             annee_p = self.edition.annee
             mois_p = Format.mois_string(self.edition.mois-1)
@@ -134,13 +138,22 @@ class Imports(object):
                               self.plateformes)
         self.userlabs = UserLabo(DossierSource(self.chemin_precedent), self.edition, self.plateformes, self.clients,
                                  self.users)
+
+        # importation des données de la version précédente
         if self.version > 0:
-            self.chemin_vprec = Chemin.chemin([self.chemin_enregistrement, "V"+str(self.version-1), "OUT"],
+            vprec = self.version-1
+            self.chemin_vprec = Chemin.chemin([self.chemin_enregistrement, "V"+str(vprec), "OUT"],
                                               self.edition)
             if not Chemin.existe(self.chemin_vprec, False):
                 Interface.fatal(ErreurConsistance(), "le dossier " + self.chemin_vprec + " se doit d'être présent !")
-            self.numeros = Numero(DossierSource(self.chemin_vprec), self.edition, self.comptes, self.clients,
-                                  self.version-1)
+            self.numeros = Numero(DossierSource(self.chemin_vprec), self.edition, self.comptes, self.clients, vprec)
+            self.versions = Version(DossierSource(self.chemin_vprec), self.edition.annee, self.edition.mois, vprec)
+            self.chemin_bilprec = Chemin.chemin([self.chemin_enregistrement, "V"+str(vprec), "Bilans_Stats"],
+                                                self.edition)
+            if not Chemin.existe(self.chemin_bilprec, False):
+                Interface.fatal(ErreurConsistance(), "le dossier " + self.chemin_bilprec + " se doit d'être présent !")
+            self.transactions_2 = Transactions2(DossierSource(self.chemin_bilprec), self.edition.annee,
+                                                self.edition.mois, self.plateforme, vprec)
 
         # vérification terminée, création des dossiers de sauvegarde
 
@@ -159,10 +172,9 @@ class Imports(object):
                             self.categories, self.groupes, self.machines, self.categprix, self.coefprests,
                             self.prestations]:
                 dossier_destination.ecrire(fichier.nom_fichier, self.dossier_source.lire(fichier.nom_fichier))
-            for fichier in [self.grants,
-                            self.userlabs]:
-                dossier_destination.ecrire(fichier.nom_fichier,
-                                           DossierSource(self.chemin_precedent).lire(fichier.nom_fichier))
+            dossier_precedent = DossierSource(self.chemin_precedent)
+            for fichier in [self.grants, self.userlabs]:
+                dossier_destination.ecrire(fichier.nom_fichier, dossier_precedent.lire(fichier.nom_fichier))
             grille = self.plateforme['grille'] + '.pdf'
             DossierDestination(self.chemin_enregistrement).ecrire(grille, dossier_source.lire(grille))
 
@@ -174,7 +186,8 @@ class Imports(object):
             dossier_destination.ecrire(fichier.nom_fichier, self.dossier_source.lire(fichier.nom_fichier))
         if self.version > 0:
             dossier_vprec = DossierSource(self.chemin_vprec)
-            dossier_destination.ecrire(self.numeros.nom_fichier, dossier_vprec.lire(self.numeros.nom_fichier))
+            for fichier in [self.numeros, self.versions]:
+                dossier_destination.ecrire(fichier.nom_fichier, dossier_vprec.lire(fichier.nom_fichier))
 
         # dossier_lien = Outils.lien_dossier([import_d.facturation.lien, plateforme, annee, Outils.mois_string(mois)],
         #                                    import_d.facturation)

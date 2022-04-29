@@ -2,7 +2,7 @@ from core import (Interface,
                   ErreurConsistance)
 
 
-class Fichier(object):
+class CsvImport(object):
     """
     Classe de base des classes d'importation de données
 

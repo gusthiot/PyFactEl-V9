@@ -1,9 +1,9 @@
-from imports import Fichier
+from core import CsvImport
 from core import (Interface,
                   ErreurConsistance)
 
 
-class CleSubside(Fichier):
+class CleSubside(CsvImport):
     """
     Classe pour l'importation des données de Subsides
     """

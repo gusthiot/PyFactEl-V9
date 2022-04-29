@@ -1,10 +1,10 @@
-from imports import Fichier
+from core import CsvImport
 from core import (Interface,
                   Format,
                   ErreurConsistance)
 
 
-class PlafSubside(Fichier):
+class PlafSubside(CsvImport):
     """
     Classe pour l'importation des données ded Plafonds de Subsides
     """
