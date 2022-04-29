@@ -55,7 +55,6 @@ class AnnexeSubsides(object):
                             clients_comptes[code_client].append(id_compte)
 
         for code, cc in clients_comptes.items():
-            ii = 0
             lignes = []
             client = imports.clients.donnees[code]
             nom_csv = "Annexe_subsides_" + str(imports.edition.annee) + "_" + \
@@ -101,7 +100,7 @@ class AnnexeSubsides(object):
                         reste = plafond['max_compte'] - grant - subs
                         ligne += [round(grant, 2), round(subs, 2), round(reste, 2)]
                         lignes.append(ligne)
-                        ii += 1
+
             with DossierDestination(chemin_destination).writer(nom_csv) as fichier_writer:
                 ligne = []
                 for cle in self.cles:

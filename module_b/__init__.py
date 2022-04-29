@@ -1,6 +1,6 @@
 from .granted_new import GrantedNew
 from .numero_new import NumeroNew
-from .annexe_details import AnnexeDetails
+from .details import Details
 from .annexe_subsides import AnnexeSubsides
 from .bilan_subsides import BilanSubsides
 from .transactions_2_new import Transactions2New

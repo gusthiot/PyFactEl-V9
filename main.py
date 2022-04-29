@@ -34,11 +34,13 @@ from module_c import (UserLaboNew,
                       SommesUL)
 from module_b import (GrantedNew,
                       NumeroNew,
-                      AnnexeDetails,
+                      Details,
                       AnnexeSubsides,
                       BilanSubsides,
                       Transactions2New)
-from module_a import VersionNew
+from module_a import (VersionNew,
+                      Modifications,
+                      Annexe)
 from imports import (Edition,
                      Imports)
 
@@ -87,18 +89,21 @@ try:
         new_grants.csv(DossierDestination(imports.chemin_out))
         new_numeros = NumeroNew(imports, transactions)
         new_numeros.csv(DossierDestination(imports.chemin_out))
-        ann_dets = AnnexeDetails(imports, transactions, sommes.par_client, new_numeros, imports.chemin_cannexes)
+        ann_dets = Details(imports, transactions, sommes.par_client, new_numeros, imports.chemin_cannexes)
         ann_subs = AnnexeSubsides(imports, transactions, sommes.par_client, imports.chemin_cannexes,
                                   ann_dets.csv_fichiers)
-        Chemin.csv_files_in_zip(ann_subs.csv_fichiers, imports.chemin_cannexes)
         bil_subs = BilanSubsides(imports, transactions, sommes.par_client)
         bil_subs.csv(DossierDestination(imports.chemin_bilans))
         new_transactions2 = Transactions2New(imports, transactions, sommes.par_client, new_numeros)
-        new_transactions2.csv((DossierDestination(imports.chemin_bilans)))
+        new_transactions2.csv(DossierDestination(imports.chemin_bilans))
 
         # Module A
         new_versions = VersionNew(imports, new_transactions2)
         new_versions.csv(DossierDestination(imports.chemin_out))
+        modifications = Modifications(imports, new_versions)
+        modifications.csv(DossierDestination(imports.chemin_version))
+        annexes = Annexe(imports, new_transactions2, new_versions, imports.chemin_cannexes, ann_subs.csv_fichiers)
+        Chemin.csv_files_in_zip(annexes.csv_fichiers, imports.chemin_cannexes)
 
         Interface.affiche_message("OK !!! (" +
                                   str(datetime.timedelta(seconds=(time.time() - start_time))).split(".")[0] + ")")

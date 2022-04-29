@@ -2,7 +2,7 @@ from core import (Format,
                   DossierDestination)
 
 
-class AnnexeDetails(object):
+class Details(object):
     """
     Classe pour la création du csv d'annexe détails
     """
@@ -43,7 +43,6 @@ class AnnexeDetails(object):
                 if code not in self.csv_fichiers:
                     self.csv_fichiers[code] = {'nom': nom_zip, 'fichiers': []}
                 self.csv_fichiers[code]['fichiers'].append(nom_csv)
-                ii = 0
                 lignes = []
                 for indice in tbtr:
                     val = transactions.valeurs[indice]
@@ -54,7 +53,6 @@ class AnnexeDetails(object):
                         else:
                             ligne.append(val[self.cles[cle]])
                     lignes.append(ligne)
-                    ii += 1
 
                 with DossierDestination(chemin_destination).writer(nom_csv) as fichier_writer:
                     ligne = []

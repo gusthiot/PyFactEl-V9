@@ -1,11 +1,11 @@
 from core import (Format,
-                  CsvList,
+                  CsvDict,
                   Interface,
                   ErreurConsistance)
 from imports.construits import Version
 
 
-class VersionNew(CsvList):
+class VersionNew(CsvDict):
     """
     Classe pour la création de la table des numéros de facture
     """
@@ -22,14 +22,14 @@ class VersionNew(CsvList):
         self.cles = Version.cles
 
         self.transactions_new = transactions_2_new.valeurs
-        facts_new = {}
+        self.facts_new = {}
         for key, trans in self.transactions_new.items():
-            if trans['invoice-id'] not in facts_new:
-                facts_new[trans['invoice-id']] = []
-            facts_new[trans['invoice-id']].append(key)
+            if trans['invoice-id'] not in self.facts_new:
+                self.facts_new[trans['invoice-id']] = []
+            self.facts_new[trans['invoice-id']].append(key)
 
         if imports.version == 0:
-            for fact_id, liste in facts_new.items():
+            for fact_id, liste in self.facts_new.items():
                 self.__add_new(fact_id, liste)
         else:
             self.transactions_old = imports.transactions_2.donnees
@@ -61,11 +61,11 @@ class VersionNew(CsvList):
                                                          " table des versions et transactions 2")
 
             for fact_id, donnee in imports.versions.donnees.items():
-                if fact_id not in facts_new:
-                    self.lignes.append([fact_id, donnee['client-code'], self.imports.version, 'CANCELED',
-                                        donnee['version-new-amount'], 0])
+                if fact_id not in self.facts_new:
+                    self._ajouter_valeur([fact_id, donnee['client-code'], self.imports.version, 'CANCELED',
+                                          donnee['version-new-amount'], 0], fact_id)
                 else:
-                    liste_new = facts_new[fact_id]
+                    liste_new = self.facts_new[fact_id]
                     base_new = self.transactions_new[liste_new[0]]
                     if donnee['client-code'] != base_new['client-code']:
                         Interface.fatal(ErreurConsistance(),
@@ -83,17 +83,17 @@ class VersionNew(CsvList):
                             idem = False
 
                     if idem:
-                        self.lignes.append([fact_id, donnee['client-code'], donnee['version-last'], 'IDEM',
-                                            donnee['version-new-amount'], donnee['version-new-amount']])
+                        self._ajouter_valeur([fact_id, donnee['client-code'], donnee['version-last'], 'IDEM',
+                                              donnee['version-new-amount'], donnee['version-new-amount']], fact_id)
                     else:
                         somme = 0
                         for unique in liste_new:
                             trans = self.transactions_new[unique]
                             somme += trans['total-fact']
-                        self.lignes.append([fact_id, donnee['client-code'], self.imports.version, 'CORRECTED',
-                                            donnee['version-new-amount'], round(somme, 2)])
+                        self._ajouter_valeur([fact_id, donnee['client-code'], self.imports.version, 'CORRECTED',
+                                              donnee['version-new-amount'], round(somme, 2)], fact_id)
 
-            for fact_id, liste in facts_new.items():
+            for fact_id, liste in self.facts_new.items():
                 if fact_id not in imports.versions.donnees.keys():
                     self.__add_new(fact_id, liste)
 
@@ -108,7 +108,7 @@ class VersionNew(CsvList):
         for unique in liste:
             trans = self.transactions_new[unique]
             somme += trans['total-fact']
-        self.lignes.append([fact_id, base['client-code'], self.imports.version, 'NEW', 0, round(somme, 2)])
+        self._ajouter_valeur([fact_id, base['client-code'], self.imports.version, 'NEW', 0, round(somme, 2)], fact_id)
 
     @staticmethod
     def __struct_fact(transactions, keys):
