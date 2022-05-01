@@ -22,64 +22,32 @@ class VersionNew(CsvDict):
         self.cles = Version.cles
 
         self.transactions_new = transactions_2_new.valeurs
-        self.facts_new = {}
-        for key, trans in self.transactions_new.items():
-            if trans['invoice-id'] not in self.facts_new:
-                self.facts_new[trans['invoice-id']] = []
-            self.facts_new[trans['invoice-id']].append(key)
+        self.facts_new = self.__struct_fact(self.transactions_new, "Nouveau Transitions 2 : ", self.imports.version)
 
         if imports.version == 0:
-            for fact_id, liste in self.facts_new.items():
-                self.__add_new(fact_id, liste)
+            for fact_id in self.facts_new.keys():
+                self.__add_new(fact_id, self.facts_new[fact_id]['transactions'])
         else:
-            self.transactions_old = imports.transactions_2.donnees
-            facts_old = {}
-            key = 0
-            for trans in self.transactions_old:
-                if trans['invoice-id'] not in facts_old:
-                    facts_old[trans['invoice-id']] = []
-                facts_old[trans['invoice-id']].append(key)
-                key += 1
-                if trans['invoice-year'] != imports.edition.annee:
-                    Interface.fatal(ErreurConsistance(), "l'ancien transactions 2 se doit "
-                                                         "d'être de la même année que le nouveau")
-                if trans['invoice-month'] != imports.edition.mois:
-                    Interface.fatal(ErreurConsistance(), "l'ancien transactions 2 se doit "
-                                                         "d'être du même mois que le nouveau")
-                if trans['invoice-version'] != imports.version-1:
-                    Interface.fatal(ErreurConsistance(), "l'ancien transactions 2 se doit "
-                                                         "d'être de la version du nouveau - 1")
-
-            for fact_id, liste in facts_old.items():
-                base_old = self.transactions_old[liste[0]]
-                if fact_id not in imports.versions.donnees.keys():
-                    Interface.fatal(ErreurConsistance(), "Un id-facture présent dans l'ancien transactions 2 se doit "
-                                                         "d'être présent dans l'ancienne table des versions")
-                old_v = imports.versions.donnees[fact_id]
-                if old_v['client-code'] != base_old['client-code']:
-                    Interface.fatal(ErreurConsistance(), "Le id-facture doit être lié au même client dans les anciennes"
-                                                         " table des versions et transactions 2")
+            transactions_old = imports.transactions_2.donnees
+            facts_old = self.__struct_fact(transactions_old, "Ancien Transitions 2 : ", self.imports.version-1)
 
             for fact_id, donnee in imports.versions.donnees.items():
                 if fact_id not in self.facts_new:
                     self._ajouter_valeur([fact_id, donnee['client-code'], self.imports.version, 'CANCELED',
                                           donnee['version-new-amount'], 0], fact_id)
                 else:
-                    liste_new = self.facts_new[fact_id]
-                    base_new = self.transactions_new[liste_new[0]]
+                    base_new = self.transactions_new[self.facts_new[fact_id]['transactions'][0]]
                     if donnee['client-code'] != base_new['client-code']:
                         Interface.fatal(ErreurConsistance(),
                                         "Le id-facture doit être lié au même client dans l'ancienne et "
                                         "la nouvelle table des versions")
 
-                    liste_old = facts_old[fact_id]
-                    struct_new = self.__struct_fact(transactions_2_new.valeurs, liste_new)
-                    struct_old = self.__struct_fact(self.transactions_old, liste_old)
                     idem = True
-                    if self.__compare(struct_new, struct_old, True, self.transactions_new, self.transactions_old):
+                    if self.__compare(self.facts_new[fact_id], facts_old[fact_id], True, self.transactions_new,
+                                      transactions_old):
                         idem = False
                     else:
-                        if self.__compare(struct_old, struct_new):
+                        if self.__compare(facts_old[fact_id], self.facts_new[fact_id]):
                             idem = False
 
                     if idem:
@@ -87,15 +55,15 @@ class VersionNew(CsvDict):
                                               donnee['version-new-amount'], donnee['version-new-amount']], fact_id)
                     else:
                         somme = 0
-                        for unique in liste_new:
+                        for unique in self.facts_new[fact_id]['transactions']:
                             trans = self.transactions_new[unique]
                             somme += trans['total-fact']
                         self._ajouter_valeur([fact_id, donnee['client-code'], self.imports.version, 'CORRECTED',
                                               donnee['version-new-amount'], round(somme, 2)], fact_id)
 
-            for fact_id, liste in self.facts_new.items():
+            for fact_id in self.facts_new.keys():
                 if fact_id not in imports.versions.donnees.keys():
-                    self.__add_new(fact_id, liste)
+                    self.__add_new(fact_id, self.facts_new[fact_id]['transactions'])
 
     def __add_new(self, fact_id, liste):
         """
@@ -110,20 +78,27 @@ class VersionNew(CsvDict):
             somme += trans['total-fact']
         self._ajouter_valeur([fact_id, base['client-code'], self.imports.version, 'NEW', 0, round(somme, 2)], fact_id)
 
-    @staticmethod
-    def __struct_fact(transactions, keys):
+    def __struct_fact(self, transactions, label, version):
         """
         crée l'arborescence des transactions, fonction projet->articleSAP->article->utilisateur
         :param transactions: données transactions
-        :param keys: liste des transactions concernées par la facture traitée
         :return: arborescence sous forme de dictionnaire
         """
         arbre = {}
-        for key in keys:
-            trans = transactions[key]
-            if trans['proj-id'] not in arbre:
-                arbre[trans['proj-id']] = {}
-            tp = arbre[trans['proj-id']]
+        for key, trans in transactions.items():
+            if trans['invoice-year'] != self.imports.edition.annee:
+                Interface.fatal(ErreurConsistance(), label + " mauvaise année à la ligne " + key)
+            if trans['invoice-month'] != self.imports.edition.mois:
+                Interface.fatal(ErreurConsistance(), label + " mauvais mois à la ligne " + key)
+            if trans['invoice-version'] != version:
+                Interface.fatal(ErreurConsistance(), label + " mauvaise version à la ligne " + key)
+            if trans['invoice-id'] not in arbre:
+                arbre[trans['invoice-id']] = {'transactions': [], 'projets': {}}
+            arbre[trans['invoice-id']]['transactions'].append(key)
+            projets = arbre[trans['invoice-id']]['projets']
+            if trans['proj-id'] not in projets:
+                projets[trans['proj-id']] = {}
+            tp = projets[trans['proj-id']]
             if trans['item-idsap'] not in tp:
                 tp[trans['item-idsap']] = {}
             tps = tp[trans['item-idsap']]
@@ -147,10 +122,10 @@ class VersionNew(CsvDict):
         :param sdata: données du second jeu
         :return: True s'il y a une différence, False autrement
         """
-        for id_compte, par_compte in first.items():
-            if id_compte not in second.keys():
+        for id_compte, par_compte in first['projets'].items():
+            if id_compte not in second['projets'].keys():
                 return True
-            sec_compte = second[id_compte]
+            sec_compte = second['projets'][id_compte]
             for id_article, par_article in par_compte.items():
                 if id_article not in sec_compte.keys():
                     return True

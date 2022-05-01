@@ -32,7 +32,7 @@ class Transactions2(CsvImport):
         del self.donnees[0]
         msg = ""
         ligne = 1
-        donnees_list = []
+        donnees_dict = {}
         ids = {}
 
         for donnee in self.donnees:
@@ -72,10 +72,10 @@ class Transactions2(CsvImport):
                            " ne peut concerner 2 clients : " + ids[donnee['invoice-id']] + " et " + \
                            donnee['client-code'] + "\n"
 
-            donnees_list.append(donnee)
+            donnees_dict[ligne-1] = donnee
             ligne += 1
 
-        self.donnees = donnees_list
+        self.donnees = donnees_dict
 
         if msg != "":
             Interface.fatal(ErreurConsistance(), self.libelle + "\n" + msg)

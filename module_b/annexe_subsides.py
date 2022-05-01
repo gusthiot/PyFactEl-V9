@@ -14,13 +14,12 @@ class AnnexeSubsides(object):
             'proj-name', 'item-codeD', 'item-labelcode', 'subsid-code', 'subsid-name', 'subsid-start', 'subsid-end',
             'subsid-pourcent', 'subsid-maxproj', 'subsid-maxmois', 'subsid-alrdygrant', 'subsid-CHF', 'subsid-reste']
 
-    def __init__(self, imports, transactions, par_client, chemin_destination, csv_fichiers):
+    def __init__(self, imports, transactions, par_client, csv_fichiers):
         """
         initialisation des données
         :param imports: données importées
         :param transactions: transactions générées
         :param par_client: tri des transactions
-        :param chemin_destination: chemin vers la destination de sauvegarde
         :param csv_fichiers: fichiers csv et nom du fichier zip par client
         """
 
@@ -101,7 +100,7 @@ class AnnexeSubsides(object):
                         ligne += [round(grant, 2), round(subs, 2), round(reste, 2)]
                         lignes.append(ligne)
 
-            with DossierDestination(chemin_destination).writer(nom_csv) as fichier_writer:
+            with DossierDestination(imports.chemin_cannexes).writer(nom_csv) as fichier_writer:
                 ligne = []
                 for cle in self.cles:
                     ligne.append(pt[cle])

@@ -4,27 +4,27 @@ from core import (Format,
 
 class Annexe(object):
     """
-    Classe pour la création du csv d'annexe détails
+    Classe pour la création du csv d'annexe
     """
 
     cles = ['invoice-year', 'invoice-month', 'invoice-version', 'invoice-id', 'platf-name', 'client-name', 'proj-nbr',
             'proj-name', 'user-name-f', 'date-start-y', 'date-start-m', 'date-end-y', 'date-end-m', 'item-labelcode',
             'item-name', 'transac-quantity', 'item-unit', 'valuation-price', 'deduct-CHF', 'total-fact']
 
-    def __init__(self, imports, transactions, versions, chemin_destination, csv_fichiers):
+    def __init__(self, imports, transactions, versions, csv_fichiers):
         """
         initialisation des données
         :param imports: données importées
         :param transactions: transactions générées
-        :param par_client: tri des transactions
-        :param numeros: table des numéros de version
-        :param chemin_destination: chemin vers la destination de sauvegarde
+        :param versions: versions des factures générées
+        :param csv_fichiers: fichiers csv et nom du fichier zip par client
         """
 
         pt = imports.paramtexte.donnees
         self.csv_fichiers = csv_fichiers
 
-        for id_fact, pf in versions.facts_new.items():
+        for id_fact in versions.facts_new.keys():
+            pf = versions.facts_new[id_fact]['transactions']
             base = transactions.valeurs[pf[0]]
             code = base['client-code']
             client = imports.clients.donnees[code]
@@ -51,7 +51,7 @@ class Annexe(object):
                         ligne.append(trans[self.cles[cle]])
                     lignes.append(ligne)
 
-                with DossierDestination(chemin_destination).writer(nom_csv) as fichier_writer:
+                with DossierDestination(imports.chemin_cannexes).writer(nom_csv) as fichier_writer:
                     ligne = []
                     for cle in self.cles:
                         ligne.append(pt[cle])

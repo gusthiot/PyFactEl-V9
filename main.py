@@ -22,8 +22,7 @@ from core import (Interface,
                   DossierDestination)
 from module_d import (Articles,
                       Tarifs,
-                      Transactions3,
-                      Sommes)
+                      Transactions3)
 from module_c import (UserLaboNew,
                       BilanUsages,
                       BilanConsos,
@@ -31,7 +30,8 @@ from module_c import (UserLaboNew,
                       StatNbUser,
                       StatUser,
                       StatClient,
-                      SommesUL)
+                      SommesUL,
+                      Sommes)
 from module_b import (GrantedNew,
                       NumeroNew,
                       Details,
@@ -40,7 +40,8 @@ from module_b import (GrantedNew,
                       Transactions2New)
 from module_a import (VersionNew,
                       Modifications,
-                      Annexe)
+                      Annexe,
+                      Transactions1)
 from imports import (Edition,
                      Imports)
 
@@ -57,6 +58,7 @@ dossier_source = DossierSource(dossier_data)
 try:
     if Chemin.existe(Chemin.chemin([dossier_data, Edition.nom_fichier])):
         start_time = time.time()
+
         # Module D
         imports = Imports(dossier_source)
         articles = Articles(imports)
@@ -65,9 +67,9 @@ try:
         tarifs.csv(DossierDestination(imports.chemin_prix))
         transactions = Transactions3(imports, articles, tarifs)
         transactions.csv(DossierDestination(imports.chemin_bilans))
-        sommes = Sommes(imports, transactions)
 
         # Module C
+        sommes = Sommes(imports, transactions)
         usr_lab = UserLaboNew(imports, transactions, sommes.par_user)
         usr_lab.csv(DossierDestination(imports.chemin_out))
         sommes_ul = SommesUL(usr_lab, imports)
@@ -89,9 +91,8 @@ try:
         new_grants.csv(DossierDestination(imports.chemin_out))
         new_numeros = NumeroNew(imports, transactions)
         new_numeros.csv(DossierDestination(imports.chemin_out))
-        ann_dets = Details(imports, transactions, sommes.par_client, new_numeros, imports.chemin_cannexes)
-        ann_subs = AnnexeSubsides(imports, transactions, sommes.par_client, imports.chemin_cannexes,
-                                  ann_dets.csv_fichiers)
+        ann_dets = Details(imports, transactions, sommes.par_client, new_numeros)
+        ann_subs = AnnexeSubsides(imports, transactions, sommes.par_client, ann_dets.csv_fichiers)
         bil_subs = BilanSubsides(imports, transactions, sommes.par_client)
         bil_subs.csv(DossierDestination(imports.chemin_bilans))
         new_transactions2 = Transactions2New(imports, transactions, sommes.par_client, new_numeros)
@@ -102,8 +103,10 @@ try:
         new_versions.csv(DossierDestination(imports.chemin_out))
         modifications = Modifications(imports, new_versions)
         modifications.csv(DossierDestination(imports.chemin_version))
-        annexes = Annexe(imports, new_transactions2, new_versions, imports.chemin_cannexes, ann_subs.csv_fichiers)
+        annexes = Annexe(imports, new_transactions2, new_versions, ann_subs.csv_fichiers)
         Chemin.csv_files_in_zip(annexes.csv_fichiers, imports.chemin_cannexes)
+        transactions1 = Transactions1(imports, new_transactions2, new_versions)
+        transactions1.csv(DossierDestination(imports.chemin_bilans))
 
         Interface.affiche_message("OK !!! (" +
                                   str(datetime.timedelta(seconds=(time.time() - start_time))).split(".")[0] + ")")

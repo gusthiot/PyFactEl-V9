@@ -5,7 +5,7 @@ from imports.construits import Transactions2
 
 class Transactions2New(CsvDict):
     """
-    Classe pour la création du csv de bilan subsides
+    Classe pour la création des transactions de niveau 2
     """
 
     def __init__(self, imports, transactions, par_client, numeros):

@@ -15,14 +15,13 @@ class Details(object):
             'subsid-maxproj', 'subsid-maxmois', 'subsid-reste', 'subsid-CHF', 'deduct-CHF', 'subsid-deduct',
             'total-fact', 'discount-bonus', 'subsid-bonus']
 
-    def __init__(self, imports, transactions, par_client, numeros, chemin_destination):
+    def __init__(self, imports, transactions, par_client, numeros):
         """
         initialisation des données
         :param imports: données importées
         :param transactions: transactions générées
         :param par_client: tri des transactions
         :param numeros: table des numéros de version
-        :param chemin_destination: chemin vers la destination de sauvegarde
         """
 
         pt = imports.paramtexte.donnees
@@ -54,7 +53,7 @@ class Details(object):
                             ligne.append(val[self.cles[cle]])
                     lignes.append(ligne)
 
-                with DossierDestination(chemin_destination).writer(nom_csv) as fichier_writer:
+                with DossierDestination(imports.chemin_cannexes).writer(nom_csv) as fichier_writer:
                     ligne = []
                     for cle in self.cles:
                         ligne.append(pt[cle])

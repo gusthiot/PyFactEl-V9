@@ -2,7 +2,7 @@
 
 class Sommes(object):
     """
-    Classe pour sommer les transactions en fonction des clients et des plateformes
+    Classe pour sommer les transactions 3 en fonction des clients et des plateformes
     """
 
     def __init__(self, imports, transactions):

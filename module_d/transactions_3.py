@@ -3,7 +3,7 @@ from core import (Format, CsvDict)
 
 class Transactions3(CsvDict):
     """
-    Classe pour la création des transactions
+    Classe pour la création des transactions de niveau 3
     """
 
     cles = ['invoice-year', 'invoice-month', 'invoice-version', 'invoice-project', 'client-code', 'client-sap',
