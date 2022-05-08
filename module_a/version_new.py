@@ -39,7 +39,11 @@ class VersionNew(CsvDict):
                     base_new = self.transactions_new[self.facts_new[fact_id]['transactions'][0]]
                     if donnee['client-code'] != base_new['client-code']:
                         Interface.fatal(ErreurConsistance(),
-                                        "Le id-facture doit être lié au même client dans l'ancienne et "
+                                        fact_id + "\n Le id-facture doit être lié au même client dans l'ancienne et "
+                                        "la nouvelle table des versions")
+                    if donnee['invoice-type'] != base_new['invoice-type']:
+                        Interface.fatal(ErreurConsistance(),
+                                        fact_id + "\n Le type de facture doit être le même dans l'ancienne et "
                                         "la nouvelle table des versions")
 
                     idem = True
@@ -76,7 +80,8 @@ class VersionNew(CsvDict):
         for unique in liste:
             trans = self.transactions_new[unique]
             somme += trans['total-fact']
-        self._ajouter_valeur([fact_id, base['client-code'], self.imports.version, 'NEW', 0, round(somme, 2)], fact_id)
+        self._ajouter_valeur([fact_id, base['client-code'], base['invoice-type'], self.imports.version, 'NEW', 0,
+                              round(somme, 2)], fact_id)
 
     def __struct_fact(self, transactions, label, version):
         """

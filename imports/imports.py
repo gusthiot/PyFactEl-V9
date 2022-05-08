@@ -81,6 +81,7 @@ class Imports(object):
         self.chemin_bilans = Chemin.chemin([self.chemin_version, "Bilans_Stats"], self.edition)
         self.chemin_prix = Chemin.chemin([self.chemin_enregistrement, "Prix"], self.edition)
         self.chemin_cannexes = Chemin.chemin([self.chemin_version, "Annexes_CSV"], self.edition)
+        self.chemin_pannexes = Chemin.chemin([self.chemin_enregistrement, "Annexes_PDF"], self.edition)
 
         # importation et vérification des données d'entrée
 
@@ -163,6 +164,7 @@ class Imports(object):
         Chemin.existe(self.chemin_bilans, True)
         Chemin.existe(self.chemin_out, True)
         Chemin.existe(self.chemin_cannexes, True)
+        Chemin.existe(self.chemin_pannexes, True)
 
         # sauvegarde des bruts
 
@@ -191,7 +193,4 @@ class Imports(object):
 
         # dossier_lien = Outils.lien_dossier([import_d.facturation.lien, plateforme, annee, Outils.mois_string(mois)],
         #                                    import_d.facturation)
-        #
-        # dossier_pannexes = Chemin.chemin([dossier_enregistrement, "Annexes_PDF"], import_d.facturation)
-        # Chemin.existe(dossier_pannexes, True)
         #

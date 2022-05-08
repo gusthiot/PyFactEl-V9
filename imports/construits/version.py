@@ -9,7 +9,8 @@ class Version(CsvImport):
     Classe pour l'importation des données des versions de facture
     """
 
-    cles = ['invoice-id', 'client-code', 'version-last', 'version-change', 'version-old-amount', 'version-new-amount']
+    cles = ['invoice-id', 'client-code', 'invoice-type', 'version-last', 'version-change', 'version-old-amount',
+            'version-new-amount']
     libelle = "Versions de facture"
 
     def __init__(self, dossier_source, annee, mois, version):

@@ -4,6 +4,5 @@ from .csv_base import CsvDict, CsvList
 from .format import Format
 from .interface import Interface
 from .chemin import Chemin
-from .outils import Outils
 from .csv_import import CsvImport
-
+from .latex import Latex

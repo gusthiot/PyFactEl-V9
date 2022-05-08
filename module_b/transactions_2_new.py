@@ -34,7 +34,11 @@ class Transactions2New(CsvDict):
                         for tbtr in par_item.values():
                             ligne = [imports.edition.annee, imports.edition.mois, imports.version, id_fact]
                             base = transactions.valeurs[tbtr[0]]
-                            for cle in range(4, 15):
+                            if base['invoice-project'] == "0":
+                                ligne.append("GLOB")
+                            else:
+                                ligne.append("CPTE")
+                            for cle in range(5, 16):
                                 ligne.append(base[self.cles[cle]])
                             ligne.append(base['user-name'] + " " + base['user-first'][0] + ".")
                             start_year = base['transac-date'].year
@@ -59,7 +63,7 @@ class Transactions2New(CsvDict):
                                     end_month = trans['transac-date'].month
 
                             ligne += [start_year, start_month, end_year, end_month]
-                            for cle in range(20, 27):
+                            for cle in range(21, 28):
                                 ligne.append(base[self.cles[cle]])
                             ligne += [round(quantity, 3), base['item-unit'], base['valuation-price'], round(deduct, 2),
                                       round(total, 2)]

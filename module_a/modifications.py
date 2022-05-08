@@ -1,14 +1,14 @@
 from core import (Format,
-                  CsvList)
+                  CsvDict)
 
 
-class Modifications(CsvList):
+class Modifications(CsvDict):
     """
     Classe pour la création de la table des modifications des factures
     """
 
-    cles = ['invoice-year', 'invoice-month', 'invoice-version', 'client-name', 'invoice-id', 'version-change',
-            'version-old-amount', 'version-new-amount']
+    cles = ['invoice-year', 'invoice-month', 'invoice-version', 'client-name', 'invoice-id', 'invoice-type',
+            'version-change', 'version-old-amount', 'version-new-amount']
 
     def __init__(self, imports, versions):
         """
@@ -23,6 +23,7 @@ class Modifications(CsvList):
         for donnee in versions.valeurs.values():
             if donnee['version-change'] != 'IDEM':
                 client = imports.clients.donnees[donnee['client-code']]
-                self.lignes.append([imports.edition.annee, imports.edition.mois, imports.version, client['abrev_labo'],
-                                    donnee['invoice-id'], donnee['version-change'], donnee['version-old-amount'],
-                                    donnee['version-new-amount']])
+                self._ajouter_valeur([imports.edition.annee, imports.edition.mois, imports.version,
+                                      client['abrev_labo'], donnee['invoice-id'], donnee['invoice-type'],
+                                      donnee['version-change'], donnee['version-old-amount'],
+                                      donnee['version-new-amount']], donnee['invoice-id'])

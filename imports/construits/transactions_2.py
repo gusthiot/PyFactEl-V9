@@ -9,11 +9,11 @@ class Transactions2(CsvImport):
     Classe pour l'importation des données des numéros de facture
     """
 
-    cles = ['invoice-year', 'invoice-month', 'invoice-version', 'invoice-id', 'platf-name', 'client-code', 'client-sap',
-            'client-name', 'client-idclass', 'client-class', 'client-labelclass', 'proj-id', 'proj-nbr', 'proj-name',
-            'user-id', 'user-name-f', 'date-start-y', 'date-start-m', 'date-end-y', 'date-end-m', 'item-idsap',
-            'item-codeD', 'item-order', 'item-labelcode', 'item-id', 'item-nbr', 'item-name', 'transac-quantity',
-            'item-unit', 'valuation-price', 'deduct-CHF', 'total-fact']
+    cles = ['invoice-year', 'invoice-month', 'invoice-version', 'invoice-id', 'invoice-type', 'platf-name',
+            'client-code', 'client-sap', 'client-name', 'client-idclass', 'client-class', 'client-labelclass',
+            'proj-id', 'proj-nbr', 'proj-name', 'user-id', 'user-name-f', 'date-start-y', 'date-start-m', 'date-end-y',
+            'date-end-m', 'item-idsap', 'item-codeD', 'item-order', 'item-labelcode', 'item-id', 'item-nbr',
+            'item-name', 'transac-quantity', 'item-unit', 'valuation-price', 'deduct-CHF', 'total-fact']
     libelle = "Versions de facture"
 
     def __init__(self, dossier_source, annee, mois, plateforme, version):

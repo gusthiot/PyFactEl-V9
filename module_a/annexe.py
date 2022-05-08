@@ -30,8 +30,8 @@ class Annexe(object):
             client = imports.clients.donnees[code]
             nom_zip = "Annexes_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + "_" + \
                       str(imports.version) + base['client-code'] + "_" + client['abrev_labo'] + ".zip"
-            prefixe_csv = "Annexe_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + \
-                          "_" + str(imports.version)
+            prefixe = "Annexe_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + \
+                      "_" + str(imports.version)
             par_compte = {}
             for key in pf:
                 id_compte = transactions.valeurs[key]['proj-id']
@@ -40,7 +40,8 @@ class Annexe(object):
                 par_compte[id_compte].append(key)
             lignes = []
             for id_compte, pc in par_compte.items():
-                nom_csv = prefixe_csv + "_" + str(id_fact) + "_" + client['abrev_labo'] + "_" + str(id_compte) + ".csv"
+                compte = imports.comptes.donnees[id_compte]
+                nom_csv = prefixe + "_" + str(id_fact) + "_" + client['abrev_labo'] + "_" + compte['numero'] + ".csv"
                 if code not in self.csv_fichiers:
                     self.csv_fichiers[code] = {'nom': nom_zip, 'fichiers': []}
                 self.csv_fichiers[code]['fichiers'].append(nom_csv)

@@ -19,7 +19,8 @@ from docopt import docopt
 from core import (Interface,
                   Chemin,
                   DossierSource,
-                  DossierDestination)
+                  DossierDestination,
+                  Latex)
 from module_d import (Articles,
                       Tarifs,
                       Transactions3)
@@ -41,7 +42,9 @@ from module_b import (GrantedNew,
 from module_a import (VersionNew,
                       Modifications,
                       Annexe,
-                      Transactions1)
+                      Transactions1,
+                      BilanFactures,
+                      Pdfs)
 from imports import (Edition,
                      Imports)
 
@@ -65,37 +68,37 @@ try:
         tarifs = Tarifs(imports)
         articles.csv(DossierDestination(imports.chemin_prix))
         tarifs.csv(DossierDestination(imports.chemin_prix))
-        transactions = Transactions3(imports, articles, tarifs)
-        transactions.csv(DossierDestination(imports.chemin_bilans))
+        transactions3 = Transactions3(imports, articles, tarifs)
+        transactions3.csv(DossierDestination(imports.chemin_bilans))
 
         # Module C
-        sommes = Sommes(imports, transactions)
-        usr_lab = UserLaboNew(imports, transactions, sommes.par_user)
+        sommes = Sommes(imports, transactions3)
+        usr_lab = UserLaboNew(imports, transactions3, sommes.par_user)
         usr_lab.csv(DossierDestination(imports.chemin_out))
         sommes_ul = SommesUL(usr_lab, imports)
-        bil_use = BilanUsages(imports, transactions, sommes.par_item)
+        bil_use = BilanUsages(imports, transactions3, sommes.par_item)
         bil_use.csv(DossierDestination(imports.chemin_bilans))
-        bil_conso = BilanConsos(imports, transactions, sommes.par_projet)
+        bil_conso = BilanConsos(imports, transactions3, sommes.par_projet)
         bil_conso.csv(DossierDestination(imports.chemin_bilans))
         stat_nb_user = StatNbUser(imports, sommes_ul.par_ul)
         stat_nb_user.csv(DossierDestination(imports.chemin_bilans))
-        stat_user = StatUser(imports, transactions, sommes.par_user)
+        stat_user = StatUser(imports, transactions3, sommes.par_user)
         stat_user.csv(DossierDestination(imports.chemin_bilans))
-        stat_cli = StatClient(imports, transactions, sommes_ul.par_ul, sommes.par_client)
+        stat_cli = StatClient(imports, transactions3, sommes_ul.par_ul, sommes.par_client)
         stat_cli.csv(DossierDestination(imports.chemin_bilans))
-        stat_mach = StatMachine(imports, transactions, sommes.par_machine)
+        stat_mach = StatMachine(imports, transactions3, sommes.par_machine)
         stat_mach.csv(DossierDestination(imports.chemin_bilans))
 
         # Module B
-        new_grants = GrantedNew(imports, transactions)
+        new_grants = GrantedNew(imports, transactions3)
         new_grants.csv(DossierDestination(imports.chemin_out))
-        new_numeros = NumeroNew(imports, transactions)
+        new_numeros = NumeroNew(imports, transactions3)
         new_numeros.csv(DossierDestination(imports.chemin_out))
-        ann_dets = Details(imports, transactions, sommes.par_client, new_numeros)
-        ann_subs = AnnexeSubsides(imports, transactions, sommes.par_client, ann_dets.csv_fichiers)
-        bil_subs = BilanSubsides(imports, transactions, sommes.par_client)
+        ann_dets = Details(imports, transactions3, sommes.par_client, new_numeros)
+        ann_subs = AnnexeSubsides(imports, transactions3, sommes.par_client, ann_dets.csv_fichiers)
+        bil_subs = BilanSubsides(imports, transactions3, sommes.par_client)
         bil_subs.csv(DossierDestination(imports.chemin_bilans))
-        new_transactions2 = Transactions2New(imports, transactions, sommes.par_client, new_numeros)
+        new_transactions2 = Transactions2New(imports, transactions3, sommes.par_client, new_numeros)
         new_transactions2.csv(DossierDestination(imports.chemin_bilans))
 
         # Module A
@@ -107,6 +110,10 @@ try:
         Chemin.csv_files_in_zip(annexes.csv_fichiers, imports.chemin_cannexes)
         transactions1 = Transactions1(imports, new_transactions2, new_versions)
         transactions1.csv(DossierDestination(imports.chemin_bilans))
+        bil_facts = BilanFactures(imports, new_transactions2, new_versions)
+        bil_facts.csv(DossierDestination(imports.chemin_bilans))
+        # if Latex.possibles():
+        #     pdfs = Pdfs(imports, new_transactions2, new_versions)
 
         Interface.affiche_message("OK !!! (" +
                                   str(datetime.timedelta(seconds=(time.time() - start_time))).split(".")[0] + ")")

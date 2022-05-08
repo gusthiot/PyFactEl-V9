@@ -38,7 +38,12 @@ class Details(object):
             for icf in pc['projets']:
                 tbtr = pc['projets'][icf]['transactions']
                 id_fact = numeros.couples[code][icf]
-                nom_csv = prefixe_csv + "_" + str(id_fact) + "_" + client['abrev_labo'] + "_" + str(icf) + ".csv"
+                if icf == "0":
+                    num = icf
+                else:
+                    compte = imports.comptes.donnees[icf]
+                    num = compte['numero']
+                nom_csv = prefixe_csv + "_" + str(id_fact) + "_" + client['abrev_labo'] + "_" + num + ".csv"
                 if code not in self.csv_fichiers:
                     self.csv_fichiers[code] = {'nom': nom_zip, 'fichiers': []}
                 self.csv_fichiers[code]['fichiers'].append(nom_csv)
