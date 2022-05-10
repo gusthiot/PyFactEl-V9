@@ -19,7 +19,7 @@ class Pdfs(object):
         prefixe = "Annexe_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + "_" + \
                   str(imports.version)
 
-        ii = 0
+        # ii = 0
         for id_fact, donnee in versions.valeurs.items():
             if donnee['version-change'] != 'IDEM':
                 par_fact = versions.facts_new[id_fact]
@@ -45,9 +45,9 @@ class Pdfs(object):
                         Latex.creer_latex_pdf(nom, self.canevas(contenu))
                         Latex.finaliser_pdf(nom, imports.chemin_pannexes)
 
-            ii += 1
-            if ii > 2:
-                break
+            # ii += 1
+            # if ii > 2:
+            #     break
 
     def entete(self, id_compte, intype):
         textes = self.imports.paramtexte.donnees

@@ -75,7 +75,7 @@ class AnnexeSubsides(object):
                         plafond = imports.plafonds.donnees[plaf]
                         ligne = [imports.edition.annee, imports.edition.mois, imports.version,
                                  imports.plateforme['abrev_plat'], client['code'], client['abrev_labo'],
-                                 compte['id_compte'], compte['intitule'], id_article,
+                                 compte['id_compte'], compte['intitule'], artsap['code_d'],
                                  artsap['intitule'], subside['type'], subside['intitule'], subside['debut'],
                                  subside['fin'], plafond['pourcentage'], plafond['max_compte'], plafond['max_mois']]
                         subs = 0
