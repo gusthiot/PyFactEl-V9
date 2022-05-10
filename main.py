@@ -112,8 +112,8 @@ try:
         transactions1.csv(DossierDestination(imports.chemin_bilans))
         bil_facts = BilanFactures(imports, transactions1)
         bil_facts.csv(DossierDestination(imports.chemin_bilans))
-        # if Latex.possibles():
-        #     pdfs = Pdfs(imports, new_transactions2, new_versions)
+        if Latex.possibles():
+            pdfs = Pdfs(imports, new_transactions2, new_versions)
 
         Interface.affiche_message("OK !!! (" +
                                   str(datetime.timedelta(seconds=(time.time() - start_time))).split(".")[0] + ")")
