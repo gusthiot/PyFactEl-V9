@@ -120,7 +120,7 @@ class Pdfs(object):
                                         \hline ''' % dico
             tot += subtot
 
-            dico.update({'article': article['intitule'], 'subtot': Format.format_2_dec(subtot)})
+            dico.update({'article': Latex.echappe_caracteres(article['intitule']), 'subtot': Format.format_2_dec(subtot)})
             contenu += r'''\multicolumn{%(multi)s}{l}{%(sub)s %(article)s} & %(subtot)s\\
                             \hline ''' % dico
 
