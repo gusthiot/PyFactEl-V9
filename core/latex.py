@@ -115,21 +115,17 @@ class Latex(object):
             '''
 
     @staticmethod
-    def tableau(contenu, structure, legende):
+    def tableau(contenu, structure):
         """
         création d'un tableau latex
         :param contenu: contenu du tableau
         :param structure: structure du tableau
-        :param legende: légende du tableau
         :return: tableau latex
         """
         return r'''
-            \begin{table}[H]
             \tiny
             \centering
             \begin{tabular}''' + structure + contenu + r'''\end{tabular}
-            \caption*{''' + legende + r'''}
-            \end{table}
             '''
 
     @staticmethod

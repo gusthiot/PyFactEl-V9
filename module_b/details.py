@@ -31,7 +31,7 @@ class Details(object):
 
             client = imports.clients.donnees[code]
             nom_zip = "Annexes_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + "_" + \
-                      str(imports.version) + code + "_" + client['abrev_labo'] + ".zip"
+                      str(imports.version) + "_" + code + "_" + client['abrev_labo'] + ".zip"
             prefixe_csv = "Details_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + \
                           "_" + str(imports.version)
 

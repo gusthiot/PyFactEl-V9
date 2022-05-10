@@ -52,16 +52,18 @@ class StatClient(CsvList):
                             if idd not in stats_clients[code]['12m']:
                                 stats_clients[code]['12m'].append(idd)
 
-        for code in par_client.keys():
-            tbtr = par_client[code]['transactions']
-            base = transactions.valeurs[tbtr[0]]
-            ligne = [imports.edition.annee, imports.edition.mois]
-            for cle in range(2, len(self.cles)-6):
-                ligne.append(base[self.cles[cle]])
-            stat_run = 0
-            for indice in tbtr:
-                if str(transactions.valeurs[indice]['transac-runcae']) == "1":
-                    stat_run += 1
-            stats = stats_clients[code]
-            ligne += [len(tbtr), stat_run, stats['1m'], len(stats['3m']), len(stats['6m']), len(stats['12m'])]
-            self.lignes.append(ligne)
+        for code, stats in stats_clients.items():
+            client = imports.clients.donnees[code]
+            classe = imports.classes.donnees[client['id_classe']]
+            nb = 0
+            runs = 0
+            if code in par_client.keys():
+                tbtr = par_client[code]['transactions']
+                for indice in tbtr:
+                    if str(transactions.valeurs[indice]['transac-runcae']) == "1":
+                        runs += 1
+                nb = len(tbtr)
+
+            self.lignes.append([imports.edition.annee, imports.edition.mois, client['code'], client['code_sap'],
+                                client['abrev_labo'], client['id_classe'], classe['code_n'], classe['intitule'], nb,
+                                runs, stats['1m'], len(stats['3m']), len(stats['6m']), len(stats['12m'])])

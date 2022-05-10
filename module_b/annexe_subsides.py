@@ -56,11 +56,11 @@ class AnnexeSubsides(object):
         for code, cc in clients_comptes.items():
             lignes = []
             client = imports.clients.donnees[code]
-            nom_csv = "Annexe_subsides_" + str(imports.edition.annee) + "_" + \
+            nom_csv = "Subsides_bilan_" + str(imports.edition.annee) + "_" + \
                       Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + \
                       client['abrev_labo'] + ".csv"
             nom_zip = "Annexes_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + "_" + \
-                      str(imports.version) + code + "_" + client['abrev_labo'] + ".zip"
+                      str(imports.version) + "_" + code + "_" + client['abrev_labo'] + ".zip"
             if code not in self.csv_fichiers:
                 self.csv_fichiers[code] = {'nom': nom_zip, 'fichiers': []}
             self.csv_fichiers[code]['fichiers'].append(nom_csv)

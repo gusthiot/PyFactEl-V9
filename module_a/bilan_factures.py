@@ -11,7 +11,7 @@ class BilanFactures(CsvList):
             'client-code', 'client-sap', 'client-name', 'client-idclass', 'client-class', 'client-labelclass',
             'total-fact']
 
-    def __init__(self, imports, transactions, versions):
+    def __init__(self, imports, transactions):
         """
         initialisation des données
         :param imports: données importées
@@ -23,24 +23,22 @@ class BilanFactures(CsvList):
         self.nom = "Bilan-factures_" + str(imports.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + \
                    "_" + Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
 
-        for id_fact, par_fact in versions.facts_new.items():
-            code = versions.valeurs[id_fact]['client-code']
-            client = imports.clients.donnees[code]
-            id_classe = client['id_classe']
+        trans_fact = {}
+        for key, trans in transactions.valeurs.items():
+            if trans['invoice-id'] not in trans_fact:
+                trans_fact[trans['invoice-id']] = []
+            trans_fact[trans['invoice-id']].append(key)
+
+        for id_fact, par_fact in trans_fact.items():
+            base = transactions.valeurs[par_fact[0]]
+            id_classe = base['client-idclass']
             classe = imports.classes.donnees[id_classe]
             ref = classe['ref_fact'] + "_" + str(imports.edition.annee) + "_" + \
                 Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + str(id_fact)
-            base = None
             total = 0
-            for par_compte in par_fact['projets'].values():
-                for par_article in par_compte.values():
-                    for par_item in par_article.values():
-                        for par_user in par_item.values():
-                            for key in par_user:
-                                trans = transactions.valeurs[key]
-                                if not base:
-                                    base = trans
-                                total += trans['total-fact']
+            for key in par_fact:
+                trans = transactions.valeurs[key]
+                total += trans['total-fact']
 
             ligne = []
             for cle in self.cles:

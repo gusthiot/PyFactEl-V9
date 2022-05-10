@@ -19,6 +19,19 @@ class Format(object):
             return str(mois)
 
     @staticmethod
+    def format_2_dec(nombre):
+        """
+        affiche un nombre en float arrondi avec 2 chiffres après la virgule
+        :param nombre: nombre à afficher
+        :return: nombre arrondi, avec 2 chiffres après la virgule, en string
+        """
+        try:
+            float(nombre)
+            return "%.2f" % round(nombre, 2)
+        except ValueError:
+            return "pas un nombre"
+
+    @staticmethod
     def est_un_texte(donnee, colonne, ligne=-1, vide=False):
         """
         vérifie que la donnée est bien un texte

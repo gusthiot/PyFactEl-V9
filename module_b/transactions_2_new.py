@@ -68,4 +68,4 @@ class Transactions2New(CsvDict):
                             ligne += [round(quantity, 3), base['item-unit'], base['valuation-price'], round(deduct, 2),
                                       round(total, 2)]
                             self._ajouter_valeur(ligne, i)
-                            i = i + 1
+                            i += 1

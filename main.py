@@ -110,7 +110,7 @@ try:
         Chemin.csv_files_in_zip(annexes.csv_fichiers, imports.chemin_cannexes)
         transactions1 = Transactions1(imports, new_transactions2, new_versions)
         transactions1.csv(DossierDestination(imports.chemin_bilans))
-        bil_facts = BilanFactures(imports, new_transactions2, new_versions)
+        bil_facts = BilanFactures(imports, transactions1)
         bil_facts.csv(DossierDestination(imports.chemin_bilans))
         # if Latex.possibles():
         #     pdfs = Pdfs(imports, new_transactions2, new_versions)

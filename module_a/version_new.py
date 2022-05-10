@@ -55,15 +55,17 @@ class VersionNew(CsvDict):
                             idem = False
 
                     if idem:
-                        self._ajouter_valeur([fact_id, donnee['client-code'], donnee['version-last'], 'IDEM',
-                                              donnee['version-new-amount'], donnee['version-new-amount']], fact_id)
+                        self._ajouter_valeur([fact_id, donnee['client-code'], donnee['invoice-type'],
+                                              donnee['version-last'], 'IDEM', donnee['version-new-amount'],
+                                              donnee['version-new-amount']], fact_id)
                     else:
                         somme = 0
                         for unique in self.facts_new[fact_id]['transactions']:
                             trans = self.transactions_new[unique]
                             somme += trans['total-fact']
-                        self._ajouter_valeur([fact_id, donnee['client-code'], self.imports.version, 'CORRECTED',
-                                              donnee['version-new-amount'], round(somme, 2)], fact_id)
+                        self._ajouter_valeur([fact_id, donnee['client-code'], donnee['invoice-type'],
+                                              self.imports.version, 'CORRECTED', donnee['version-new-amount'],
+                                              round(somme, 2)], fact_id)
 
             for fact_id in self.facts_new.keys():
                 if fact_id not in imports.versions.donnees.keys():

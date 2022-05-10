@@ -1,8 +1,8 @@
 from core import (Format,
-                  CsvList)
+                  CsvDict)
 
 
-class Transactions1(CsvList):
+class Transactions1(CsvDict):
     """
     Classe pour la création des transactions de niveau 1
     """
@@ -24,6 +24,7 @@ class Transactions1(CsvList):
         self.nom = "Transaction1_" + str(imports.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + \
                    "_" + Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
 
+        i = 0
         for id_fact, par_fact in versions.facts_new.items():
             code = versions.valeurs[id_fact]['client-code']
             client = imports.clients.donnees[code]
@@ -52,4 +53,5 @@ class Transactions1(CsvList):
                             ligne.append(round(2*total, 1)/2)
                         else:
                             ligne.append(base[cle])
-                    self.lignes.append(ligne)
+                    self._ajouter_valeur(ligne, i)
+                    i += 1
