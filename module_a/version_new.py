@@ -3,6 +3,7 @@ from core import (Format,
                   Interface,
                   ErreurConsistance)
 from imports.construits import Version
+from module_a import Sommes2
 
 
 class VersionNew(CsvDict):
@@ -10,11 +11,12 @@ class VersionNew(CsvDict):
     Classe pour la création de la table des numéros de facture
     """
 
-    def __init__(self, imports, transactions_2_new):
+    def __init__(self, imports, transactions_2_new, sommes_2):
         """
         initialisation des données
         :param imports: données importées
         :param transactions_2_new: transactions 2 nouvellement générées
+        :param sommes_2: sommes des transactions 2
         """
         super().__init__(imports)
         self.nom = "Table-versions-factures_" + str(imports.edition.annee) + "_" + \
@@ -22,21 +24,20 @@ class VersionNew(CsvDict):
         self.cles = Version.cles
 
         self.transactions_new = transactions_2_new.valeurs
-        self.facts_new = self.__struct_fact(self.transactions_new, "Nouveau Transitions 2 : ", self.imports.version)
 
         if imports.version == 0:
-            for fact_id in self.facts_new.keys():
-                self.__add_new(fact_id, self.facts_new[fact_id]['transactions'])
+            for fact_id in sommes_2.par_fact.keys():
+                self.__add_new(fact_id, sommes_2.par_fact[fact_id]['transactions'])
         else:
             transactions_old = imports.transactions_2.donnees
-            facts_old = self.__struct_fact(transactions_old, "Ancien Transitions 2 : ", self.imports.version-1)
+            sommes_2_old = Sommes2.struct_fact(transactions_old)
 
             for fact_id, donnee in imports.versions.donnees.items():
-                if fact_id not in self.facts_new:
+                if fact_id not in sommes_2.par_fact:
                     self._ajouter_valeur([fact_id, donnee['client-code'], self.imports.version, 'CANCELED',
                                           donnee['version-new-amount'], 0], fact_id)
                 else:
-                    base_new = self.transactions_new[self.facts_new[fact_id]['transactions'][0]]
+                    base_new = self.transactions_new[sommes_2.par_fact[fact_id]['transactions'][0]]
                     if donnee['client-code'] != base_new['client-code']:
                         Interface.fatal(ErreurConsistance(),
                                         fact_id + "\n Le id-facture doit être lié au même client dans l'ancienne et "
@@ -47,11 +48,11 @@ class VersionNew(CsvDict):
                                         "la nouvelle table des versions")
 
                     idem = True
-                    if self.__compare(self.facts_new[fact_id], facts_old[fact_id], True, self.transactions_new,
+                    if self.__compare(sommes_2.par_fact[fact_id], sommes_2_old[fact_id], True, self.transactions_new,
                                       transactions_old):
                         idem = False
                     else:
-                        if self.__compare(facts_old[fact_id], self.facts_new[fact_id]):
+                        if self.__compare(sommes_2_old[fact_id], sommes_2.par_fact[fact_id]):
                             idem = False
 
                     if idem:
@@ -60,16 +61,16 @@ class VersionNew(CsvDict):
                                               donnee['version-new-amount']], fact_id)
                     else:
                         somme = 0
-                        for unique in self.facts_new[fact_id]['transactions']:
+                        for unique in sommes_2.par_fact[fact_id]['transactions']:
                             trans = self.transactions_new[unique]
                             somme += trans['total-fact']
                         self._ajouter_valeur([fact_id, donnee['client-code'], donnee['invoice-type'],
                                               self.imports.version, 'CORRECTED', donnee['version-new-amount'],
                                               round(somme, 2)], fact_id)
 
-            for fact_id in self.facts_new.keys():
+            for fact_id in sommes_2.par_fact.keys():
                 if fact_id not in imports.versions.donnees.keys():
-                    self.__add_new(fact_id, self.facts_new[fact_id]['transactions'])
+                    self.__add_new(fact_id, sommes_2.par_fact[fact_id]['transactions'])
 
     def __add_new(self, fact_id, liste):
         """
@@ -84,39 +85,6 @@ class VersionNew(CsvDict):
             somme += trans['total-fact']
         self._ajouter_valeur([fact_id, base['client-code'], base['invoice-type'], self.imports.version, 'NEW', 0,
                               round(somme, 2)], fact_id)
-
-    def __struct_fact(self, transactions, label, version):
-        """
-        crée l'arborescence des transactions, fonction projet->articleSAP->article->utilisateur
-        :param transactions: données transactions
-        :return: arborescence sous forme de dictionnaire
-        """
-        arbre = {}
-        for key, trans in transactions.items():
-            if trans['invoice-year'] != self.imports.edition.annee:
-                Interface.fatal(ErreurConsistance(), label + " mauvaise année à la ligne " + key)
-            if trans['invoice-month'] != self.imports.edition.mois:
-                Interface.fatal(ErreurConsistance(), label + " mauvais mois à la ligne " + key)
-            if trans['invoice-version'] != version:
-                Interface.fatal(ErreurConsistance(), label + " mauvaise version à la ligne " + key)
-            if trans['invoice-id'] not in arbre:
-                arbre[trans['invoice-id']] = {'transactions': [], 'projets': {}}
-            arbre[trans['invoice-id']]['transactions'].append(key)
-            projets = arbre[trans['invoice-id']]['projets']
-            if trans['proj-id'] not in projets:
-                projets[trans['proj-id']] = {}
-            tp = projets[trans['proj-id']]
-            if trans['item-idsap'] not in tp:
-                tp[trans['item-idsap']] = {}
-            tps = tp[trans['item-idsap']]
-            if trans['item-id'] not in tps:
-                tps[trans['item-id']] = {}
-            tpsi = tps[trans['item-id']]
-            if trans['user-id'] not in tpsi:
-                tpsi[trans['user-id']] = [key]
-            else:
-                tpsi[trans['user-id']].append(key)
-        return arbre
 
     @staticmethod
     def __compare(first, second, comparaison_fine=False, fdata=None, sdata=None):

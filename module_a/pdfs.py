@@ -7,11 +7,12 @@ class Pdfs(object):
     Classe pour la création des annexes PDF
     """
 
-    def __init__(self, imports, transactions, versions):
+    def __init__(self, imports, transactions_2, sommes_2, versions):
         """
         initialisation des données
         :param imports: données importées
-        :param transactions: transactions générées
+        :param transactions_2: transactions 2 générées
+        :param sommes_2: sommes des transactions 2
         :param versions: versions des factures générées
         """
         self.imports = imports
@@ -19,16 +20,16 @@ class Pdfs(object):
         prefixe = "Annexe_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + "_" + \
                   str(imports.version)
 
-        # ii = 0
+        ii = 0
         for id_fact, donnee in versions.valeurs.items():
             if donnee['version-change'] != 'IDEM':
-                par_fact = versions.facts_new[id_fact]
+                par_fact = sommes_2.par_fact[id_fact]
                 intype = donnee['invoice-type']
                 code = donnee['client-code']
                 client = imports.clients.donnees[code]
                 parties = {}
                 for id_compte, par_compte in par_fact['projets'].items():
-                    parties[id_compte] = self.entete(id_compte, intype) + self.table(transactions, par_compte, intype)
+                    parties[id_compte] = self.entete(id_compte, intype) + self.table(transactions_2, par_compte, intype)
 
                 if intype == "GLOB":
                     nom = prefixe + "_" + str(id_fact) + "_" + client['abrev_labo'] + "_0"

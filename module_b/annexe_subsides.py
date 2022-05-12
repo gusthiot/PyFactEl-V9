@@ -14,11 +14,11 @@ class AnnexeSubsides(object):
             'proj-name', 'item-codeD', 'item-labelcode', 'subsid-code', 'subsid-name', 'subsid-start', 'subsid-end',
             'subsid-pourcent', 'subsid-maxproj', 'subsid-maxmois', 'subsid-alrdygrant', 'subsid-CHF', 'subsid-reste']
 
-    def __init__(self, imports, transactions, par_client, csv_fichiers):
+    def __init__(self, imports, transactions_3, par_client, csv_fichiers):
         """
         initialisation des données
         :param imports: données importées
-        :param transactions: transactions générées
+        :param transactions_3: transactions 3 générées
         :param par_client: tri des transactions
         :param csv_fichiers: fichiers csv et nom du fichier zip par client
         """
@@ -92,7 +92,7 @@ class AnnexeSubsides(object):
                             if id_article in par_code.keys():
                                 tbtr = par_code[id_article]
                                 for indice in tbtr:
-                                    trans = transactions.valeurs[indice]
+                                    trans = transactions_3.valeurs[indice]
                                     if trans['subsid-code'] != "" and trans['subsid-maxproj'] > 0:
                                         subs += trans['subsid-CHF']
 

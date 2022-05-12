@@ -9,11 +9,11 @@ class UserLaboNew(CsvDict):
     Classe pour la création du csv des utilisations des plateformes
     """
 
-    def __init__(self, imports, transactions, par_user):
+    def __init__(self, imports, transactions_3, par_user):
         """
         initialisation des données
         :param imports: données importées
-        :param transactions: transactions générées
+        :param transactions_3: transactions 3 générées
         :param par_user: tri des transactions
         """
         super().__init__(imports)
@@ -44,7 +44,7 @@ class UserLaboNew(CsvDict):
         for id_user, par_client in par_user.items():
             for code, par_code in par_client.items():
                 for jour in par_code['days'].values():
-                    trans = transactions.valeurs[jour]
+                    trans = transactions_3.valeurs[jour]
                     valeur = [imports.edition.annee, imports.edition.mois]
                     for cle in range(2, len(UserLabo.cles)):
                         if UserLabo.cles[cle] == 'day':

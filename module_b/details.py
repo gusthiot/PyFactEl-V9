@@ -15,11 +15,11 @@ class Details(object):
             'subsid-maxproj', 'subsid-maxmois', 'subsid-reste', 'subsid-CHF', 'deduct-CHF', 'subsid-deduct',
             'total-fact', 'discount-bonus', 'subsid-bonus']
 
-    def __init__(self, imports, transactions, par_client, numeros):
+    def __init__(self, imports, transactions_3, par_client, numeros):
         """
         initialisation des données
         :param imports: données importées
-        :param transactions: transactions générées
+        :param transactions_3: transactions 3 générées
         :param par_client: tri des transactions
         :param numeros: table des numéros de version
         """
@@ -49,7 +49,7 @@ class Details(object):
                 self.csv_fichiers[code]['fichiers'].append(nom_csv)
                 lignes = []
                 for indice in tbtr:
-                    val = transactions.valeurs[indice]
+                    val = transactions_3.valeurs[indice]
                     ligne = [imports.edition.annee, imports.edition.mois]
                     for cle in range(2, len(self.cles)):
                         if self.cles[cle] == 'invoice-id':

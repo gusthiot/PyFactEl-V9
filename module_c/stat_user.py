@@ -11,16 +11,16 @@ class StatUser(CsvList):
             'client-sap', 'client-name', 'client-idclass', 'client-class', 'client-labelclass', 'stat-trans',
             'stat-run']
 
-    def __init__(self, imports, transactions, par_user):
+    def __init__(self, imports, transactions_3, par_user):
         """
         initialisation des données
         :param imports: données importées
-        :param transactions: transactions générées
+        :param transactions_3: transactions 3 générées
         :param par_user: tri des transactions
         """
         super().__init__(imports)
 
-        self.nom = "Stat-user_" + str(imports.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + "_" \
+        self.nom = "Stat-user_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" \
                    + Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
 
         for par_client in par_user.values():
@@ -29,11 +29,11 @@ class StatUser(CsvList):
                 ligne = [imports.edition.annee, imports.edition.mois]
                 stat_trans = 0
                 stat_run = 0
-                base = transactions.valeurs[tbtr[0]]
+                base = transactions_3.valeurs[tbtr[0]]
                 for cle in range(2, len(self.cles)-2):
                     ligne.append(base[self.cles[cle]])
                 for indice in tbtr:
-                    trans = transactions.valeurs[indice]
+                    trans = transactions_3.valeurs[indice]
                     stat_trans += 1
                     if str(trans['transac-runcae']) == "1":
                         stat_run += 1

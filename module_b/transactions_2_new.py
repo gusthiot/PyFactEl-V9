@@ -8,17 +8,17 @@ class Transactions2New(CsvDict):
     Classe pour la création des transactions de niveau 2
     """
 
-    def __init__(self, imports, transactions, par_client, numeros):
+    def __init__(self, imports, transactions_3, par_client, numeros):
         """
         initialisation des données
         :param imports: données importées
-        :param transactions: transactions générées
+        :param transactions_3: transactions 3 générées
         :param par_client: tri des transactions
         :param numeros: table des numéros de version
         """
         super().__init__(imports)
 
-        self.nom = "Transaction2_" + str(imports.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + \
+        self.nom = "Transaction2_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + \
                    "_" + Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
         self.cles = Transactions2.cles
 
@@ -33,7 +33,7 @@ class Transactions2New(CsvDict):
                         par_item = par_order[nbr]
                         for tbtr in par_item.values():
                             ligne = [imports.edition.annee, imports.edition.mois, imports.version, id_fact]
-                            base = transactions.valeurs[tbtr[0]]
+                            base = transactions_3.valeurs[tbtr[0]]
                             if base['invoice-project'] == "0":
                                 ligne.append("GLOB")
                             else:
@@ -49,7 +49,7 @@ class Transactions2New(CsvDict):
                             deduct = 0
                             total = 0
                             for indice in tbtr:
-                                trans = transactions.valeurs[indice]
+                                trans = transactions_3.valeurs[indice]
                                 quantity += trans['transac-quantity']
                                 deduct += trans['deduct-CHF']
                                 total += trans['total-fact']

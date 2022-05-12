@@ -20,7 +20,7 @@ class StatNbUser(CsvList):
         """
         super().__init__(imports)
 
-        self.nom = "Stat-nbre-user_" + str(imports.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + "_" \
+        self.nom = "Stat-nbre-user_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" \
                    + Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
 
         jour_de_semaine, nb_de_jours = monthrange(imports.edition.annee, imports.edition.mois)

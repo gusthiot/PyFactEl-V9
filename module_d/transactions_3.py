@@ -26,7 +26,7 @@ class Transactions3(CsvDict):
         :param tarifs: tarifs générés
         """
         super().__init__(imports)
-        self.nom = "Transaction3_" + str(imports.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + "_" \
+        self.nom = "Transaction3_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" \
                    + Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
         self.comptabilises = {}
         self.valeurs = {}

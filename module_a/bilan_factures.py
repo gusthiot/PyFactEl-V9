@@ -11,33 +11,28 @@ class BilanFactures(CsvList):
             'client-code', 'client-sap', 'client-name', 'client-idclass', 'client-class', 'client-labelclass',
             'total-fact']
 
-    def __init__(self, imports, transactions):
+    def __init__(self, imports, transactions_1, sommes_1):
         """
         initialisation des données
         :param imports: données importées
-        :param transactions: transactions générées
-        :param versions: versions des factures générées
+        :param transactions_1: transactions 1 générées
+        :param sommes_1: sommes des transactions 1
         """
         super().__init__(imports)
 
-        self.nom = "Bilan-factures_" + str(imports.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + \
+        self.nom = "Bilan-factures_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + \
                    "_" + Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
 
-        trans_fact = {}
-        for key, trans in transactions.valeurs.items():
-            if trans['invoice-id'] not in trans_fact:
-                trans_fact[trans['invoice-id']] = []
-            trans_fact[trans['invoice-id']].append(key)
-
-        for id_fact, par_fact in trans_fact.items():
-            base = transactions.valeurs[par_fact[0]]
+        for id_fact in sommes_1.par_fact.keys():
+            par_fact = sommes_1.par_fact[id_fact]['transactions']
+            base = transactions_1.valeurs[par_fact[0]]
             id_classe = base['client-idclass']
             classe = imports.classes.donnees[id_classe]
             ref = classe['ref_fact'] + "_" + str(imports.edition.annee) + "_" + \
                 Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + str(id_fact)
             total = 0
             for key in par_fact:
-                trans = transactions.valeurs[key]
+                trans = transactions_1.valeurs[key]
                 total += trans['total-fact']
 
             ligne = []

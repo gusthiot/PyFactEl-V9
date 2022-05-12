@@ -11,21 +11,20 @@ class BilanUsages(CsvList):
     cles = ['invoice-year', 'invoice-month', 'platf-code', 'platf-name', 'item-id', 'item-nbr', 'item-name',
             'item-unit', 'transac-usage', 'transac-runtime', 'runtime-N', 'runtime-avg', 'runtime-stddev']
 
-    def __init__(self, imports, transactions, par_item):
+    def __init__(self, imports, transactions_3, par_item):
         """
         initialisation des données
         :param imports: données importées
-        :param transactions: transactions générées
+        :param transactions_3: transactions 3 générées
         :param par_item: tri des transactions
         """
         super().__init__(imports)
 
-        self.nom = "Bilan-usage_" + str(imports.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + "_" + \
+        self.nom = "Bilan-usage_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" + \
                    Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
 
-        trans_vals = transactions.valeurs
         for tbtr in par_item.values():
-            base = trans_vals[tbtr[0]]
+            base = transactions_3.valeurs[tbtr[0]]
             if base['item-flag-usage'] == "OUI":
                 ligne = [imports.edition.annee, imports.edition.mois]
                 for cle in range(2, len(self.cles)-5):
@@ -37,7 +36,7 @@ class BilanUsages(CsvList):
                 stddev = 0
                 rts = []
                 for indice in tbtr:
-                    trans = trans_vals[indice]
+                    trans = transactions_3.valeurs[indice]
                     usage += trans['transac-usage']
                     if trans['transac-runtime'] != "":
                         rti = trans['transac-runtime']

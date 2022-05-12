@@ -25,7 +25,7 @@ class Transactions2(CsvImport):
         :param plateforme: plateforme traitée
         :param version: version de facturation ciblée
         """
-        self.nom_fichier = "Transaction2_" + str(plateforme['abrev_plat']) + "_" + str(annee) + "_" + \
+        self.nom_fichier = "Transaction2_" + plateforme['abrev_plat'] + "_" + str(annee) + "_" + \
                            Format.mois_string(mois) + "_" + str(version) + ".csv"
         super().__init__(dossier_source)
 
@@ -71,6 +71,13 @@ class Transactions2(CsvImport):
                     msg += "l'id facture '" + donnee['invoice-id'] + "' de la ligne " + str(ligne) + \
                            " ne peut concerner 2 clients : " + ids[donnee['invoice-id']] + " et " + \
                            donnee['client-code'] + "\n"
+
+            if donnee['invoice-year'] != annee:
+                msg += " mauvaise année à la ligne " + str(ligne)
+            if donnee['invoice-month'] != mois:
+                msg += " mauvais mois à la ligne " + str(ligne)
+            if donnee['invoice-version'] != version-1:
+                msg += " mauvaise version à la ligne " + str(ligne)
 
             donnees_dict[ligne-1] = donnee
             ligne += 1

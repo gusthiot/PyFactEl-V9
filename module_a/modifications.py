@@ -17,7 +17,7 @@ class Modifications(CsvDict):
         :param versions: versions nouvellement générées
         """
         super().__init__(imports)
-        self.nom = "Modif-factures_" + str(imports.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + \
+        self.nom = "Modif-factures_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + \
                    "_" + Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
 
         for donnee in versions.valeurs.values():

@@ -12,27 +12,20 @@ class Transactions1(CsvDict):
             'proj-id', 'proj-nbr', 'proj-name', 'item-idsap', 'item-codeD', 'item-order', 'item-labelcode',
             'total-fact']
 
-    def __init__(self, imports, transactions, versions):
+    def __init__(self, imports, transactions_2, sommes_2):
         """
         initialisation des données
         :param imports: données importées
-        :param transactions: transactions générées
-        :param versions: versions des factures générées
+        :param transactions_2: transactions 2 générées
+        :param sommes_2: sommes des transactions 2
         """
         super().__init__(imports)
 
-        self.nom = "Transaction1_" + str(imports.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + \
+        self.nom = "Transaction1_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + \
                    "_" + Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
 
         i = 0
-        for id_fact, par_fact in versions.facts_new.items():
-            code = versions.valeurs[id_fact]['client-code']
-            client = imports.clients.donnees[code]
-            id_classe = client['id_classe']
-            classe = imports.classes.donnees[id_classe]
-            ref = classe['ref_fact'] + "_" + str(imports.edition.annee) + "_" + \
-                Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + str(id_fact)
-
+        for id_fact, par_fact in sommes_2.par_fact.items():
             for par_compte in par_fact['projets'].values():
                 for par_article in par_compte.values():
                     base = None
@@ -40,12 +33,18 @@ class Transactions1(CsvDict):
                     for par_item in par_article.values():
                         for par_user in par_item.values():
                             for key in par_user:
-                                trans = transactions.valeurs[key]
+                                trans = transactions_2.valeurs[key]
                                 if not base:
                                     base = trans
                                 total += trans['total-fact']
 
                     ligne = []
+                    code = base['client-code']
+                    client = imports.clients.donnees[code]
+                    id_classe = client['id_classe']
+                    classe = imports.classes.donnees[id_classe]
+                    ref = classe['ref_fact'] + "_" + str(imports.edition.annee) + "_" + \
+                          Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + str(id_fact)
                     for cle in self.cles:
                         if cle == 'invoice-ref':
                             ligne.append(ref)

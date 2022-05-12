@@ -8,11 +8,11 @@ class NumeroNew(CsvList):
     Classe pour la création de la table des numéros de facture
     """
 
-    def __init__(self, imports, transactions):
+    def __init__(self, imports, transactions_3):
         """
         initialisation des données
         :param imports: données importées
-        :param transactions: transactions générées
+        :param transactions_3: transactions 3 générées
         """
         super().__init__(imports)
         self.nom = "Table-numeros-factures_" + str(imports.edition.annee) + "_" + \
@@ -32,7 +32,7 @@ class NumeroNew(CsvList):
                 self.couples[code][icf] = key
                 self.lignes.append([key, code, icf])
 
-        for transaction in transactions.valeurs.values():
+        for transaction in transactions_3.valeurs.values():
             if (imports.edition.annee == transaction['invoice-year'] and
                     imports.edition.mois == transaction['invoice-month']):
                 code = transaction['client-code']

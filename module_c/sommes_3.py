@@ -1,15 +1,15 @@
 
 
-class Sommes(object):
+class Sommes3(object):
     """
     Classe pour sommer les transactions 3 en fonction des clients et des plateformes
     """
 
-    def __init__(self, imports, transactions):
+    def __init__(self, imports, transactions_3):
         """
         initialisation des données
         :param imports: données importées
-        :param transactions: transactions générées
+        :param transactions_3: transactions 3 générées
         """
         self.par_client = {}
         self.par_item = {}
@@ -17,7 +17,7 @@ class Sommes(object):
         self.par_machine = {}
         self.par_projet = {}
 
-        for key, transaction in transactions.valeurs.items():
+        for key, transaction in transactions_3.valeurs.items():
             code_client = transaction['client-code']
             id_compte = transaction['proj-id']
             user_id = transaction['user-id']

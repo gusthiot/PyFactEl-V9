@@ -12,22 +12,22 @@ class StatMachine(CsvList):
             'item-nbr', 'item-name', 'item-unit', 'transac-quantity', 'transac-usage', 'transac-runtime', 'runtime-N',
             'runtime-avg', 'runtime-stddev']
 
-    def __init__(self, imports, transactions, par_machine):
+    def __init__(self, imports, transactions_3, par_machine):
         """
         initialisation des données
         :param imports: données importées
-        :param transactions: transactions générées
+        :param transactions_3: transactions 3 générées
         :param par_machine: tri des transactions
         """
         super().__init__(imports)
 
-        self.nom = "Stat-machine_" + str(imports.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + "_" \
+        self.nom = "Stat-machine_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" \
                    + Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
 
         for par_item in par_machine.values():
             for tbtr in par_item.values():
                 ligne = [imports.edition.annee, imports.edition.mois]
-                base = transactions.valeurs[tbtr[0]]
+                base = transactions_3.valeurs[tbtr[0]]
                 for cle in range(2, len(self.cles)-6):
                     ligne.append(base[self.cles[cle]])
                 quantity = 0
@@ -38,7 +38,7 @@ class StatMachine(CsvList):
                 stddev = 0
                 rts = []
                 for indice in tbtr:
-                    trans = transactions.valeurs[indice]
+                    trans = transactions_3.valeurs[indice]
                     quantity += trans['transac-quantity']
                     usage += trans['transac-usage']
                     run = trans['transac-runtime']

@@ -1,4 +1,4 @@
-from .sommes import Sommes
+from .sommes_3 import Sommes3
 from .user_labo_new import UserLaboNew
 from .bilan_usages import BilanUsages
 from .bilan_consos import BilanConsos

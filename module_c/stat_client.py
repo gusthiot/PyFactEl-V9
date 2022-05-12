@@ -11,17 +11,17 @@ class StatClient(CsvList):
             'client-class', 'client-labelclass', 'stat-trans', 'stat-run', 'stat-nbuser-m', 'stat-nbuser-3m',
             'stat-nbuser-6m', 'stat-nbuser-12m']
 
-    def __init__(self, imports, transactions, par_ul, par_client):
+    def __init__(self, imports, transactions_3, par_ul, par_client):
         """
         initialisation des données
         :param imports: données importées
-        :param transactions: transactions générées
+        :param transactions_3: transactions 3 générées
         :param par_ul: tri des users labo
         :param par_client: tri des transactions
         """
         super().__init__(imports)
 
-        self.nom = "Stat-client_" + str(imports.plateforme['abrev_plat']) + "_" + str(imports.edition.annee) + "_" \
+        self.nom = "Stat-client_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" \
                    + Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
 
         stats_clients = {}
@@ -60,7 +60,7 @@ class StatClient(CsvList):
             if code in par_client.keys():
                 tbtr = par_client[code]['transactions']
                 for indice in tbtr:
-                    if str(transactions.valeurs[indice]['transac-runcae']) == "1":
+                    if str(transactions_3.valeurs[indice]['transac-runcae']) == "1":
                         runs += 1
                 nb = len(tbtr)
 
