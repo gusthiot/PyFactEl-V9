@@ -78,7 +78,6 @@ class AnnexeSubsides(object):
                                  compte['id_compte'], compte['intitule'], artsap['code_d'],
                                  artsap['intitule'], subside['type'], subside['intitule'], subside['debut'],
                                  subside['fin'], plafond['pourcentage'], plafond['max_compte'], plafond['max_mois']]
-                        subs = 0
                         g_id = id_compte + imports.plateforme['id_plateforme'] + id_article
                         if g_id in imports.grants.donnees.keys():
                             grant, info = Format.est_un_nombre(imports.grants.donnees[g_id]['subsid-alrdygrant'],
@@ -87,14 +86,11 @@ class AnnexeSubsides(object):
                                 Interface.affiche_message(info)
                         else:
                             grant = 0
+                        subs = 0
                         if code in par_client and id_compte in par_client[code]['comptes']:
                             par_code = par_client[code]['comptes'][id_compte]
                             if id_article in par_code.keys():
-                                tbtr = par_code[id_article]
-                                for indice in tbtr:
-                                    trans = transactions_3.valeurs[indice]
-                                    if trans['subsid-code'] != "" and trans['subsid-maxproj'] > 0:
-                                        subs += trans['subsid-CHF']
+                                subs = par_code[id_article]['subs']
 
                         reste = plafond['max_compte'] - grant - subs
                         ligne += [round(grant, 2), round(subs, 2), round(reste, 2)]

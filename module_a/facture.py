@@ -7,12 +7,11 @@ class Facture(CsvList):
     Classe contenant les méthodes nécessaires à la génération des factures
     """
 
-    def __init__(self, imports, versions, transactions_1, sommes_1):
+    def __init__(self, imports, versions, sommes_1):
         """
         génère la facture sous forme de csv
         :param imports: données importées
         :param versions: versions des factures générées
-        :param transactions_1: transactions 1 générées
         :param sommes_1: sommes des transactions 1
 
         """
@@ -54,7 +53,7 @@ class Facture(CsvList):
                 if intype == "GLOB":
                     lien += "0.pdf"
                 else:
-                    for id_compte in sommes_1.par_fact[id_fact]['projets'].keys():
+                    for id_compte in sommes_1.par_fact['factures'][id_fact]['projets'].keys():
                         compte = imports.comptes.donnees[id_compte]
                         lien += compte['numero'] + ".pdf"
 
@@ -72,19 +71,13 @@ class Facture(CsvList):
                 inc = 1
                 date_dernier = str(imports.edition.annee) + Format.mois_string(imports.edition.mois) + \
                     str(imports.edition.dernier_jour)
-                for id_compte, par_compte in sommes_1.par_fact[id_fact]['projets'].items():
+                for id_compte, par_compte in sommes_1.par_fact['factures'][id_fact]['projets'].items():
                     compte = imports.comptes.donnees[id_compte]
                     nom = compte['numero'] + "-" + compte['intitule']
-                    orders = {}
                     poste = inc*10
-                    for id_article in par_compte.keys():
-                        article = imports.artsap.donnees[id_article]
-                        orders[article['ordre']] = id_article
-                    for id_article in sorted(orders.values()):
-                        article = imports.artsap.donnees[id_article]
-                        net = 0
-                        for key in par_compte[id_article]:
-                            net += transactions_1.valeurs[key]['total-fact']
+                    for ordre, par_article in sorted(par_compte.items()):
+                        article = imports.artsap.donnees[par_article['id']]
+                        net = par_article['total']
                         code_op = self.imports.plateforme['code_p'] + classe['code_n'] + str(imports.edition.annee) + \
                             Format.mois_string(imports.edition.mois) + article['code_d']
 

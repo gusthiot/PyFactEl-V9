@@ -23,31 +23,22 @@ class BilanUsages(CsvList):
         self.nom = "Bilan-usage_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" + \
                    Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
 
-        for tbtr in par_item.values():
-            base = transactions_3.valeurs[tbtr[0]]
+        for pi in par_item.values():
+            base = transactions_3.valeurs[pi['base']]
             if base['item-flag-usage'] == "OUI":
                 ligne = [imports.edition.annee, imports.edition.mois]
                 for cle in range(2, len(self.cles)-5):
                     ligne.append(base[self.cles[cle]])
-                usage = 0
-                runtime = 0
-                nn = 0
+                runtime = pi['runtime']
+                nn = pi['nn']
                 avg = 0
                 stddev = 0
-                rts = []
-                for indice in tbtr:
-                    trans = transactions_3.valeurs[indice]
-                    usage += trans['transac-usage']
-                    if trans['transac-runtime'] != "":
-                        rti = trans['transac-runtime']
-                        runtime += rti
-                        nn += 1
-                        rts.append(rti)
+                rts = pi['rts']
                 if nn > 0:
                     avg = runtime / nn
                     somme = 0
                     for rt in rts:
                         somme += math.pow(rt-avg, 2)
                     stddev = math.sqrt(1 / nn * somme)
-                ligne += [round(usage, 3), round(runtime, 3), nn, round(avg, 3), round(stddev, 3)]
+                ligne += [round(pi['usage'], 3), round(runtime, 3), nn, round(avg, 3), round(stddev, 3)]
                 self.lignes.append(ligne)

@@ -46,9 +46,9 @@ class Pdfs(object):
                         Latex.creer_latex_pdf(nom, self.canevas(contenu))
                         Latex.finaliser_pdf(nom, imports.chemin_pannexes)
 
-            # ii += 1
-            # if ii > 2:
-            #     break
+            ii += 1
+            if ii > 2:
+                break
 
     def entete(self, id_compte, intype):
         textes = self.imports.paramtexte.donnees
@@ -101,7 +101,7 @@ class Pdfs(object):
         for id_article, par_article in par_compte.items():
             article = self.imports.artsap.donnees[id_article]
             subtot = 0
-            for par_item in par_article.values():
+            for par_item in par_article['items'].values():
                 for par_user in par_item.values():
                     for key in par_user:
                         trans = transactions.valeurs[key]

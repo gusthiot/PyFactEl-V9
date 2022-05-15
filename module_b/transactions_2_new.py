@@ -27,13 +27,11 @@ class Transactions2New(CsvDict):
             for icf in par_code['projets']:
                 par_fact = par_code['projets'][icf]
                 id_fact = numeros.couples[code][icf]
-                for order in sorted(par_fact['articles'].keys()):
-                    par_order = par_fact['articles'][order]
-                    for nbr in sorted(par_order.keys()):
-                        par_item = par_order[nbr]
-                        for tbtr in par_item.values():
+                for order, par_order in sorted(par_fact['articles'].items()):
+                    for nbr, par_item in sorted(par_order.items()):
+                        for par_user in par_item.values():
                             ligne = [imports.edition.annee, imports.edition.mois, imports.version, id_fact]
-                            base = transactions_3.valeurs[tbtr[0]]
+                            base = transactions_3.valeurs[par_user['base']]
                             if base['invoice-project'] == "0":
                                 ligne.append("GLOB")
                             else:
@@ -41,31 +39,10 @@ class Transactions2New(CsvDict):
                             for cle in range(5, 16):
                                 ligne.append(base[self.cles[cle]])
                             ligne.append(base['user-name'] + " " + base['user-first'][0] + ".")
-                            start_year = base['transac-date'].year
-                            start_month = base['transac-date'].month
-                            end_year = base['transac-date'].year
-                            end_month = base['transac-date'].month
-                            quantity = 0
-                            deduct = 0
-                            total = 0
-                            for indice in tbtr:
-                                trans = transactions_3.valeurs[indice]
-                                quantity += trans['transac-quantity']
-                                deduct += trans['deduct-CHF']
-                                total += trans['total-fact']
-                                if trans['transac-date'].year < start_year:
-                                    start_year = trans['transac-date'].year
-                                if trans['transac-date'].year > end_year:
-                                    end_year = trans['transac-date'].year
-                                if trans['transac-date'].month < start_month:
-                                    start_month = trans['transac-date'].month
-                                if trans['transac-date'].month > end_month:
-                                    end_month = trans['transac-date'].month
-
-                            ligne += [start_year, start_month, end_year, end_month]
+                            ligne += [par_user['start-y'], par_user['start-m'], par_user['end-y'], par_user['end-m']]
                             for cle in range(21, 28):
                                 ligne.append(base[self.cles[cle]])
-                            ligne += [round(quantity, 3), base['item-unit'], base['valuation-price'], round(deduct, 2),
-                                      round(total, 2)]
+                            ligne += [round(par_user['quantity'], 3), base['item-unit'], base['valuation-price'],
+                                      round(par_user['deduct'], 2), round(par_user['total'], 2)]
                             self._ajouter_valeur(ligne, i)
                             i += 1

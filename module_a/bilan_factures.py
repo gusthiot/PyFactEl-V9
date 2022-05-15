@@ -23,17 +23,14 @@ class BilanFactures(CsvList):
         self.nom = "Bilan-factures_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + \
                    "_" + Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
 
-        for id_fact in sommes_1.par_fact.keys():
-            par_fact = sommes_1.par_fact[id_fact]['transactions']
+        for id_fact in sommes_1.par_fact['factures'].keys():
+            par_fact = sommes_1.par_fact['factures'][id_fact]['transactions']['keys']
             base = transactions_1.valeurs[par_fact[0]]
             id_classe = base['client-idclass']
             classe = imports.classes.donnees[id_classe]
             ref = classe['ref_fact'] + "_" + str(imports.edition.annee) + "_" + \
                 Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + str(id_fact)
-            total = 0
-            for key in par_fact:
-                trans = transactions_1.valeurs[key]
-                total += trans['total-fact']
+            total = sommes_1.par_fact['factures'][id_fact]['transactions']['total']
 
             ligne = []
             for cle in self.cles:

@@ -25,17 +25,9 @@ class StatUser(CsvList):
 
         for par_client in par_user.values():
             for par_code in par_client.values():
-                tbtr = par_code['transactions']
                 ligne = [imports.edition.annee, imports.edition.mois]
-                stat_trans = 0
-                stat_run = 0
-                base = transactions_3.valeurs[tbtr[0]]
+                base = transactions_3.valeurs[par_code['base']]
                 for cle in range(2, len(self.cles)-2):
                     ligne.append(base[self.cles[cle]])
-                for indice in tbtr:
-                    trans = transactions_3.valeurs[indice]
-                    stat_trans += 1
-                    if str(trans['transac-runcae']) == "1":
-                        stat_run += 1
-                ligne += [stat_trans, stat_run]
+                ligne += [par_code['stat_trans'], par_code['stat_run']]
                 self.lignes.append(ligne)

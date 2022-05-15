@@ -24,8 +24,7 @@ class Annexe(object):
         self.csv_fichiers = csv_fichiers
 
         for id_fact in sommes_2.par_fact.keys():
-            pf = sommes_2.par_fact[id_fact]['transactions']
-            base = transactions_2.valeurs[pf[0]]
+            base = transactions_2.valeurs[sommes_2.par_fact[id_fact]['base']]
             code = base['client-code']
             intype = base['invoice-type']
             client = imports.clients.donnees[code]
@@ -35,12 +34,6 @@ class Annexe(object):
                       "_" + str(imports.version)
 
             lignes = []
-            par_compte = {}
-            for key in pf:
-                id_compte = transactions_2.valeurs[key]['proj-id']
-                if id_compte not in par_compte.keys():
-                    par_compte[id_compte] = []
-                par_compte[id_compte].append(key)
 
             if intype == "GLOB":
                 nom_csv = prefixe + "_" + str(id_fact) + "_" + client['abrev_labo'] + "_0.csv"
@@ -52,7 +45,7 @@ class Annexe(object):
                 self.csv_fichiers[code] = {'nom': nom_zip, 'fichiers': []}
             self.csv_fichiers[code]['fichiers'].append(nom_csv)
 
-            for pc in par_compte.values():
+            for pc in sommes_2.par_fact[id_fact]['comptes'].values():
                 for key in pc:
                     trans = transactions_2.valeurs[key]
                     ligne = []

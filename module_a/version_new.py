@@ -27,17 +27,17 @@ class VersionNew(CsvDict):
 
         if imports.version == 0:
             for fact_id in sommes_2.par_fact.keys():
-                self.__add_new(fact_id, sommes_2.par_fact[fact_id]['transactions'])
+                self.__add_new(fact_id, sommes_2.par_fact[fact_id])
         else:
             transactions_old = imports.transactions_2.donnees
-            sommes_2_old = Sommes2.struct_fact(transactions_old)
+            sommes_2_old = Sommes2.sommes_old(transactions_old)
 
             for fact_id, donnee in imports.versions.donnees.items():
                 if fact_id not in sommes_2.par_fact:
                     self._ajouter_valeur([fact_id, donnee['client-code'], self.imports.version, 'CANCELED',
                                           donnee['version-new-amount'], 0], fact_id)
                 else:
-                    base_new = self.transactions_new[sommes_2.par_fact[fact_id]['transactions'][0]]
+                    base_new = self.transactions_new[sommes_2.par_fact[fact_id]['base']]
                     if donnee['client-code'] != base_new['client-code']:
                         Interface.fatal(ErreurConsistance(),
                                         fact_id + "\n Le id-facture doit être lié au même client dans l'ancienne et "
@@ -48,8 +48,8 @@ class VersionNew(CsvDict):
                                         "la nouvelle table des versions")
 
                     idem = True
-                    if self.__compare(sommes_2.par_fact[fact_id], sommes_2_old[fact_id], True, self.transactions_new,
-                                      transactions_old):
+                    if self.__compare(sommes_2.par_fact[fact_id], sommes_2_old[fact_id], True,
+                                      self.transactions_new, transactions_old):
                         idem = False
                     else:
                         if self.__compare(sommes_2_old[fact_id], sommes_2.par_fact[fact_id]):
@@ -60,31 +60,23 @@ class VersionNew(CsvDict):
                                               donnee['version-last'], 'IDEM', donnee['version-new-amount'],
                                               donnee['version-new-amount']], fact_id)
                     else:
-                        somme = 0
-                        for unique in sommes_2.par_fact[fact_id]['transactions']:
-                            trans = self.transactions_new[unique]
-                            somme += trans['total-fact']
                         self._ajouter_valeur([fact_id, donnee['client-code'], donnee['invoice-type'],
                                               self.imports.version, 'CORRECTED', donnee['version-new-amount'],
-                                              round(somme, 2)], fact_id)
+                                              round(sommes_2.par_fact[fact_id]['total'], 2)], fact_id)
 
             for fact_id in sommes_2.par_fact.keys():
                 if fact_id not in imports.versions.donnees.keys():
-                    self.__add_new(fact_id, sommes_2.par_fact[fact_id]['transactions'])
+                    self.__add_new(fact_id, sommes_2.par_fact[fact_id]['base'])
 
-    def __add_new(self, fact_id, liste):
+    def __add_new(self, fact_id, somme_fact):
         """
         ajout d'une nouvelle facture aux versions
         :param fact_id: id de facture
-        :param liste: liste des transactions concernées par cette facture
+        :param somme_fact: partie de la somme concernant la facture spécifiée
         """
-        somme = 0
-        base = self.transactions_new[liste[0]]
-        for unique in liste:
-            trans = self.transactions_new[unique]
-            somme += trans['total-fact']
+        base = self.transactions_new[somme_fact['base']]
         self._ajouter_valeur([fact_id, base['client-code'], base['invoice-type'], self.imports.version, 'NEW', 0,
-                              round(somme, 2)], fact_id)
+                              round(somme_fact['total'], 2)], fact_id)
 
     @staticmethod
     def __compare(first, second, comparaison_fine=False, fdata=None, sdata=None):

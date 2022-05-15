@@ -119,7 +119,7 @@ try:
         bil_facts.csv(DossierDestination(imports.chemin_bilans))
         if Latex.possibles():
             pdfs = Pdfs(imports, new_transactions_2, sommes_2, new_versions)
-        factures = Facture(imports, new_versions, transactions_1, sommes_1)
+        factures = Facture(imports, new_versions, sommes_1)
         factures.csv(DossierDestination(imports.chemin_version))
 
         Interface.affiche_message("OK !!! (" +

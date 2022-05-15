@@ -25,27 +25,13 @@ class BilanSubsides(CsvList):
                    "_" + Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
 
         for par_code in par_client.values():
-            for tbtr in par_code['articles'].values():
-                base = transactions_3.valeurs[tbtr[0]]
+            for par_article in par_code['articles'].values():
+                base = transactions_3.valeurs[par_article['base']]
                 ligne = [imports.edition.annee, imports.edition.mois]
                 for cle in range(2, len(self.cles)-7):
                     ligne.append(base[self.cles[cle]])
-                avant = 0
-                compris = 0
-                deduit = 0
-                sub_ded = 0
-                fact = 0
-                remb = 0
-                sub_remb = 0
-                for indice in tbtr:
-                    val = transactions_3.valeurs[indice]
-                    avant += val['valuation-brut']
-                    compris += val['valuation-net']
-                    deduit += val['deduct-CHF']
-                    sub_ded += val['subsid-deduct']
-                    fact += val['total-fact']
-                    remb += val['discount-bonus']
-                    sub_remb += val['subsid-bonus']
-                ligne += [round(avant, 2), round(compris, 2), round(deduit, 2), round(sub_ded, 2), round(fact, 2),
-                          round(remb, 2), round(sub_remb, 2)]
+                ligne += [round(par_article['avant'], 2), round(par_article['compris'], 2),
+                          round(par_article['deduit'], 2), round(par_article['sub_ded'], 2),
+                          round(par_article['fact'], 2), round(par_article['remb'], 2),
+                          round(par_article['sub_remb'], 2)]
                 self.lignes.append(ligne)

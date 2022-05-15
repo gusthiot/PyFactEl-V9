@@ -58,11 +58,8 @@ class StatClient(CsvList):
             nb = 0
             runs = 0
             if code in par_client.keys():
-                tbtr = par_client[code]['transactions']
-                for indice in tbtr:
-                    if str(transactions_3.valeurs[indice]['transac-runcae']) == "1":
-                        runs += 1
-                nb = len(tbtr)
+                nb = par_client[code]['nb']
+                runs = par_client[code]['runs']
 
             self.lignes.append([imports.edition.annee, imports.edition.mois, client['code'], client['code_sap'],
                                 client['abrev_labo'], client['id_classe'], classe['code_n'], classe['intitule'], nb,
