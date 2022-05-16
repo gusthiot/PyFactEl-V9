@@ -47,7 +47,8 @@ from module_a import (VersionNew,
                       Transactions1,
                       BilanFactures,
                       Pdfs,
-                      Facture)
+                      Facture,
+                      Ticket)
 from imports import (Edition,
                      Imports)
 
@@ -121,6 +122,10 @@ try:
             pdfs = Pdfs(imports, new_transactions_2, sommes_2, new_versions)
         factures = Facture(imports, new_versions, sommes_1)
         factures.csv(DossierDestination(imports.chemin_version))
+        Chemin.copier_dossier("./reveal.js/", "js", imports.chemin_enregistrement)
+        Chemin.copier_dossier("./reveal.js/", "css", imports.chemin_enregistrement)
+        tickets = Ticket(imports, factures, sommes_1)
+        tickets.creer_html(DossierDestination(imports.chemin_version))
 
         Interface.affiche_message("OK !!! (" +
                                   str(datetime.timedelta(seconds=(time.time() - start_time))).split(".")[0] + ")")

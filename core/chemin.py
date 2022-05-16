@@ -1,5 +1,7 @@
 import os
 import zipfile
+import shutil
+import errno
 
 from core import Interface
 
@@ -118,3 +120,19 @@ class Chemin(object):
                     os.unlink(os.path.join(chemin_destination, file))
             except IOError as err:
                 Interface.affiche_message("IOError: {0}".format(err))
+
+    @staticmethod
+    def copier_dossier(source, dossier, destination):
+        """
+        copier un dossier
+        :param source: chemin du dossier à copier
+        :param dossier: dossier à copier
+        :param destination: chemin de destination de copie
+        """
+        chemin = destination + "/" + dossier
+        if not os.path.exists(chemin):
+            try:
+                shutil.copytree(source + dossier, chemin)
+            except OSError as exc:
+                if exc.errno == errno.ENOTDIR:
+                    shutil.copy(source, destination)

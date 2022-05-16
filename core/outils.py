@@ -1,5 +1,4 @@
 import shutil
-import errno
 import os
 
 from core import (Chemin, Interface)
@@ -9,21 +8,6 @@ class Outils(object):
     """
     Classe contenant diverses méthodes utiles
     """
-    @staticmethod
-    def copier_dossier(source, dossier, destination):
-        """
-        copier un dossier
-        :param source: chemin du dossier à copier
-        :param dossier: dossier à copier
-        :param destination: chemin de destination de copie
-        """
-        chemin = destination + "/" + dossier
-        if not os.path.exists(chemin):
-            try:
-                shutil.copytree(source + dossier, chemin)
-            except OSError as exc:
-                if exc.errno == errno.ENOTDIR:
-                    shutil.copy(source, destination)
 
     @staticmethod
     def format_heure(nombre):

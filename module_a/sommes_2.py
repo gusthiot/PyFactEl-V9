@@ -22,18 +22,22 @@ class Sommes2(object):
             tp = projets[trans['proj-id']]
             if trans['item-idsap'] not in tp:
                 tp[trans['item-idsap']] = {'items': {}, 'total': 0, 'base': key}
-            tp[trans['item-idsap']]['total'] += trans['total-fact']  # => transactions 1
+            tp[trans['item-idsap']]['total'] += trans['total-fact']
+            # => transactions 1
+
             tps = tp[trans['item-idsap']]['items']
             if trans['item-id'] not in tps:
                 tps[trans['item-id']] = {}
             tpsi = tps[trans['item-id']]
             if trans['user-id'] not in tpsi:
-                tpsi[trans['user-id']] = [key]
-            else:
-                tpsi[trans['user-id']].append(key)  # => versions / pdfs
+                tpsi[trans['user-id']] = []
+            tpsi[trans['user-id']].append(key)
+            # => versions / pdfs
+
             if trans['proj-id'] not in comptes.keys():
                 comptes[trans['proj-id']] = []
-            comptes[trans['proj-id']].append(key)  # => annexes
+            comptes[trans['proj-id']].append(key)
+            # => annexes
 
     @staticmethod
     def sommes_old(transactions):
@@ -57,7 +61,6 @@ class Sommes2(object):
                 tps[trans['item-id']] = {}
             tpsi = tps[trans['item-id']]
             if trans['user-id'] not in tpsi:
-                tpsi[trans['user-id']] = [key]
-            else:
-                tpsi[trans['user-id']].append(key)
+                tpsi[trans['user-id']] = []
+            tpsi[trans['user-id']].append(key)
         return arbre

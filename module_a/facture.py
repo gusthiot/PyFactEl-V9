@@ -7,20 +7,28 @@ class Facture(CsvList):
     Classe contenant les méthodes nécessaires à la génération des factures
     """
 
+    cles = ['fact-A', 'fact-B', 'fact-C', 'fact-D', 'fact-E', 'fact-F', 'fact-G', 'fact-H', 'fact-I', 'fact-J',
+            'fact-K', 'fact-L', 'fact-M', 'fact-N', 'fact-O', 'fact-P', 'fact-Q', 'fact-R', 'fact-S', 'fact-T',
+            'fact-U', 'fact-V', 'fact-W', 'fact-X', 'fact-Y', 'fact-Z', 'fact-AA', 'fact-AB', 'fact-AC', 'fact-AD',
+            'fact-AE', 'fact-AF', 'fact-AG', 'fact-AH', 'fact-AI', 'fact-AJ', 'fact-AK', 'fact-AL', 'fact-AM',
+            'fact-AN', 'fact-AO', 'fact-AP', 'fact-AQ', 'fact-AR', 'fact-AS', 'fact-AT', 'fact-AU', 'fact-AV',
+            'fact-AW', 'fact-AX', 'fact-AY']
+
     def __init__(self, imports, versions, sommes_1):
         """
         génère la facture sous forme de csv
         :param imports: données importées
         :param versions: versions des factures générées
         :param sommes_1: sommes des transactions 1
-
         """
         super().__init__(imports)
 
         self.nom = "Facture_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" + \
                    Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".csv"
 
-        textes = self.imports.paramtexte.donnees
+        self.par_client = {}
+
+        textes = imports.paramtexte.donnees
 
         for id_fact, donnee in versions.valeurs.items():
             if ((donnee['version-change'] == 'NEW' or donnee['version-change'] == 'CORRECTED')
@@ -29,6 +37,9 @@ class Facture(CsvList):
                 intype = donnee['invoice-type']
                 client = imports.clients.donnees[code]
                 classe = imports.classes.donnees[client['id_classe']]
+                if code not in self.par_client:
+                    self.par_client[code] = {}
+                self.par_client[code][id_fact] = {'factures': [], 'intype': intype, 'version': donnee['version-last']}
 
                 poste = 0
                 code_sap = client['code_sap']
@@ -53,7 +64,7 @@ class Facture(CsvList):
                 if intype == "GLOB":
                     lien += "0.pdf"
                 else:
-                    for id_compte in sommes_1.par_fact['factures'][id_fact]['projets'].keys():
+                    for id_compte in sommes_1.par_fact[id_fact]['projets'].keys():
                         compte = imports.comptes.donnees[id_compte]
                         lien += compte['numero'] + ".pdf"
 
@@ -71,7 +82,7 @@ class Facture(CsvList):
                 inc = 1
                 date_dernier = str(imports.edition.annee) + Format.mois_string(imports.edition.mois) + \
                     str(imports.edition.dernier_jour)
-                for id_compte, par_compte in sommes_1.par_fact['factures'][id_fact]['projets'].items():
+                for id_compte, par_compte in sommes_1.par_fact[id_fact]['projets'].items():
                     compte = imports.comptes.donnees[id_compte]
                     nom = compte['numero'] + "-" + compte['intitule']
                     poste = inc*10
@@ -87,5 +98,11 @@ class Facture(CsvList):
                                             article['type_rabais'], 0, date_dernier, self.imports.plateforme['centre'],
                                             "", self.imports.plateforme['fonds'], "", "", code_op, "", "", "",
                                             article['texte_sap'], nom])
+                        description = article['code_d'] + " : " + str(article['code_sap'])
+                        self.par_client[code][id_fact]['factures'].append({'poste': poste, 'nom': nom,
+                                                                           'descr': description,
+                                                                           'texte': article['texte_sap'],
+                                                                           'net': "%.2f" % net, 'total': net,
+                                                                           'compte': compte['numero']})
                         poste += 1
                     inc += 1

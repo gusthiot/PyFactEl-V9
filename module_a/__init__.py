@@ -7,3 +7,4 @@ from .transactions_1 import Transactions1
 from .bilan_factures import BilanFactures
 from .pdfs import Pdfs
 from .facture import Facture
+from .ticket import Ticket
