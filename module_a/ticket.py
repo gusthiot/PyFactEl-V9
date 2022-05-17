@@ -9,7 +9,7 @@ class Ticket(object):
 
     def __init__(self, imports, factures, sommes_1):
         """
-        génère la facture sous forme de csv
+        génère les tickets sous forme de sections html
         :param imports: données importées
         :param factures: factures générées
         :param sommes_1: sommes des transactions 1
@@ -18,7 +18,7 @@ class Ticket(object):
         self.nom = "Ticket_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" + \
                    Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + ".html"
 
-        self.combo_list = {}
+        self.sections = {}
 
         textes = imports.paramtexte.donnees
 
@@ -28,7 +28,7 @@ class Ticket(object):
 
             ref_fact = classe['ref_fact']
             reference = ref_fact + str(imports.edition.annee)[2:] + Format.mois_string(imports.edition.mois) + "." + \
-                        code + "-" + str(imports.version)
+                code + "-" + str(imports.version)
 
             if client['ref'] != "":
                 your_ref = textes['your-ref'] + client['ref']
@@ -153,12 +153,11 @@ class Ticket(object):
                                 </section>
                                 '''
 
-            self.combo_list[client['abrev_labo'] + " (" + code + ")"] = contenu_client
+            self.sections[client['abrev_labo'] + " (" + code + ")"] = contenu_client
 
     def creer_html(self, destination):
         """
         crée une page html autour d'une liste de sections
-
         :param destination:  Une instance de la classe dossier.DossierDestination
         """
 
@@ -211,8 +210,8 @@ class Ticket(object):
                             <select name="client" onchange="changeClient(this)">
                             '''
             i = 0
-            for k, v in sorted(self.combo_list.items()):
-                html += r'''<option value="''' + str(i) + r'''">''' + str(k) + r'''</option>'''
+            for client in sorted(self.sections.keys()):
+                html += r'''<option value="''' + str(i) + r'''">''' + client + r'''</option>'''
                 i += 1
             html += r'''
                             </select>
@@ -220,8 +219,8 @@ class Ticket(object):
                         <div class="reveal">
                           <div class="slides">
                 '''
-            for k, v in sorted(self.combo_list.items()):
-                html += v
+            for client, section in sorted(self.sections.items()):
+                html += section
             html += r'''
                           </div>
                         </div>

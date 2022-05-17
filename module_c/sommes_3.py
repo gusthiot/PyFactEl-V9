@@ -1,3 +1,4 @@
+import datetime
 
 
 class Sommes3(object):
@@ -45,21 +46,15 @@ class Sommes3(object):
                     pcpa[nbr] = {}
                 if user_id not in pcpa[nbr].keys():
                     pcpa[nbr][user_id] = {'base': key, 'quantity': 0, 'deduct': 0, 'total': 0,
-                                          'start-y': transaction['transac-date'].year,
-                                          'start-m': transaction['transac-date'].month,
-                                          'end-y': transaction['transac-date'].year,
-                                          'end-m': transaction['transac-date'].month}
+                                          'start': transaction['transac-date'],
+                                          'end': transaction['transac-date']}
                 pcpa[nbr][user_id]['quantity'] += transaction['transac-quantity']
                 pcpa[nbr][user_id]['deduct'] += transaction['deduct-CHF']
                 pcpa[nbr][user_id]['total'] += transaction['total-fact']
-                if transaction['transac-date'].year < pcpa[nbr][user_id]['start-y']:
-                    pcpa[nbr][user_id]['start-y'] = transaction['transac-date'].year
-                if transaction['transac-date'].year > pcpa[nbr][user_id]['end-y']:
-                    pcpa[nbr][user_id]['end-y'] = transaction['transac-date'].year
-                if transaction['transac-date'].month < pcpa[nbr][user_id]['start-m']:
-                    pcpa[nbr][user_id]['start-m'] = transaction['transac-date'].month
-                if transaction['transac-date'].month > pcpa[nbr][user_id]['end-m']:
-                    pcpa[nbr][user_id]['end-m'] = transaction['transac-date'].month
+                if transaction['transac-date'] < pcpa[nbr][user_id]['start']:
+                    pcpa[nbr][user_id]['start'] = transaction['transac-date']
+                if transaction['transac-date'] > pcpa[nbr][user_id]['end']:
+                    pcpa[nbr][user_id]['end'] = transaction['transac-date']
                 # => transactions 2
 
                 id_article = transaction['item-idsap']

@@ -57,7 +57,7 @@ class Facture(CsvList):
                 ref = classe['ref_fact'] + "_" + str(imports.edition.annee) + "_" + \
                     Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + str(id_fact)
 
-                lien = imports.facturation.lien + "/" + imports.plateforme['abrev_plat'] + "/" + \
+                lien = imports.facturation.lien + "/" + imports.edition.plateforme + "/" + \
                     str(imports.edition.annee) + "/" + Format.mois_string(imports.edition.mois) + "/Annexes_PDF/"
                 lien += "Annexe_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + "_"\
                         + str(donnee['version-last']) + "_" + str(id_fact) + "_" + client['abrev_labo'] + "_"
@@ -69,7 +69,9 @@ class Facture(CsvList):
                         lien += compte['numero'] + ".pdf"
 
                 if classe['grille'] == "OUI":
-                    grille = imports.plateforme['grille'] + '.pdf'
+                    grille = imports.facturation.lien + "/" + imports.edition.plateforme + "/" + \
+                        str(imports.edition.annee) + "/" + Format.mois_string(imports.edition.mois) + "/" + \
+                        imports.plateforme['grille'] + '.pdf'
                 else:
                     grille = ""
 

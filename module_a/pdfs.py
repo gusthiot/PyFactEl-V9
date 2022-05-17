@@ -55,13 +55,13 @@ class Pdfs(object):
         plateforme = self.imports.plateforme
         compte = self.imports.comptes.donnees[id_compte]
         if intype == "GLOB":
-            dico = {'titre1': textes['annex-compte-titre1'], 'titre2': textes['annex-compte-titre2'],
-                    'abrev': textes['annex-compte-abrev-platform'], 'nom': textes['annex-compte-name-platform'],
-                    'num': textes['annex-compte-proj-no']}
-        else:
             dico = {'titre1': textes['annex-client-titre1'], 'titre2': textes['annex-client-titre2'],
                     'abrev': textes['annex-client-abrev-platform'], 'nom': textes['annex-client-name-platform'],
                     'num': textes['annex-client-proj-no']}
+        else:
+            dico = {'titre1': textes['annex-compte-titre1'], 'titre2': textes['annex-compte-titre2'],
+                    'abrev': textes['annex-compte-abrev-platform'], 'nom': textes['annex-compte-name-platform'],
+                    'num': textes['annex-compte-proj-no']}
         dico.update({'int_plat': Latex.echappe_caracteres(plateforme['int_plat']),
                      'abrev_plat': plateforme['abrev_plat'], 'numero': compte['numero'],
                      'intitule': Latex.echappe_caracteres(compte['intitule'])})
@@ -84,11 +84,11 @@ class Pdfs(object):
                     'sub': textes['annex-client-subtotal'], 'tot': textes['annex-client-total'], 'multi': 8}
             structure = r'''{c c c c c c c c c}'''
         else:
-            dico= {'user': textes['annex-compte-user'], 'start': textes['annex-compte-start'],
-                   'end': textes['annex-compte-end'], 'prest': textes['annex-compte-prestation'],
-                   'quant': textes['annex-compte-quantity'], 'unit': textes['annex-compte-unit'],
-                   'price': textes['annex-compte-unit-price'], 'total': textes['annex-compte-total-CHF'],
-                   'sub': textes['annex-compte-subtotal'], 'tot': textes['annex-compte-total'], 'multi': 7}
+            dico = {'user': textes['annex-compte-user'], 'start': textes['annex-compte-start'],
+                    'end': textes['annex-compte-end'], 'prest': textes['annex-compte-prestation'],
+                    'quant': textes['annex-compte-quantity'], 'unit': textes['annex-compte-unit'],
+                    'price': textes['annex-compte-unit-price'], 'total': textes['annex-compte-total-CHF'],
+                    'sub': textes['annex-compte-subtotal'], 'tot': textes['annex-compte-total'], 'multi': 7}
             structure = r'''{ c c c c c c c c}'''
 
         contenu = r'''%(user)s & %(start)s & %(end)s & %(prest)s & %(quant)s & %(unit)s & %(price)s & ''' % dico
@@ -121,7 +121,8 @@ class Pdfs(object):
                                         \hline ''' % dico
             tot += subtot
 
-            dico.update({'article': Latex.echappe_caracteres(article['intitule']), 'subtot': Format.format_2_dec(subtot)})
+            dico.update({'article': Latex.echappe_caracteres(article['intitule']),
+                         'subtot': Format.format_2_dec(subtot)})
             contenu += r'''\multicolumn{%(multi)s}{l}{%(sub)s %(article)s} & %(subtot)s\\
                             \hline ''' % dico
 

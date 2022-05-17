@@ -39,7 +39,8 @@ class Transactions2New(CsvDict):
                             for cle in range(5, 16):
                                 ligne.append(base[self.cles[cle]])
                             ligne.append(base['user-name'] + " " + base['user-first'][0] + ".")
-                            ligne += [par_user['start-y'], par_user['start-m'], par_user['end-y'], par_user['end-m']]
+                            ligne += [par_user['start'].year, par_user['start'].month, par_user['end'].year,
+                                      par_user['end'].month]
                             for cle in range(21, 28):
                                 ligne.append(base[self.cles[cle]])
                             ligne += [round(par_user['quantity'], 3), base['item-unit'], base['valuation-price'],
