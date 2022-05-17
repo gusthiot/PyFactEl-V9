@@ -22,7 +22,7 @@ class Pdfs(object):
 
         ii = 0
         for id_fact, donnee in versions.valeurs.items():
-            if donnee['version-change'] != 'IDEM':
+            if donnee['version-change'] == 'NEW' or donnee['version-change'] == 'CORRECTED':
                 par_fact = sommes_2.par_fact[id_fact]
                 intype = donnee['invoice-type']
                 code = donnee['client-code']

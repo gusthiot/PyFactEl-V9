@@ -34,8 +34,8 @@ class VersionNew(CsvDict):
 
             for fact_id, donnee in imports.versions.donnees.items():
                 if fact_id not in sommes_2.par_fact:
-                    self._ajouter_valeur([fact_id, donnee['client-code'], self.imports.version, 'CANCELED',
-                                          donnee['version-new-amount'], 0], fact_id)
+                    self._ajouter_valeur([fact_id, donnee['client-code'], donnee['invoice-type'],
+                                          self.imports.version, 'CANCELED', donnee['version-new-amount'], 0], fact_id)
                 else:
                     base_new = self.transactions_new[sommes_2.par_fact[fact_id]['base']]
                     if donnee['client-code'] != base_new['client-code']:
@@ -66,7 +66,7 @@ class VersionNew(CsvDict):
 
             for fact_id in sommes_2.par_fact.keys():
                 if fact_id not in imports.versions.donnees.keys():
-                    self.__add_new(fact_id, sommes_2.par_fact[fact_id]['base'])
+                    self.__add_new(fact_id, sommes_2.par_fact[fact_id])
 
     def __add_new(self, fact_id, somme_fact):
         """
