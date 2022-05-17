@@ -14,7 +14,7 @@ class Transactions2(CsvImport):
             'proj-id', 'proj-nbr', 'proj-name', 'user-id', 'user-name-f', 'date-start-y', 'date-start-m', 'date-end-y',
             'date-end-m', 'item-idsap', 'item-codeD', 'item-order', 'item-labelcode', 'item-id', 'item-nbr',
             'item-name', 'transac-quantity', 'item-unit', 'valuation-price', 'deduct-CHF', 'total-fact']
-    libelle = "Versions de facture"
+    libelle = "Transactions 2"
 
     def __init__(self, dossier_source, annee, mois, plateforme, version):
         """
@@ -76,7 +76,7 @@ class Transactions2(CsvImport):
                 msg += " mauvaise année à la ligne " + str(ligne)
             if donnee['invoice-month'] != mois:
                 msg += " mauvais mois à la ligne " + str(ligne)
-            if donnee['invoice-version'] != version-1:
+            if donnee['invoice-version'] != version:
                 msg += " mauvaise version à la ligne " + str(ligne)
 
             donnees_dict[ligne-1] = donnee

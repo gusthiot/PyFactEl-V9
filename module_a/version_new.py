@@ -97,10 +97,10 @@ class VersionNew(CsvDict):
                 if id_article not in sec_compte.keys():
                     return True
                 sec_article = sec_compte[id_article]
-                for id_item, par_item in par_article.items():
-                    if id_item not in sec_article.keys():
+                for id_item, par_item in par_article['items'].items():
+                    if id_item not in sec_article['items'].keys():
                         return True
-                    sec_item = sec_article[id_item]
+                    sec_item = sec_article['items'][id_item]
                     for id_user, par_user in par_item.items():
                         if id_user not in sec_item.keys():
                             return True
@@ -112,27 +112,19 @@ class VersionNew(CsvDict):
                             fd = fdata[par_user[0]]
                             sd = sdata[sec_user[0]]
                             if sd['proj-nbr'] != fd['proj-nbr']:
-                                print('proj-nbr')
                                 return True
                             if sd['proj-name'] != fd['proj-name']:
-                                print('proj-name')
                                 return True
                             if sd['user-name-f'] != fd['user-name-f']:
-                                print('user-name-f')
                                 return True
                             if sd['date-start-y'] != fd['date-start-y']:
-                                print('date-start-y')
                                 return True
                             if sd['date-start-m'] != fd['date-start-m']:
-                                print('date-start-m')
                                 return True
                             if sd['date-end-y'] != fd['date-end-y']:
-                                print('date-end-y')
                                 return True
                             if sd['date-end-m'] != fd['date-end-m']:
-                                print('date-end-m')
                                 return True
                             if sd['total-fact'] != fd['total-fact']:
-                                print('total-fact')
                                 return True
         return False

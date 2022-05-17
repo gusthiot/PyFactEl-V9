@@ -51,17 +51,22 @@ class Pdfs(object):
            #     break
 
     def entete(self, id_compte, intype):
-        textes = self.imports.paramtexte.donnees
+        """
+        création de l'entête d'annexe
+        :param id_compte: id du compte concernée, pour une annexe compte
+        :param intype: GLOB ou CPTE
+        :return: entête
+        """
         plateforme = self.imports.plateforme
         compte = self.imports.comptes.donnees[id_compte]
         if intype == "GLOB":
-            dico = {'titre1': textes['annex-client-titre1'], 'titre2': textes['annex-client-titre2'],
-                    'abrev': textes['annex-client-abrev-platform'], 'nom': textes['annex-client-name-platform'],
-                    'num': textes['annex-client-proj-no']}
+            dico = {'titre1': self.echappe('annex-client-titre1'), 'titre2': self.echappe('annex-client-titre2'),
+                    'abrev': self.echappe('annex-client-abrev-platform'),
+                    'nom': self.echappe('annex-client-name-platform'), 'num': self.echappe('annex-client-proj-no')}
         else:
-            dico = {'titre1': textes['annex-compte-titre1'], 'titre2': textes['annex-compte-titre2'],
-                    'abrev': textes['annex-compte-abrev-platform'], 'nom': textes['annex-compte-name-platform'],
-                    'num': textes['annex-compte-proj-no']}
+            dico = {'titre1': self.echappe('annex-compte-titre1'), 'titre2': self.echappe('annex-compte-titre2'),
+                    'abrev': self.echappe('annex-compte-abrev-platform'),
+                    'nom': self.echappe('annex-compte-name-platform'), 'num': self.echappe('annex-compte-proj-no')}
         dico.update({'int_plat': Latex.echappe_caracteres(plateforme['int_plat']),
                      'abrev_plat': plateforme['abrev_plat'], 'numero': compte['numero'],
                      'intitule': Latex.echappe_caracteres(compte['intitule'])})
@@ -73,27 +78,40 @@ class Pdfs(object):
                     %(nom)s \\
                     %(int_plat)s \\ ''' % dico
 
-    def table(self, transactions, par_compte, intype):
-        textes = self.imports.paramtexte.donnees
+    def echappe(self, valeur):
+        """
+        pour échapper les caractères spéciaux des paramtextes
+        :param valeur: clé de paramtexte
+        :return: valeur échappée
+        """
+        return Latex.echappe_caracteres(self.imports.paramtexte.donnees[valeur])
 
+    def table(self, transactions, par_compte, intype):
+        """
+        création de la table d'annexe
+        :param transactions: transactions 2 générées
+        :param par_compte: sommes des transactions 2 par compte
+        :param intype: GLOB ou CPTE
+        :return: table
+        """
         if intype == "GLOB":
-            dico = {'user': textes['annex-client-user'], 'start': textes['annex-client-start'],
-                    'end': textes['annex-client-end'], 'prest': textes['annex-client-prestation'],
-                    'quant': textes['annex-client-quantity'], 'unit': textes['annex-client-unit'],
-                    'price': textes['annex-client-unit-price'], 'total': textes['annex-client-total-CHF'],
-                    'sub': textes['annex-client-subtotal'], 'tot': textes['annex-client-total'], 'multi': 8}
+            dico = {'user': self.echappe('annex-client-user'), 'start': self.echappe('annex-client-start'),
+                    'end': self.echappe('annex-client-end'), 'prest': self.echappe('annex-client-prestation'),
+                    'quant': self.echappe('annex-client-quantity'), 'unit': self.echappe('annex-client-unit'),
+                    'price': self.echappe('annex-client-unit-price'), 'total': self.echappe('annex-client-total-CHF'),
+                    'sub': self.echappe('annex-client-subtotal'), 'tot': self.echappe('annex-client-total'), 'multi': 8}
             structure = r'''{c c c c c c c c c}'''
         else:
-            dico = {'user': textes['annex-compte-user'], 'start': textes['annex-compte-start'],
-                    'end': textes['annex-compte-end'], 'prest': textes['annex-compte-prestation'],
-                    'quant': textes['annex-compte-quantity'], 'unit': textes['annex-compte-unit'],
-                    'price': textes['annex-compte-unit-price'], 'total': textes['annex-compte-total-CHF'],
-                    'sub': textes['annex-compte-subtotal'], 'tot': textes['annex-compte-total'], 'multi': 7}
+            dico = {'user': self.echappe('annex-compte-user'), 'start': self.echappe('annex-compte-start'),
+                    'end': self.echappe('annex-compte-end'), 'prest': self.echappe('annex-compte-prestation'),
+                    'quant': self.echappe('annex-compte-quantity'), 'unit': self.echappe('annex-compte-unit'),
+                    'price': self.echappe('annex-compte-unit-price'), 'total': self.echappe('annex-compte-total-CHF'),
+                    'sub': self.echappe('annex-compte-subtotal'), 'tot': self.echappe('annex-compte-total'), 'multi': 7}
             structure = r'''{ c c c c c c c c}'''
 
         contenu = r'''%(user)s & %(start)s & %(end)s & %(prest)s & %(quant)s & %(unit)s & %(price)s & ''' % dico
         if intype == "GLOB":
-            contenu += textes['annex-client-deducted'] + " & "
+            contenu += self.echappe('annex-client-deducted') + " & "
         contenu += r''' %(total)s \\
                         \hline ''' % dico
 
