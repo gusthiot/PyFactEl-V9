@@ -31,8 +31,7 @@ class Facture(CsvList):
         textes = imports.paramtexte.donnees
 
         for id_fact, donnee in versions.valeurs.items():
-            if ((donnee['version-change'] == 'NEW' or donnee['version-change'] == 'CORRECTED')
-                    and donnee['version-new-amount'] > 0):
+            if donnee['version-change'] != 'CANCELED' and donnee['version-new-amount'] > 0:
                 code = donnee['client-code']
                 intype = donnee['invoice-type']
                 client = imports.clients.donnees[code]
@@ -75,11 +74,12 @@ class Facture(CsvList):
                 else:
                     grille = ""
 
-                self.lignes.append([poste, imports.facturation.origine, genre, imports.facturation.commerciale,
-                                    imports.facturation.canal, imports.facturation.secteur, "", "", code_sap,
-                                    client['nom2'], client['nom3'], client['email'], code_sap, code_sap, code_sap,
-                                    imports.facturation.devise, client['mode'], ref, "", "", your_ref, lien, "",
-                                    grille])
+                if donnee['version-change'] == 'NEW' or donnee['version-change'] == 'CORRECTED':
+                    self.lignes.append([poste, imports.facturation.origine, genre, imports.facturation.commerciale,
+                                        imports.facturation.canal, imports.facturation.secteur, "", "", code_sap,
+                                        client['nom2'], client['nom3'], client['email'], code_sap, code_sap, code_sap,
+                                        imports.facturation.devise, client['mode'], ref, "", "", your_ref, lien, "",
+                                        grille])
 
                 inc = 1
                 date_dernier = str(imports.edition.annee) + Format.mois_string(imports.edition.mois) + \
@@ -94,12 +94,13 @@ class Facture(CsvList):
                         code_op = self.imports.plateforme['code_p'] + classe['code_n'] + str(imports.edition.annee) + \
                             Format.mois_string(imports.edition.mois) + article['code_d']
 
-                        self.lignes.append([poste, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
-                                            "", "", "", "", "", "", "", "", "", "", "", "", "", article['code_sap'], "",
-                                            article['quantite'], article['unite'], article['type_prix'], net,
-                                            article['type_rabais'], 0, date_dernier, self.imports.plateforme['centre'],
-                                            "", self.imports.plateforme['fonds'], "", "", code_op, "", "", "",
-                                            article['texte_sap'], nom])
+                        if donnee['version-change'] == 'NEW' or donnee['version-change'] == 'CORRECTED':
+                            self.lignes.append([poste, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+                                                "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+                                                article['code_sap'], "", article['quantite'], article['unite'],
+                                                article['type_prix'], net, article['type_rabais'], 0, date_dernier,
+                                                self.imports.plateforme['centre'], "", self.imports.plateforme['fonds'],
+                                                "", "", code_op, "", "", "", article['texte_sap'], nom])
                         description = article['code_d'] + " : " + str(article['code_sap'])
                         self.par_client[code][id_fact]['factures'].append({'poste': poste, 'nom': nom,
                                                                            'descr': description,
