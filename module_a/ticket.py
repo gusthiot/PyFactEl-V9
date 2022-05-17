@@ -26,10 +26,6 @@ class Ticket(object):
             client = imports.clients.donnees[code]
             classe = imports.classes.donnees[client['id_classe']]
 
-            ref_fact = classe['ref_fact']
-            reference = ref_fact + str(imports.edition.annee)[2:] + Format.mois_string(imports.edition.mois) + "." + \
-                code + "-" + str(imports.version)
-
             if client['ref'] != "":
                 your_ref = textes['your-ref'] + client['ref']
             else:
@@ -37,7 +33,7 @@ class Ticket(object):
 
             total = 0
             dico_contenu = {'code': code, 'abrev': client['abrev_labo'], 'nom2': client['nom2'],
-                            'nom3': client['nom3'], 'ref': your_ref, 'ref_fact': reference}
+                            'nom3': client['nom3'], 'ref': your_ref}
 
             contenu_client = r'''<section id="%(code)s">
                                     <section>
@@ -47,7 +43,6 @@ class Ticket(object):
                                             %(nom2)s <br />
                                             %(nom3)s <br />
                                         </div><br />
-                                        %(ref_fact)s <br /><br />
                                         ''' % dico_contenu
             contenu_client += r'''      <div id="reference">%(ref)s</div>
                                         <table id="tableau">
@@ -96,7 +91,10 @@ class Ticket(object):
                                     '''
             if code in factures.par_client:
                 for id_fact, par_fact in factures.par_client[code].items():
+                    reference = classe['ref_fact'] + "_" + str(imports.edition.annee) + "_" + \
+                        Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + str(id_fact)
                     contenu_client += r'''  <section>
+                                                ''' + reference + r''' <br /><br />
                                                 <table id="tableau">
                                                     <tr>
                                                         <td>N° Poste </td>

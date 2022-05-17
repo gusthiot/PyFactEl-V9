@@ -187,9 +187,11 @@ class Imports(object):
                         self.acces, self.noshows, self.livraisons, self.services]:
             dossier_destination.ecrire(fichier.nom_fichier, self.dossier_source.lire(fichier.nom_fichier))
         if self.version > 0:
-            dossier_vprec = DossierSource(self.chemin_vprec)
             for fichier in [self.numeros, self.versions]:
-                dossier_destination.ecrire(fichier.nom_fichier, dossier_vprec.lire(fichier.nom_fichier))
+                dossier_destination.ecrire(fichier.nom_fichier,
+                                           DossierSource(self.chemin_vprec).lire(fichier.nom_fichier))
+            dossier_destination.ecrire(self.transactions_2.nom_fichier,
+                                       DossierSource(self.chemin_bilprec).lire(self.transactions_2.nom_fichier))
 
         # dossier_lien = Outils.lien_dossier([import_d.facturation.lien, plateforme, annee, Outils.mois_string(mois)],
         #                                    import_d.facturation)
