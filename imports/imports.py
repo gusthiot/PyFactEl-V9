@@ -78,16 +78,19 @@ class Imports(object):
             self.chemin_version = chemin_fixe_version
 
         self.chemin_in = Chemin.chemin([self.chemin_enregistrement, "IN"], self.edition)
+        self.chemin_prix = Chemin.chemin([self.chemin_enregistrement, "Prix"], self.edition)
         if self.version > 0:
             self.chemin_in = Chemin.chemin([chemin_fixe_enregistrement, "IN"], self.edition)
+            self.chemin_prix = Chemin.chemin([chemin_fixe_enregistrement, "Prix"], self.edition)
             if not Chemin.existe(self.chemin_in, False):
                 Interface.fatal(ErreurConsistance(), "le dossier " + self.chemin_in + " se doit d'être présent !")
+            if not Chemin.existe(self.chemin_prix, False):
+                Interface.fatal(ErreurConsistance(), "le dossier " + self.chemin_prix + " est censé exister !")
             dossier_fixe = DossierSource(self.chemin_in)
             chemin_grille = chemin_fixe_enregistrement
 
         self.chemin_out = Chemin.chemin([self.chemin_version, "OUT"], self.edition)
         self.chemin_bilans = Chemin.chemin([self.chemin_version, "Bilans_Stats"], self.edition)
-        self.chemin_prix = Chemin.chemin([self.chemin_enregistrement, "Prix"], self.edition)
         self.chemin_cannexes = Chemin.chemin([self.chemin_version, "Annexes_CSV"], self.edition)
         self.chemin_pannexes = Chemin.chemin([self.chemin_enregistrement, "Annexes_PDF"], self.edition)
 
@@ -167,7 +170,7 @@ class Imports(object):
 
         if self.version == 0:
             Chemin.existe(self.chemin_in, True)
-        Chemin.existe(self.chemin_prix, True)
+            Chemin.existe(self.chemin_prix, True)
         Chemin.existe(self.chemin_bilans, True)
         Chemin.existe(self.chemin_out, True)
         Chemin.existe(self.chemin_cannexes, True)

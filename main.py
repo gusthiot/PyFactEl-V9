@@ -20,6 +20,7 @@ from core import (Interface,
                   Chemin,
                   DossierSource,
                   DossierDestination,
+                  ErreurConsistance,
                   Latex)
 from module_d import (Articles,
                       Tarifs,
@@ -70,8 +71,14 @@ try:
         imports = Imports(dossier_source)
         articles = Articles(imports)
         tarifs = Tarifs(imports)
-        articles.csv(DossierDestination(imports.chemin_prix))
-        tarifs.csv(DossierDestination(imports.chemin_prix))
+        if imports.version == 0:
+            articles.csv(DossierDestination(imports.chemin_prix))
+            tarifs.csv(DossierDestination(imports.chemin_prix))
+        else:
+            if not Chemin.existe(Chemin.chemin([imports.chemin_prix, articles.nom], imports.edition), False):
+                Interface.fatal(ErreurConsistance(), "le fichier " + articles.nom + " est censé exister !")
+            if not Chemin.existe(Chemin.chemin([imports.chemin_prix, tarifs.nom], imports.edition), False):
+                Interface.fatal(ErreurConsistance(), "le fichier " + tarifs.nom + " est censé exister !")
         transactions_3 = Transactions3(imports, articles, tarifs)
         transactions_3.csv(DossierDestination(imports.chemin_bilans))
 
