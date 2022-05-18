@@ -43,38 +43,39 @@ class Facture(CsvList):
                 poste = 0
                 code_sap = client['code_sap']
 
-                if classe['ref_fact'] == "INT":
-                    genre = imports.facturation.code_int
-                else:
-                    genre = imports.facturation.code_ext
-
-                if client['ref'] != "":
-                    your_ref = textes['your-ref'] + client['ref']
-                else:
-                    your_ref = ""
-
-                ref = classe['ref_fact'] + "_" + str(imports.edition.annee) + "_" + \
-                    Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + str(id_fact)
-
-                lien = imports.facturation.lien + "/" + imports.edition.plateforme + "/" + \
-                    str(imports.edition.annee) + "/" + Format.mois_string(imports.edition.mois) + "/Annexes_PDF/"
-                lien += "Annexe_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + "_"\
-                        + str(donnee['version-last']) + "_" + str(id_fact) + "_" + client['abrev_labo'] + "_"
-                if intype == "GLOB":
-                    lien += "0.pdf"
-                else:
-                    for id_compte in sommes_1.par_fact[id_fact]['projets'].keys():
-                        compte = imports.comptes.donnees[id_compte]
-                        lien += compte['numero'] + ".pdf"
-
-                if classe['grille'] == "OUI":
-                    grille = imports.facturation.lien + "/" + imports.edition.plateforme + "/" + \
-                        str(imports.edition.annee) + "/" + Format.mois_string(imports.edition.mois) + "/" + \
-                        imports.plateforme['grille'] + '.pdf'
-                else:
-                    grille = ""
-
                 if donnee['version-change'] == 'NEW' or donnee['version-change'] == 'CORRECTED':
+
+                    if classe['ref_fact'] == "INT":
+                        genre = imports.facturation.code_int
+                    else:
+                        genre = imports.facturation.code_ext
+
+                    if client['ref'] != "":
+                        your_ref = textes['your-ref'] + client['ref']
+                    else:
+                        your_ref = ""
+
+                    ref = classe['ref_fact'] + "_" + str(imports.edition.annee) + "_" + \
+                        Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + str(id_fact)
+
+                    if classe['grille'] == "OUI":
+                        grille = imports.facturation.lien + "/" + imports.edition.plateforme + "/" + \
+                            str(imports.edition.annee) + "/" + Format.mois_string(imports.edition.mois) + "/" + \
+                            imports.plateforme['grille'] + '.pdf'
+                    else:
+                        grille = ""
+
+                    lien = imports.facturation.lien + "/" + imports.edition.plateforme + "/" + \
+                        str(imports.edition.annee) + "/" + Format.mois_string(imports.edition.mois) + "/Annexes_PDF/"
+                    lien += "Annexe_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + \
+                            "_" + str(donnee['version-last']) + "_" + str(id_fact) + "_" + client['abrev_labo'] + "_"
+                    if intype == "GLOB":
+                        lien += "0.pdf"
+                    else:
+                        for id_compte in sommes_1.par_fact[id_fact]['projets'].keys():
+                            compte = imports.comptes.donnees[id_compte]
+                            lien += compte['numero'] + ".pdf"
+
                     self.lignes.append([poste, imports.facturation.origine, genre, imports.facturation.commerciale,
                                         imports.facturation.canal, imports.facturation.secteur, "", "", code_sap,
                                         client['nom2'], client['nom3'], client['email'], code_sap, code_sap, code_sap,

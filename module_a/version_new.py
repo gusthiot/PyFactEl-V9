@@ -33,8 +33,8 @@ class VersionNew(CsvDict):
             sommes_2_old = Sommes2.sommes_old(transactions_old)
 
             for fact_id, donnee in imports.versions.donnees.items():
-                if fact_id not in sommes_2.par_fact:
-                    if fact_id in sommes_2.par_fact.keys():
+                if fact_id not in sommes_2.par_fact.keys():
+                    if fact_id in sommes_2_old.keys():
                         self._ajouter_valeur([fact_id, donnee['client-code'], donnee['invoice-type'],
                                               self.imports.version, 'CANCELED', donnee['version-new-amount'], 0],
                                              fact_id)
