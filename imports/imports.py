@@ -50,23 +50,18 @@ class Imports(object):
 
         # création de l'arobrescence
 
-        if self.edition.filigrane != "":
-            chemin = self.edition.chemin_filigrane
-        else:
-            chemin = self.edition.chemin
-        self.chemin_enregistrement = Chemin.chemin([chemin, self.edition.plateforme, self.edition.annee,
+        chemin_fixe_enregistrement = Chemin.chemin([self.edition.chemin, self.edition.plateforme, self.edition.annee,
                                                     Format.mois_string(self.edition.mois)], self.edition)
-
         self.version = 0
         dossier_fixe = dossier_source
         chemin_grille = dossier_source.chemin
-        self.chemin_in = Chemin.chemin([self.chemin_enregistrement, "IN"], self.edition)
-        self.chemin_version = Chemin.chemin([self.chemin_enregistrement, "V0"], self.edition)
-        if Chemin.existe(self.chemin_enregistrement, False):
+        self.chemin_in = Chemin.chemin([chemin_fixe_enregistrement, "IN"], self.edition)
+        chemin_fixe_version = Chemin.chemin([chemin_fixe_enregistrement, "V0"], self.edition)
+        if Chemin.existe(chemin_fixe_enregistrement, False):
             while True:
-                if Chemin.existe(self.chemin_version, False):
+                if Chemin.existe(chemin_fixe_version, False):
                     self.version = self.version + 1
-                    self.chemin_version = Chemin.chemin([self.chemin_enregistrement, "V"+str(self.version)],
+                    chemin_fixe_version = Chemin.chemin([chemin_fixe_enregistrement, "V"+str(self.version)],
                                                         self.edition)
                 else:
                     break
@@ -75,7 +70,19 @@ class Imports(object):
                 if not Chemin.existe(self.chemin_in, False):
                     Interface.fatal(ErreurConsistance(), "le dossier " + self.chemin_in + " se doit d'être présent !")
                 dossier_fixe = DossierSource(self.chemin_in)
-                chemin_grille = self.chemin_enregistrement
+                chemin_grille = chemin_fixe_enregistrement
+
+        if self.edition.filigrane != "":
+            self.chemin_enregistrement = Chemin.chemin([self.edition.chemin_filigrane, self.edition.plateforme,
+                                                        self.edition.annee, Format.mois_string(self.edition.mois)],
+                                                       self.edition)
+            self.chemin_version = Chemin.chemin([self.chemin_enregistrement, "V" + str(self.version)],
+                                                self.edition)
+            if Chemin.existe(self.chemin_version, False):
+                Interface.fatal(ErreurConsistance(), "la facturation proforma V" + self.version + " existe déjà !")
+        else:
+            self.chemin_enregistrement = chemin_fixe_enregistrement
+            self.chemin_version = chemin_fixe_version
 
         self.chemin_out = Chemin.chemin([self.chemin_version, "OUT"], self.edition)
         self.chemin_bilans = Chemin.chemin([self.chemin_version, "Bilans_Stats"], self.edition)
@@ -143,8 +150,7 @@ class Imports(object):
         # importation des données de la version précédente
         if self.version > 0:
             vprec = self.version-1
-            self.chemin_vprec = Chemin.chemin([self.chemin_enregistrement, "V"+str(vprec), "OUT"],
-                                              self.edition)
+            self.chemin_vprec = Chemin.chemin([chemin_fixe_enregistrement, "V"+str(vprec), "OUT"], self.edition)
             if not Chemin.existe(self.chemin_vprec, False):
                 Interface.fatal(ErreurConsistance(), "le dossier " + self.chemin_vprec + " se doit d'être présent !")
             self.numeros = Numero(DossierSource(self.chemin_vprec), self.edition, self.comptes, self.clients, vprec)
@@ -178,7 +184,11 @@ class Imports(object):
             for fichier in [self.grants, self.userlabs]:
                 dossier_destination.ecrire(fichier.nom_fichier, dossier_precedent.lire(fichier.nom_fichier))
             grille = self.plateforme['grille'] + '.pdf'
-            DossierDestination(self.chemin_enregistrement).ecrire(grille, dossier_source.lire(grille))
+            DossierDestination(chemin_fixe_enregistrement).ecrire(grille, dossier_source.lire(grille))
+
+        if self.version == 0 or self.edition.filigrane != "":
+            Chemin.copier_dossier("./reveal.js/", "js", self.chemin_enregistrement)
+            Chemin.copier_dossier("./reveal.js/", "css", self.chemin_enregistrement)
 
         chemin_vin = Chemin.chemin([self.chemin_version, "IN"], self.edition)
         Chemin.existe(chemin_vin, True)
@@ -192,7 +202,3 @@ class Imports(object):
                                            DossierSource(self.chemin_vprec).lire(fichier.nom_fichier))
             dossier_destination.ecrire(self.transactions_2.nom_fichier,
                                        DossierSource(self.chemin_bilprec).lire(self.transactions_2.nom_fichier))
-
-        # dossier_lien = Outils.lien_dossier([import_d.facturation.lien, plateforme, annee, Outils.mois_string(mois)],
-        #                                    import_d.facturation)
-        #

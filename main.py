@@ -123,8 +123,6 @@ try:
         factures = Facture(imports, new_versions, sommes_1)
         if imports.edition.filigrane == "":
             factures.csv(DossierDestination(imports.chemin_version))
-        Chemin.copier_dossier("./reveal.js/", "js", imports.chemin_enregistrement)
-        Chemin.copier_dossier("./reveal.js/", "css", imports.chemin_enregistrement)
         tickets = Ticket(imports, factures, sommes_1)
         tickets.creer_html(DossierDestination(imports.chemin_version))
 
