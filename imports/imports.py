@@ -155,7 +155,7 @@ class Imports(object):
                 Interface.fatal(ErreurConsistance(), "le dossier " + self.chemin_vprec + " se doit d'être présent !")
             self.numeros = Numero(DossierSource(self.chemin_vprec), self.edition, self.comptes, self.clients, vprec)
             self.versions = Version(DossierSource(self.chemin_vprec), self.edition.annee, self.edition.mois, vprec)
-            self.chemin_bilprec = Chemin.chemin([self.chemin_enregistrement, "V"+str(vprec), "Bilans_Stats"],
+            self.chemin_bilprec = Chemin.chemin([chemin_fixe_enregistrement, "V"+str(vprec), "Bilans_Stats"],
                                                 self.edition)
             if not Chemin.existe(self.chemin_bilprec, False):
                 Interface.fatal(ErreurConsistance(), "le dossier " + self.chemin_bilprec + " se doit d'être présent !")
