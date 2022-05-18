@@ -86,7 +86,7 @@ class Imports(object):
 
         self.chemin_out = Chemin.chemin([self.chemin_version, "OUT"], self.edition)
         self.chemin_bilans = Chemin.chemin([self.chemin_version, "Bilans_Stats"], self.edition)
-        self.chemin_prix = Chemin.chemin([self.chemin_enregistrement, "Prix"], self.edition)
+        self.chemin_prix = Chemin.chemin([chemin_fixe_enregistrement, "Prix"], self.edition)
         self.chemin_cannexes = Chemin.chemin([self.chemin_version, "Annexes_CSV"], self.edition)
         self.chemin_pannexes = Chemin.chemin([self.chemin_enregistrement, "Annexes_PDF"], self.edition)
 
