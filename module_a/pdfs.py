@@ -46,9 +46,9 @@ class Pdfs(object):
                         Latex.creer_latex_pdf(nom, self.canevas(contenu))
                         Latex.finaliser_pdf(nom, imports.chemin_pannexes)
 
-            ii += 1
-            if ii > 2:
-                break
+            # ii += 1
+            # if ii > 2:
+            #     break
 
     def entete(self, id_compte, intype):
         """
