@@ -55,7 +55,6 @@ class Imports(object):
         self.version = 0
         dossier_fixe = dossier_source
         chemin_grille = dossier_source.chemin
-        self.chemin_in = Chemin.chemin([chemin_fixe_enregistrement, "IN"], self.edition)
         chemin_fixe_version = Chemin.chemin([chemin_fixe_enregistrement, "V0"], self.edition)
         if Chemin.existe(chemin_fixe_enregistrement, False):
             while True:
@@ -65,12 +64,6 @@ class Imports(object):
                                                         self.edition)
                 else:
                     break
-
-            if self.version > 0:
-                if not Chemin.existe(self.chemin_in, False):
-                    Interface.fatal(ErreurConsistance(), "le dossier " + self.chemin_in + " se doit d'être présent !")
-                dossier_fixe = DossierSource(self.chemin_in)
-                chemin_grille = chemin_fixe_enregistrement
 
         if self.edition.filigrane != "":
             self.chemin_enregistrement = Chemin.chemin([self.edition.chemin_filigrane, self.edition.plateforme,
@@ -84,9 +77,17 @@ class Imports(object):
             self.chemin_enregistrement = chemin_fixe_enregistrement
             self.chemin_version = chemin_fixe_version
 
+        self.chemin_in = Chemin.chemin([self.chemin_enregistrement, "IN"], self.edition)
+        if self.version > 0:
+            self.chemin_in = Chemin.chemin([chemin_fixe_enregistrement, "IN"], self.edition)
+            if not Chemin.existe(self.chemin_in, False):
+                Interface.fatal(ErreurConsistance(), "le dossier " + self.chemin_in + " se doit d'être présent !")
+            dossier_fixe = DossierSource(self.chemin_in)
+            chemin_grille = chemin_fixe_enregistrement
+
         self.chemin_out = Chemin.chemin([self.chemin_version, "OUT"], self.edition)
         self.chemin_bilans = Chemin.chemin([self.chemin_version, "Bilans_Stats"], self.edition)
-        self.chemin_prix = Chemin.chemin([chemin_fixe_enregistrement, "Prix"], self.edition)
+        self.chemin_prix = Chemin.chemin([self.chemin_enregistrement, "Prix"], self.edition)
         self.chemin_cannexes = Chemin.chemin([self.chemin_version, "Annexes_CSV"], self.edition)
         self.chemin_pannexes = Chemin.chemin([self.chemin_enregistrement, "Annexes_PDF"], self.edition)
 
@@ -184,7 +185,7 @@ class Imports(object):
             for fichier in [self.grants, self.userlabs]:
                 dossier_destination.ecrire(fichier.nom_fichier, dossier_precedent.lire(fichier.nom_fichier))
             grille = self.plateforme['grille'] + '.pdf'
-            DossierDestination(chemin_fixe_enregistrement).ecrire(grille, dossier_source.lire(grille))
+            DossierDestination(self.chemin_enregistrement).ecrire(grille, dossier_source.lire(grille))
 
         if self.version == 0 or self.edition.filigrane != "":
             Chemin.copier_dossier("./reveal.js/", "js", self.chemin_enregistrement)
