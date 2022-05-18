@@ -79,7 +79,7 @@ class Imports(object):
             self.chemin_version = Chemin.chemin([self.chemin_enregistrement, "V" + str(self.version)],
                                                 self.edition)
             if Chemin.existe(self.chemin_version, False):
-                Interface.fatal(ErreurConsistance(), "la facturation proforma V" + self.version + " existe déjà !")
+                Interface.fatal(ErreurConsistance(), "la facturation proforma V" + str(self.version) + " existe déjà !")
         else:
             self.chemin_enregistrement = chemin_fixe_enregistrement
             self.chemin_version = chemin_fixe_version
