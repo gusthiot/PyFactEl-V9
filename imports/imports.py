@@ -187,8 +187,9 @@ class Imports(object):
             dossier_precedent = DossierSource(self.chemin_precedent)
             for fichier in [self.grants, self.userlabs]:
                 dossier_destination.ecrire(fichier.nom_fichier, dossier_precedent.lire(fichier.nom_fichier))
-            grille = self.plateforme['grille'] + '.pdf'
-            DossierDestination(self.chemin_enregistrement).ecrire(grille, dossier_source.lire(grille))
+            if self.plateforme['grille'] != "":
+                grille = self.plateforme['grille'] + '.pdf'
+                DossierDestination(self.chemin_enregistrement).ecrire(grille, dossier_source.lire(grille))
 
         if self.version == 0 or self.edition.filigrane != "":
             Chemin.copier_dossier("./reveal.js/", "js", self.chemin_enregistrement)

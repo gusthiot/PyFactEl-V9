@@ -26,7 +26,8 @@ class StatClient(CsvList):
 
         stats_clients = {}
 
-        if imports.edition.mois in par_ul['annees'][imports.edition.annee]:
+        if imports.edition.annee in par_ul['annees'] and \
+                imports.edition.mois in par_ul['annees'][imports.edition.annee]:
             pm = par_ul['annees'][imports.edition.annee][imports.edition.mois]['clients']
             for code in pm:
                 stats_clients[code] = {'1m': len(pm[code]), '3m': pm[code].copy(), '6m': pm[code].copy(),

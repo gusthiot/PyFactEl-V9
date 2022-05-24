@@ -57,7 +57,7 @@ class Plateforme(CsvImport):
             msg += info
             donnee['grille'], info = Format.est_un_document(donnee['grille'], "la grille tarifaire", ligne, True)
             msg += info
-            if donnee['grille'] != "":
+            if donnee['id_plateforme'] == edition.plateforme and donnee['grille'] != "":
                 if not Chemin.existe(Chemin.chemin([chemin_grille, donnee['grille'] + '.pdf'])):
                     msg += "la grille de la ligne " + str(ligne) + " n'existe pas dans le dossier d'entrée \n"
 

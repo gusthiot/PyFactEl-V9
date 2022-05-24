@@ -31,7 +31,8 @@ class StatNbUser(CsvList):
             nb_user_6m = ""
             nb_user_12m = ""
             pmu = []
-            if imports.edition.mois in par_ul['annees'][imports.edition.annee]:
+            if imports.edition.annee in par_ul['annees'] and \
+                    imports.edition.mois in par_ul['annees'][imports.edition.annee]:
                 pm = par_ul['annees'][imports.edition.annee][imports.edition.mois]
                 pmu = pm['users']
                 if jour in pm['jours']:
