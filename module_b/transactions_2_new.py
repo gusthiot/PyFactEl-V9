@@ -27,23 +27,24 @@ class Transactions2New(CsvDict):
             for icf in par_code['projets']:
                 par_fact = par_code['projets'][icf]
                 id_fact = numeros.couples[code][icf]
-                for order, par_order in sorted(par_fact['articles'].items()):
-                    for nbr, par_item in sorted(par_order.items()):
-                        for par_user in par_item.values():
-                            ligne = [imports.edition.annee, imports.edition.mois, imports.version, id_fact]
-                            base = transactions_3.valeurs[par_user['base']]
-                            if base['invoice-project'] == "0":
-                                ligne.append("GLOB")
-                            else:
-                                ligne.append("CPTE")
-                            for cle in range(5, 16):
-                                ligne.append(base[self.cles[cle]])
-                            ligne.append(base['user-name'] + " " + base['user-first'][0] + ".")
-                            ligne += [par_user['start'].year, par_user['start'].month, par_user['end'].year,
-                                      par_user['end'].month]
-                            for cle in range(21, 28):
-                                ligne.append(base[self.cles[cle]])
-                            ligne += [round(par_user['quantity'], 3), base['item-unit'], base['valuation-price'],
-                                      round(par_user['deduct'], 2), round(par_user['total'], 2)]
-                            self._ajouter_valeur(ligne, i)
-                            i += 1
+                for id_compte, par_compte in sorted(par_fact['comptes'].items()):
+                    for order, par_order in sorted(par_compte.items()):
+                        for nbr, par_item in sorted(par_order.items()):
+                            for par_user in par_item.values():
+                                ligne = [imports.edition.annee, imports.edition.mois, imports.version, id_fact]
+                                base = transactions_3.valeurs[par_user['base']]
+                                if base['invoice-project'] == "0":
+                                    ligne.append("GLOB")
+                                else:
+                                    ligne.append("CPTE")
+                                for cle in range(5, 16):
+                                    ligne.append(base[self.cles[cle]])
+                                ligne.append(base['user-name'] + " " + base['user-first'][0] + ".")
+                                ligne += [par_user['start'].year, par_user['start'].month, par_user['end'].year,
+                                          par_user['end'].month]
+                                for cle in range(21, 28):
+                                    ligne.append(base[self.cles[cle]])
+                                ligne += [round(par_user['quantity'], 3), base['item-unit'], base['valuation-price'],
+                                          round(par_user['deduct'], 2), round(par_user['total'], 2)]
+                                self._ajouter_valeur(ligne, i)
+                                i += 1

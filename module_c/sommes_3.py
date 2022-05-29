@@ -32,16 +32,19 @@ class Sommes3(object):
                 id_compte_fact = transaction['invoice-project']
                 pcp = self.par_client[code_client]['projets']
                 if id_compte_fact not in pcp.keys():
-                    pcp[id_compte_fact] = {'articles': {}, 'transactions': []}
+                    pcp[id_compte_fact] = {'comptes': {}, 'transactions': []}
 
                 pcp[id_compte_fact]['transactions'].append(key)
                 # => annexe details
 
                 nbr = transaction['item-nbr']
                 order = transaction['item-order']
-                if order not in pcp[id_compte_fact]['articles'].keys():
-                    pcp[id_compte_fact]['articles'][order] = {}
-                pcpa = pcp[id_compte_fact]['articles'][order]
+                if id_compte not in pcp[id_compte_fact]['comptes'].keys():
+                    pcp[id_compte_fact]['comptes'][id_compte] = {}
+                pcpc = pcp[id_compte_fact]['comptes'][id_compte]
+                if order not in pcpc.keys():
+                    pcpc[order] = {}
+                pcpa = pcpc[order]
                 if nbr not in pcpa.keys():
                     pcpa[nbr] = {}
                 if user_id not in pcpa[nbr].keys():

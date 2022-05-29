@@ -132,17 +132,18 @@ class Imports(object):
             mois_p = 12
 
         old_ver = 0
+        chemin_old = Chemin.chemin([self.edition.chemin, self.edition.plateforme, annee_p, mois_p], self.edition)
+        if not Chemin.existe(chemin_old, False):
+            Interface.fatal(ErreurConsistance(), "le dossier " + chemin_old + " se doit d'être présent !")
         while True:
-            self.chemin_old_ver = Chemin.chemin([self.edition.chemin, self.edition.plateforme, annee_p, mois_p,
-                                                 "V"+str(old_ver)], self.edition)
-            if Chemin.existe(self.chemin_old_ver, False):
+            chemin_old_ver = Chemin.chemin([chemin_old, "V"+str(old_ver)], self.edition)
+            if Chemin.existe(chemin_old_ver, False):
                 old_ver = old_ver + 1
             else:
                 old_ver = old_ver - 1
                 break
 
-        self.chemin_precedent = Chemin.chemin([self.edition.chemin, self.edition.plateforme, annee_p, mois_p,
-                                               "V"+str(old_ver), "OUT"], self.edition)
+        self.chemin_precedent = Chemin.chemin([chemin_old, "V"+str(old_ver), "OUT"], self.edition)
         if not Chemin.existe(self.chemin_precedent, False):
             Interface.fatal(ErreurConsistance(), "le dossier " + self.chemin_precedent + " se doit d'être présent !")
 
