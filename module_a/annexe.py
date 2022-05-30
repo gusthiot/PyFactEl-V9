@@ -7,9 +7,9 @@ class Annexe(object):
     Classe pour la création du csv d'annexe
     """
 
-    cles = ['invoice-year', 'invoice-month', 'invoice-version', 'invoice-id', 'platf-name', 'client-name', 'proj-nbr',
-            'proj-name', 'user-name-f', 'date-start-y', 'date-start-m', 'date-end-y', 'date-end-m', 'item-labelcode',
-            'item-name', 'transac-quantity', 'item-unit', 'valuation-price', 'deduct-CHF', 'total-fact']
+    cles = ['proj-nbr', 'proj-name', 'user-name-f', 'date-start-y', 'date-start-m', 'date-end-y', 'date-end-m',
+            'item-labelcode', 'item-name', 'transac-quantity', 'item-unit', 'valuation-price', 'deduct-CHF',
+            'total-fact']
 
     def __init__(self, imports, transactions_2, sommes_2, csv_fichiers):
         """
@@ -28,10 +28,11 @@ class Annexe(object):
             code = base['client-code']
             intype = base['invoice-type']
             client = imports.clients.donnees[code]
-            nom_zip = "Annexes_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + "_" + \
-                      str(imports.version) + "_" + base['client-code'] + "_" + client['abrev_labo'] + ".zip"
-            prefixe = "Annexe_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + \
-                      "_" + str(imports.version)
+            nom_zip = "Annexes_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" + \
+                      Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + code + "_" + \
+                      client['abrev_labo'] + ".zip"
+            prefixe = "Annexe_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" + \
+                      Format.mois_string(imports.edition.mois) + "_" + str(imports.version)
 
             lignes = []
 

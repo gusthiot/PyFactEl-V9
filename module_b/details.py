@@ -7,13 +7,9 @@ class Details(object):
     Classe pour la création du csv d'annexe détails
     """
 
-    cles = ['invoice-year', 'invoice-month', 'invoice-version', 'invoice-id', 'platf-name', 'client-code',
-            'client-name', 'oper-name', 'oper-note', 'staff-note', 'mach-name', 'user-sciper', 'user-name',
-            'user-first', 'proj-nbr', 'proj-name', 'item-nbr', 'item-name', 'item-unit', 'transac-date',
-            'transac-quantity', 'valuation-price', 'valuation-brut', 'discount-type', 'discount-CHF', 'valuation-net',
-            'subsid-code', 'subsid-name', 'subsid-start', 'subsid-end', 'subsid-ok', 'subsid-pourcent',
-            'subsid-maxproj', 'subsid-maxmois', 'subsid-reste', 'subsid-CHF', 'deduct-CHF', 'subsid-deduct',
-            'total-fact', 'discount-bonus', 'subsid-bonus']
+    cles = ['transac-date', 'user-name-f', 'proj-nbr', 'proj-name', 'oper-name', 'oper-note', 'staff-note', 'mach-name',
+            'item-name', 'item-unit', 'transac-quantity', 'valuation-price', 'valuation-brut', 'discount-type',
+            'discount-CHF', 'valuation-net', 'subsid-ok', 'subsid-CHF', 'total-fact', 'discount-bonus', 'subsid-bonus']
 
     def __init__(self, imports, transactions_3, par_client, numeros):
         """
@@ -30,10 +26,11 @@ class Details(object):
         for code, pc in par_client.items():
 
             client = imports.clients.donnees[code]
-            nom_zip = "Annexes_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + "_" + \
-                      str(imports.version) + "_" + code + "_" + client['abrev_labo'] + ".zip"
-            prefixe_csv = "Details_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + \
-                          "_" + str(imports.version)
+            nom_zip = "Annexes_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" + \
+                      Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + code + "_" + \
+                      client['abrev_labo'] + ".zip"
+            prefixe_csv = "Details_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" + \
+                          Format.mois_string(imports.edition.mois) + "_" + str(imports.version)
 
             for icf in pc['projets']:
                 tbtr = pc['projets'][icf]['transactions']
@@ -52,10 +49,7 @@ class Details(object):
                     val = transactions_3.valeurs[indice]
                     ligne = [imports.edition.annee, imports.edition.mois]
                     for cle in range(2, len(self.cles)):
-                        if self.cles[cle] == 'invoice-id':
-                            ligne.append(id_fact)
-                        else:
-                            ligne.append(val[self.cles[cle]])
+                        ligne.append(val[self.cles[cle]])
                     lignes.append(ligne)
 
                 with DossierDestination(imports.chemin_cannexes).writer(nom_csv) as fichier_writer:

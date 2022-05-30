@@ -70,9 +70,9 @@ class Ticket(object):
                                             </tr>
                                         </table>
                                         ''' % dico_contenu
-
-            nom_zip = "Annexes_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + "_" + \
-                      str(imports.version) + "_" + code + "_" + client['abrev_labo'] + ".zip"
+            nom_zip = "Annexes_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" + \
+                      Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + code + "_" + \
+                      client['abrev_labo'] + ".zip"
             dossier_zip = "./Annexes_CSV/" + nom_zip
             chemin_zip = imports.chemin_cannexes + "/" + nom_zip
 
@@ -123,8 +123,8 @@ class Ticket(object):
                                                 </table> 
                                             ''' % dico_contenu
 
-                    prefixe_pdf = "Annexe_" + str(imports.edition.annee) + "_" + \
-                                  Format.mois_string(imports.edition.mois) + "_" + str(par_fact['version'])
+                    prefixe_pdf = "Annexe_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + \
+                                  "_" + Format.mois_string(imports.edition.mois) + "_" + str(par_fact['version'])
                     if par_fact['intype'] == "GLOB":
                         nom_pdf = prefixe_pdf + "_" + str(id_fact) + "_" + client['abrev_labo'] + "_0.pdf"
                     else:

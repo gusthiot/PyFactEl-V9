@@ -17,8 +17,8 @@ class Pdfs(object):
         """
         self.imports = imports
 
-        prefixe = "Annexe_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + "_" + \
-                  str(imports.version)
+        prefixe = "Annexe_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" + \
+                  Format.mois_string(imports.edition.mois) + "_" + str(imports.version)
 
         ii = 0
         for id_fact, donnee in versions.valeurs.items():
@@ -70,13 +70,20 @@ class Pdfs(object):
         dico.update({'int_plat': Latex.echappe_caracteres(plateforme['int_plat']),
                      'abrev_plat': plateforme['abrev_plat'], 'numero': compte['numero'],
                      'intitule': Latex.echappe_caracteres(compte['intitule'])})
-        return r'''\hspace{50mm} %(titre1)s \\
-                    \hspace{50mm} %(titre2)s \\
-                    %(abrev)s \hspace{50mm} %(num)s\\
-                    %(abrev_plat)s \hspace{50mm} %(numero)s\\
-                    %(intitule)s \\
-                    %(nom)s \\
-                    %(int_plat)s \\ ''' % dico
+        return r'''\begin{flushright}
+                    %(titre1)s \\
+                    %(titre2)s \\
+                    \end{flushright}
+                    \begin{flushleft}
+                    \renewcommand{\arraystretch}{1.2}
+                    \begin{tabular}{p{10cm} l}
+                    %(abrev)s & %(num)s\\
+                    %(abrev_plat)s & %(numero)s\\
+                     & %(intitule)s \\
+                    %(nom)s & \\
+                    %(int_plat)s & \\ 
+                    \end{tabular}
+                    \end{flushleft} ''' % dico
 
     def echappe(self, valeur):
         """
@@ -100,16 +107,20 @@ class Pdfs(object):
                     'quant': self.echappe('annex-client-quantity'), 'unit': self.echappe('annex-client-unit'),
                     'price': self.echappe('annex-client-unit-price'), 'total': self.echappe('annex-client-total-CHF'),
                     'sub': self.echappe('annex-client-subtotal'), 'tot': self.echappe('annex-client-total'), 'multi': 8}
-            structure = r'''{c c c c c c c c c}'''
+            structure = r'''{l l l l l l l l l}'''
         else:
             dico = {'user': self.echappe('annex-compte-user'), 'start': self.echappe('annex-compte-start'),
                     'end': self.echappe('annex-compte-end'), 'prest': self.echappe('annex-compte-prestation'),
                     'quant': self.echappe('annex-compte-quantity'), 'unit': self.echappe('annex-compte-unit'),
                     'price': self.echappe('annex-compte-unit-price'), 'total': self.echappe('annex-compte-total-CHF'),
                     'sub': self.echappe('annex-compte-subtotal'), 'tot': self.echappe('annex-compte-total'), 'multi': 7}
-            structure = r'''{ c c c c c c c c}'''
+            structure = r'''{l l l l l l l l}'''
 
-        contenu = r'''%(user)s & %(start)s & %(end)s & %(prest)s & %(quant)s & %(unit)s & %(price)s & ''' % dico
+        contenu = r'''
+                 \renewcommand{\arraystretch}{1.7}
+                 \begin{tabular}
+                    ''' + structure + r'''
+                  %(user)s & %(start)s & %(end)s & %(prest)s & %(quant)s & %(unit)s & %(price)s & ''' % dico
         if intype == "GLOB":
             contenu += self.echappe('annex-client-deducted') + " & "
         contenu += r''' %(total)s \\
@@ -128,26 +139,27 @@ class Pdfs(object):
                                      'start-m': Format.mois_string(trans['date-start-m']), 'end-y': trans['date-end-y'],
                                      'end-m': Format.mois_string(trans['date-end-m']),
                                      'prest': Latex.echappe_caracteres(trans['item-name']),
-                                     'quant': trans['transac-quantity'], 'unit': trans['item-unit'],
+                                     'quant': "%.3f" % trans['transac-quantity'], 'unit': trans['item-unit'],
                                      'price': Format.format_2_dec(trans['valuation-price']),
                                      'total': Format.format_2_dec(trans['total-fact'])})
                         contenu += r'''%(user)s & %(start-m)s.%(start-y)s & %(end-m)s.%(end-y)s & %(prest)s & %(quant)s 
                                         & %(unit)s & %(price)s & ''' % dico
                         if intype == "GLOB":
                             contenu += Format.format_2_dec(trans['deduct-CHF']) + " & "
-                        contenu += r''' %(total)s \\
-                                        \hline ''' % dico
+                        contenu += r''' %(total)s \\''' % dico
             tot += subtot
 
             dico.update({'article': Latex.echappe_caracteres(article['intitule']),
                          'subtot': Format.format_2_dec(subtot)})
-            contenu += r'''\multicolumn{%(multi)s}{l}{%(sub)s %(article)s} & %(subtot)s\\
+            contenu += r''' \hline
+                            \multicolumn{%(multi)s}{l}{%(sub)s %(article)s} & %(subtot)s\\
                             \hline ''' % dico
 
         dico.update({'total': Format.format_2_dec(tot)})
-        contenu += r'''\multicolumn{%(multi)s}{l}{%(tot)s} & %(total)s \\ ''' % dico
+        contenu += r''' \multicolumn{%(multi)s}{l}{%(tot)s} & %(total)s \\ 
+                        \end{tabular}''' % dico
 
-        return Latex.tableau(contenu, structure)
+        return contenu
 
     def canevas(self, contenu):
         """
@@ -157,19 +169,29 @@ class Pdfs(object):
         """
 
         document = Latex.entete()
-        # document += r'''
-        #     \usepackage[margin=12mm, includehead, includefoot]{geometry}
-        #     \usepackage{multirow}
-        #     \usepackage{graphicx}
+        document += r'''
+             \usepackage[margin=12mm, includehead, includefoot]{geometry}
+             \usepackage{multirow}
+             \usepackage{graphicx}
+             \usepackage{fancyhdr, lastpage}
+             \pagestyle{fancy}
+        
+             \fancyhead{}
+             \fancyfoot{}
+        
+             \renewcommand{\headrulewidth}{0pt}
+             \renewcommand{\footrulewidth}{0pt}
+             \fancyfoot[L]{Vice Présidence pour les Finances \\ Contrôle de Gestion}
+             \fancyfoot[C]{Page \thepage  of \pageref{LastPage}}
+             \fancyfoot[R]{\today}
+             '''
         #     \usepackage{longtable}
         #     \usepackage{dcolumn}
         #     \usepackage{changepage}
         #     \usepackage[scriptsize]{caption}
         #     \captionsetup[table]{position=bottom}
-        #     \usepackage{fancyhdr}\usepackage{float}
+        #     \usepackage{float}
         #     \restylefloat{table}
-        #
-        #     '''
 
         if self.imports.edition.filigrane != "":
             document += r'''
@@ -189,7 +211,6 @@ class Pdfs(object):
         #
         #     \renewcommand{\headrulewidth}{0pt}
         #     \renewcommand{\footrulewidth}{0pt}
-        #     \renewcommand{\arraystretch}{1.5}
         #
         #     \fancyhead[L]{\leftmark}
         #     \fancyhead[R]{\thepage \\ \rightmark}
@@ -197,6 +218,7 @@ class Pdfs(object):
         #     \newcommand{\fakesection}[2]{
         #         \markboth{#1}{#2}
         #     }'''
+
         document += r'''
             \begin{document}
             '''

@@ -9,8 +9,7 @@ class UserLabo(CsvImport):
     Classe pour l'importation des données des Utilisateurs des  laboratoires
     """
 
-    cles = ['year', 'month', 'day', 'week-nbr', 'platf-code', 'platf-op', 'platf-name', 'client-code', 'client-name',
-            'client-class', 'user-id', 'user-sciper', 'user-name', 'user-first']
+    cles = ['year', 'month', 'day', 'week-nbr', 'platf-code', 'client-code', 'user-id']
     libelle = "User labo"
 
     def __init__(self, dossier_source, edition, plateformes, clients, users):

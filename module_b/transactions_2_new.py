@@ -45,6 +45,6 @@ class Transactions2New(CsvDict):
                                 for cle in range(21, 28):
                                     ligne.append(base[self.cles[cle]])
                                 ligne += [round(par_user['quantity'], 3), base['item-unit'], base['valuation-price'],
-                                          round(par_user['deduct'], 2), round(par_user['total'], 2)]
+                                          round(par_user['deduct'], 2), round(2*par_user['total'], 1)/2]
                                 self._ajouter_valeur(ligne, i)
                                 i += 1

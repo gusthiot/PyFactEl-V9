@@ -10,9 +10,8 @@ class AnnexeSubsides(object):
     Classe pour la création du csv d'annexe subsides
     """
 
-    cles = ['invoice-year', 'invoice-month', 'invoice-version', 'platf-name', 'client-code', 'client-name', 'proj-id',
-            'proj-name', 'item-codeD', 'item-labelcode', 'subsid-code', 'subsid-name', 'subsid-start', 'subsid-end',
-            'subsid-pourcent', 'subsid-maxproj', 'subsid-maxmois', 'subsid-alrdygrant', 'subsid-CHF', 'subsid-reste']
+    cles = ['proj-name', 'item-labelcode', 'subsid-name', 'subsid-start', 'subsid-end', 'subsid-pourcent',
+            'subsid-maxproj', 'subsid-maxmois', 'subsid-alrdygrant', 'subsid-CHF', 'subsid-reste']
 
     def __init__(self, imports, transactions_3, par_client, csv_fichiers):
         """
@@ -56,11 +55,12 @@ class AnnexeSubsides(object):
         for code, cc in clients_comptes.items():
             lignes = []
             client = imports.clients.donnees[code]
-            nom_csv = "Subsides_bilan_" + str(imports.edition.annee) + "_" + \
+            nom_csv = "Subsides_bilan_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" + \
                       Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + \
                       client['abrev_labo'] + ".csv"
-            nom_zip = "Annexes_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + "_" + \
-                      str(imports.version) + "_" + code + "_" + client['abrev_labo'] + ".zip"
+            nom_zip = "Annexes_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" + \
+                      Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + code + "_" + \
+                      client['abrev_labo'] + ".zip"
             if code not in self.csv_fichiers:
                 self.csv_fichiers[code] = {'nom': nom_zip, 'fichiers': []}
             self.csv_fichiers[code]['fichiers'].append(nom_csv)
@@ -73,11 +73,9 @@ class AnnexeSubsides(object):
                     plaf = type_s + imports.plateforme['id_plateforme'] + id_article
                     if plaf in imports.plafonds.donnees.keys():
                         plafond = imports.plafonds.donnees[plaf]
-                        ligne = [imports.edition.annee, imports.edition.mois, imports.version,
-                                 imports.plateforme['abrev_plat'], client['code'], client['abrev_labo'],
-                                 compte['id_compte'], compte['intitule'], artsap['code_d'],
-                                 artsap['intitule'], subside['type'], subside['intitule'], subside['debut'],
-                                 subside['fin'], plafond['pourcentage'], plafond['max_compte'], plafond['max_mois']]
+                        ligne = [compte['id_compte'], artsap['code_d'], subside['type'], subside['intitule'],
+                                 subside['debut'], subside['fin'], plafond['pourcentage'], plafond['max_compte'],
+                                 plafond['max_mois']]
                         g_id = id_compte + imports.plateforme['id_plateforme'] + id_article
                         if g_id in imports.grants.donnees.keys():
                             grant, info = Format.est_un_nombre(imports.grants.donnees[g_id]['subsid-alrdygrant'],
