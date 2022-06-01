@@ -74,87 +74,28 @@ class Latex(object):
             Interface.affiche_message("IOError: {0}".format(err))
 
     @staticmethod
-    def concatenation_pdfs(nom_fichier, pdfs):
-        """
-        concatenation de pdfs
-        :param nom_fichier: nom du pdf final
-        :param pdfs: pages à concaténer
-        """
-        fichier = nom_fichier + ".pdf"
-        try:
-            if pdfs is not None and len(pdfs) > 1:
-                merger = PdfFileMerger()
-                fs = []
-                for pdf in pdfs:
-                    f = open(pdf, 'rb')
-                    merger.append(f)
-                    fs.append(f)
-                merger.write('concatene.pdf')
-                for f in fs:
-                    f.close()
-                shutil.copy('concatene.pdf', fichier)
-                os.unlink('concatene.pdf')
-        except IOError as err:
-            Interface.affiche_message("IOError: {0}".format(err))
-
-    @staticmethod
-    def long_tableau(contenu, structure, legende):
-        """
-        création d'un long tableau latex (peut s'étendre sur plusieurs pages)
-        :param contenu: contenu du tableau
-        :param structure: structure du tableau
-        :param legende: légende du tabéeau
-        :return: long tableau latex
-        """
-        return r'''
-            {\tiny
-            \begin{longtable}[c]
-            ''' + structure + contenu + r'''
-            \caption*{''' + legende + r'''}
-            \end{longtable}}
-            '''
-
-    @staticmethod
-    def tableau(contenu, structure):
-        """
-        création d'un tableau latex
-        :param contenu: contenu du tableau
-        :param structure: structure du tableau
-        :return: tableau latex
-        """
-        return r'''
-            \tiny
-            \centering
-            \begin{tabular}''' + structure + contenu + r'''\end{tabular}
-            '''
-
-    @staticmethod
-    def tableau_vide(legende):
-        """
-        création d'un tableau vide, juste pour avoir la légende formatée
-        :param legende: légende du tableau vide
-        :return: tableau avec juste la légende
-        """
-        return r'''
-            \begin{table}[H]
-            \tiny
-            \centering
-            \caption*{''' + legende + r'''}
-            \end{table}
-            '''
-
-    @staticmethod
     def entete():
         """
         création de l'entête de fichier latex en fonction de l'OS
         :return: le contenu de l'entête
         """
         debut = r'''\documentclass[a4paper,10pt]{article}
-            \usepackage[T1]{fontenc}
+            \usepackage{geometry}
+            \geometry{
+             left=13mm,
+             right=13mm,
+             top=15mm,
+             bottom=15mm,
+             includefoot
+            }
             \usepackage{lmodern}
+            \usepackage[T1]{fontenc}
             \usepackage[french]{babel}
             \usepackage{microtype}
             \DisableLigatures{encoding = *, family = * }
+            
+            \usepackage{helvet}
+            \renewcommand{\familydefault}{\sfdefault}
             '''
         if sys.platform == "win32":
             debut += r'''

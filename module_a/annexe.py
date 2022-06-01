@@ -7,9 +7,8 @@ class Annexe(object):
     Classe pour la création du csv d'annexe
     """
 
-    cles = ['proj-nbr', 'proj-name', 'user-name-f', 'date-start-y', 'date-start-m', 'date-end-y', 'date-end-m',
-            'item-labelcode', 'item-name', 'transac-quantity', 'item-unit', 'valuation-price', 'deduct-CHF',
-            'total-fact']
+    cles = ['proj-nbr', 'proj-name', 'item-labelcode', 'user-name-f', 'date-start-y', 'date-start-m', 'date-end-y',
+            'date-end-m', 'item-name', 'transac-quantity', 'item-unit', 'valuation-price', 'deduct-CHF', 'total-fact']
 
     def __init__(self, imports, transactions_2, sommes_2, csv_fichiers):
         """

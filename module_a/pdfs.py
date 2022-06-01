@@ -71,19 +71,23 @@ class Pdfs(object):
                      'abrev_plat': plateforme['abrev_plat'], 'numero': compte['numero'],
                      'intitule': Latex.echappe_caracteres(compte['intitule'])})
         return r'''\begin{flushright}
-                    %(titre1)s \\
-                    %(titre2)s \\
+                    \LARGE \textcolor{taupe}{%(titre1)s} \\
+                    \LARGE \textcolor{canard}{\textbf{%(titre2)s}} \\
                     \end{flushright}
+                    
+                    \vspace{10mm}
+                    
                     \begin{flushleft}
                     \renewcommand{\arraystretch}{1.2}
-                    \begin{tabular}{p{10cm} l}
-                    %(abrev)s & %(num)s\\
-                    %(abrev_plat)s & %(numero)s\\
-                     & %(intitule)s \\
-                    %(nom)s & \\
-                    %(int_plat)s & \\ 
+                    \begin{tabular}{p{109mm} l}
+                    \small \textcolor{taupe}{%(abrev)s} & \small \textcolor{taupe}{%(num)s}\\
+                    \textcolor{canard}{\textbf{%(abrev_plat)s}} & \textcolor{canard}{\textbf{%(numero)s}}\\
+                     & \textcolor{canard}{\textbf{%(intitule)s}} \\
+                    \small \textcolor{taupe}{%(nom)s} & \\
+                    \textcolor{canard}{\textbf{%(int_plat)s}} & \\ 
                     \end{tabular}
-                    \end{flushleft} ''' % dico
+                    \end{flushleft} 
+                     ''' % dico
 
     def echappe(self, valeur):
         """
@@ -101,29 +105,34 @@ class Pdfs(object):
         :param intype: GLOB ou CPTE
         :return: table
         """
+        structure = r'''{p{21mm} p{15mm} p{15mm} p{41mm} p{17mm} p{13mm} p{17mm}'''
         if intype == "GLOB":
             dico = {'user': self.echappe('annex-client-user'), 'start': self.echappe('annex-client-start'),
                     'end': self.echappe('annex-client-end'), 'prest': self.echappe('annex-client-prestation'),
                     'quant': self.echappe('annex-client-quantity'), 'unit': self.echappe('annex-client-unit'),
                     'price': self.echappe('annex-client-unit-price'), 'total': self.echappe('annex-client-total-CHF'),
                     'sub': self.echappe('annex-client-subtotal'), 'tot': self.echappe('annex-client-total'), 'multi': 8}
-            structure = r'''{l l l l l l l l l}'''
+            structure += r'''p{17mm} '''
         else:
             dico = {'user': self.echappe('annex-compte-user'), 'start': self.echappe('annex-compte-start'),
                     'end': self.echappe('annex-compte-end'), 'prest': self.echappe('annex-compte-prestation'),
                     'quant': self.echappe('annex-compte-quantity'), 'unit': self.echappe('annex-compte-unit'),
                     'price': self.echappe('annex-compte-unit-price'), 'total': self.echappe('annex-compte-total-CHF'),
                     'sub': self.echappe('annex-compte-subtotal'), 'tot': self.echappe('annex-compte-total'), 'multi': 7}
-            structure = r'''{l l l l l l l l}'''
+        structure += r''' p{25mm}}'''
 
         contenu = r'''
-                 \renewcommand{\arraystretch}{1.7}
+                 \begin{flushleft}
+                 \renewcommand{\arraystretch}{2}
+                 \setlength{\arrayrulewidth}{0.5mm}
+                 \arrayrulecolor{leman}
                  \begin{tabular}
                     ''' + structure + r'''
-                  %(user)s & %(start)s & %(end)s & %(prest)s & %(quant)s & %(unit)s & %(price)s & ''' % dico
+                  \textbf{%(user)s} & \textbf{%(start)s} & \textbf{%(end)s} & \textbf{%(prest)s} & \textbf{%(quant)s} & 
+                  \textbf{%(unit)s} & \textbf{%(price)s} & ''' % dico
         if intype == "GLOB":
-            contenu += self.echappe('annex-client-deducted') + " & "
-        contenu += r''' %(total)s \\
+            contenu += r'''\textbf{''' + self.echappe('annex-client-deducted') + r'''} & '''
+        contenu += r''' \textbf{%(total)s} \\
                         \hline ''' % dico
 
         tot = 0
@@ -152,12 +161,13 @@ class Pdfs(object):
             dico.update({'article': Latex.echappe_caracteres(article['intitule']),
                          'subtot': Format.format_2_dec(subtot)})
             contenu += r''' \hline
-                            \multicolumn{%(multi)s}{l}{%(sub)s %(article)s} & %(subtot)s\\
+                            \multicolumn{%(multi)s}{l}{\small \textbf{%(sub)s %(article)s}} & \small %(subtot)s\\
                             \hline ''' % dico
 
         dico.update({'total': Format.format_2_dec(tot)})
-        contenu += r''' \multicolumn{%(multi)s}{l}{%(tot)s} & %(total)s \\ 
-                        \end{tabular}''' % dico
+        contenu += r''' \multicolumn{%(multi)s}{l}{\small \textbf{%(tot)s}} & \small %(total)s \\ 
+                        \end{tabular}
+                        \end{flushleft} ''' % dico
 
         return contenu
 
@@ -170,20 +180,29 @@ class Pdfs(object):
 
         document = Latex.entete()
         document += r'''
-             \usepackage[margin=12mm, includehead, includefoot]{geometry}
              \usepackage{multirow}
+             \usepackage[table]{xcolor}
+             \definecolor{leman}{RGB}{0, 167, 157}
+             \definecolor{taupe}{RGB}{65, 61, 58}
+             \definecolor{canard}{RGB}{0, 116, 118}
+             \setlength{\tabcolsep}{0pt}
              \usepackage{graphicx}
              \usepackage{fancyhdr, lastpage}
+             
              \pagestyle{fancy}
         
              \fancyhead{}
-             \fancyfoot{}
-        
+             \fancyfoot{}      
+             
+             \newcommand{\changefont}{%
+                \fontsize{8pt}{10pt}\selectfont
+             }
+
              \renewcommand{\headrulewidth}{0pt}
              \renewcommand{\footrulewidth}{0pt}
-             \fancyfoot[L]{Vice Présidence pour les Finances \\ Contrôle de Gestion}
-             \fancyfoot[C]{Page \thepage  of \pageref{LastPage}}
-             \fancyfoot[R]{\today}
+             \fancyfoot[L]{\changefont Vice Présidence pour les Finances \\ Contrôle de Gestion}
+             \fancyfoot[C]{\changefont Page \thepage  of \pageref{LastPage}}
+             \fancyfoot[R]{\changefont \today}
              '''
         #     \usepackage{longtable}
         #     \usepackage{dcolumn}
@@ -221,6 +240,7 @@ class Pdfs(object):
 
         document += r'''
             \begin{document}
+            \changefont
             '''
 
         document += contenu

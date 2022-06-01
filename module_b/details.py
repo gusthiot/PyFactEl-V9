@@ -47,9 +47,12 @@ class Details(object):
                 lignes = []
                 for indice in tbtr:
                     val = transactions_3.valeurs[indice]
-                    ligne = [imports.edition.annee, imports.edition.mois]
-                    for cle in range(2, len(self.cles)):
-                        ligne.append(val[self.cles[cle]])
+                    ligne = []
+                    for cle in range(0, len(self.cles)):
+                        if self.cles[cle] == 'user-name-f':
+                            ligne.append(val['user-name'] + " " + val['user-first'][0] + ".")
+                        else:
+                            ligne.append(val[self.cles[cle]])
                     lignes.append(ligne)
 
                 with DossierDestination(imports.chemin_cannexes).writer(nom_csv) as fichier_writer:
