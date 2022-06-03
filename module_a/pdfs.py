@@ -1,4 +1,5 @@
 from core import (Latex,
+                  Interface,
                   Format)
 
 
@@ -224,7 +225,7 @@ class Pdfs(object):
         #     \restylefloat{table}
         if self.imports.logo != "":
             document += r'''
-                \graphicspath{ {''' + self.imports.chemin_logo + r'''/} }
+                \graphicspath{ {''' + self.imports.chemin_logo + Interface.separateur_os() + r'''} }
                 '''
 
         if self.imports.edition.filigrane != "":
