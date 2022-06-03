@@ -106,7 +106,7 @@ try:
         new_numeros = NumeroNew(imports, transactions_3)
         new_numeros.csv(DossierDestination(imports.chemin_out))
         details = Details(imports, transactions_3, sommes_3.par_client, new_numeros)
-        ann_subs = AnnexeSubsides(imports, transactions_3, sommes_3.par_client, details.csv_fichiers)
+        ann_subs = AnnexeSubsides(imports, sommes_3.par_client, details.csv_fichiers)
         bil_subs = BilanSubsides(imports, transactions_3, sommes_3.par_client)
         bil_subs.csv(DossierDestination(imports.chemin_bilans))
         new_transactions_2 = Transactions2New(imports, transactions_3, sommes_3.par_client, new_numeros)

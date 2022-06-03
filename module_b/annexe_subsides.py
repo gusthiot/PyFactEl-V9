@@ -13,11 +13,10 @@ class AnnexeSubsides(object):
     cles = ['proj-name', 'item-labelcode', 'subsid-name', 'subsid-start', 'subsid-end', 'subsid-pourcent',
             'subsid-maxproj', 'subsid-maxmois', 'subsid-alrdygrant', 'subsid-CHF', 'subsid-reste']
 
-    def __init__(self, imports, transactions_3, par_client, csv_fichiers):
+    def __init__(self, imports, par_client, csv_fichiers):
         """
         initialisation des données
         :param imports: données importées
-        :param transactions_3: transactions 3 générées
         :param par_client: tri des transactions
         :param csv_fichiers: fichiers csv et nom du fichier zip par client
         """
@@ -93,11 +92,12 @@ class AnnexeSubsides(object):
                         ligne += [round(grant, 2), round(subs, 2), round(reste, 2)]
                         lignes.append(ligne)
 
-            with DossierDestination(imports.chemin_cannexes).writer(nom_csv) as fichier_writer:
-                ligne = []
-                for cle in self.cles:
-                    ligne.append(pt[cle])
-                fichier_writer.writerow(ligne)
-
-                for ligne in lignes:
+            if len(lignes) > 0:
+                with DossierDestination(imports.chemin_cannexes).writer(nom_csv) as fichier_writer:
+                    ligne = []
+                    for cle in self.cles:
+                        ligne.append(pt[cle])
                     fichier_writer.writerow(ligne)
+
+                    for ligne in lignes:
+                        fichier_writer.writerow(ligne)

@@ -54,6 +54,7 @@ class Imports(object):
                                                     Format.mois_string(self.edition.mois)], self.edition)
         self.version = 0
         dossier_fixe = dossier_source
+        self.chemin_logo = dossier_source.chemin
         chemin_grille = dossier_source.chemin
         chemin_fixe_version = Chemin.chemin([chemin_fixe_enregistrement, "V0"], self.edition)
         if Chemin.existe(chemin_fixe_enregistrement, False):
@@ -87,6 +88,7 @@ class Imports(object):
             if not Chemin.existe(self.chemin_prix, False):
                 Interface.fatal(ErreurConsistance(), "le dossier " + self.chemin_prix + " est censé exister !")
             dossier_fixe = DossierSource(self.chemin_in)
+            self.chemin_logo = self.chemin_in
             chemin_grille = chemin_fixe_enregistrement
 
         self.chemin_out = Chemin.chemin([self.chemin_version, "OUT"], self.edition)
@@ -152,6 +154,14 @@ class Imports(object):
         self.userlabs = UserLabo(DossierSource(self.chemin_precedent), self.edition, self.plateformes, self.clients,
                                  self.users)
 
+        self.logo = ""
+        extensions = [".pdf", ".eps", ".png", ".jpg"]
+        for ext in extensions:
+            chemin = Chemin.chemin([self.chemin_logo, "logo" + ext], self.edition)
+            if Chemin.existe(chemin, False):
+                self.logo = "logo" + ext
+                break
+
         # importation des données de la version précédente
         if self.version > 0:
             vprec = self.version-1
@@ -185,6 +195,8 @@ class Imports(object):
                             self.categories, self.groupes, self.machines, self.categprix, self.coefprests,
                             self.prestations]:
                 dossier_destination.ecrire(fichier.nom_fichier, self.dossier_source.lire(fichier.nom_fichier))
+            if self.logo != "":
+                dossier_destination.ecrire(self.logo, dossier_source.lire(self.logo))
             dossier_precedent = DossierSource(self.chemin_precedent)
             for fichier in [self.grants, self.userlabs]:
                 dossier_destination.ecrire(fichier.nom_fichier, dossier_precedent.lire(fichier.nom_fichier))

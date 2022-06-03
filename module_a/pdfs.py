@@ -75,7 +75,7 @@ class Pdfs(object):
                     \LARGE \textcolor{canard}{\textbf{%(titre2)s}} \\
                     \end{flushright}
                     
-                    \vspace{10mm}
+                    \vspace{5mm}
                     
                     \begin{flushleft}
                     \renewcommand{\arraystretch}{1.2}
@@ -105,34 +105,36 @@ class Pdfs(object):
         :param intype: GLOB ou CPTE
         :return: table
         """
-        structure = r'''{p{21mm} p{15mm} p{15mm} p{41mm} p{17mm} p{13mm} p{17mm}'''
+        structure = r'''{m{21mm} m{15mm} m{15mm} m{41mm} m{17mm} m{13mm} m{17mm}'''
         if intype == "GLOB":
             dico = {'user': self.echappe('annex-client-user'), 'start': self.echappe('annex-client-start'),
                     'end': self.echappe('annex-client-end'), 'prest': self.echappe('annex-client-prestation'),
                     'quant': self.echappe('annex-client-quantity'), 'unit': self.echappe('annex-client-unit'),
                     'price': self.echappe('annex-client-unit-price'), 'total': self.echappe('annex-client-total-CHF'),
-                    'sub': self.echappe('annex-client-subtotal'), 'tot': self.echappe('annex-client-total'), 'multi': 8}
-            structure += r'''p{17mm} '''
+                    'sub': self.echappe('annex-client-subtotal'), 'tot': self.echappe('annex-client-total'), 'multi': 8,
+                    'taille': str(156) + "mm"}
+            structure += r'''m{17mm} '''
         else:
             dico = {'user': self.echappe('annex-compte-user'), 'start': self.echappe('annex-compte-start'),
                     'end': self.echappe('annex-compte-end'), 'prest': self.echappe('annex-compte-prestation'),
                     'quant': self.echappe('annex-compte-quantity'), 'unit': self.echappe('annex-compte-unit'),
                     'price': self.echappe('annex-compte-unit-price'), 'total': self.echappe('annex-compte-total-CHF'),
-                    'sub': self.echappe('annex-compte-subtotal'), 'tot': self.echappe('annex-compte-total'), 'multi': 7}
-        structure += r''' p{25mm}}'''
+                    'sub': self.echappe('annex-compte-subtotal'), 'tot': self.echappe('annex-compte-total'), 'multi': 7,
+                    'taille': str(139) + "mm"}
+        structure += r''' m{25mm}}'''
 
         contenu = r'''
                  \begin{flushleft}
-                 \renewcommand{\arraystretch}{2}
+                 \renewcommand{\arraystretch}{0}
                  \setlength{\arrayrulewidth}{0.5mm}
                  \arrayrulecolor{leman}
                  \begin{tabular}
                     ''' + structure + r'''
-                  \textbf{%(user)s} & \textbf{%(start)s} & \textbf{%(end)s} & \textbf{%(prest)s} & \textbf{%(quant)s} & 
-                  \textbf{%(unit)s} & \textbf{%(price)s} & ''' % dico
+                  \flb{%(user)s} & \flb{%(start)s} & \flb{%(end)s} & \flb{%(prest)s} & \flb{%(quant)s} & 
+                  \frb{%(unit)s} & \frb{%(price)s} & ''' % dico
         if intype == "GLOB":
-            contenu += r'''\textbf{''' + self.echappe('annex-client-deducted') + r'''} & '''
-        contenu += r''' \textbf{%(total)s} \\
+            contenu += r'''\frb{''' + self.echappe('annex-client-deducted') + r'''} & '''
+        contenu += r''' \frb{%(total)s} \\
                         \hline ''' % dico
 
         tot = 0
@@ -148,24 +150,24 @@ class Pdfs(object):
                                      'start-m': Format.mois_string(trans['date-start-m']), 'end-y': trans['date-end-y'],
                                      'end-m': Format.mois_string(trans['date-end-m']),
                                      'prest': Latex.echappe_caracteres(trans['item-name']),
-                                     'quant': "%.3f" % trans['transac-quantity'], 'unit': trans['item-unit'],
+                                     'quant': trans['transac-quantity'], 'unit': trans['item-unit'],
                                      'price': Format.format_2_dec(trans['valuation-price']),
                                      'total': Format.format_2_dec(trans['total-fact'])})
-                        contenu += r'''%(user)s & %(start-m)s.%(start-y)s & %(end-m)s.%(end-y)s & %(prest)s & %(quant)s 
-                                        & %(unit)s & %(price)s & ''' % dico
+                        contenu += r'''\fl{%(user)s} & \fl{%(start-m)s.%(start-y)s} & \fl{%(end-m)s.%(end-y)s} & 
+                                \fl{%(prest)s} & \fr{%(quant)s} & \fr{%(unit)s} & \fr{%(price)s} & ''' % dico
                         if intype == "GLOB":
-                            contenu += Format.format_2_dec(trans['deduct-CHF']) + " & "
-                        contenu += r''' %(total)s \\''' % dico
+                            contenu += r'''\fr{ ''' + Format.format_2_dec(trans['deduct-CHF']) + r'''} & '''
+                        contenu += r''' \fr{%(total)s} \\''' % dico
             tot += subtot
 
             dico.update({'article': Latex.echappe_caracteres(article['intitule']),
                          'subtot': Format.format_2_dec(subtot)})
             contenu += r''' \hline
-                            \multicolumn{%(multi)s}{l}{\small \textbf{%(sub)s %(article)s}} & \small %(subtot)s\\
+                            \multicolumn{%(multi)s}{m{%(taille)s}}{\flbs{%(sub)s %(article)s}} & \frbs{%(subtot)s}\\
                             \hline ''' % dico
 
         dico.update({'total': Format.format_2_dec(tot)})
-        contenu += r''' \multicolumn{%(multi)s}{l}{\small \textbf{%(tot)s}} & \small %(total)s \\ 
+        contenu += r''' \multicolumn{%(multi)s}{m{%(taille)s}}{\flbs{%(tot)s}} & \frbs{%(total)s} \\ 
                         \end{tabular}
                         \end{flushleft} ''' % dico
 
@@ -181,6 +183,8 @@ class Pdfs(object):
         document = Latex.entete()
         document += r'''
              \usepackage{multirow}
+             \usepackage{dcolumn}
+             \newcolumntype{d}[1]{D{.}{.}{#1}}
              \usepackage[table]{xcolor}
              \definecolor{leman}{RGB}{0, 167, 157}
              \definecolor{taupe}{RGB}{65, 61, 58}
@@ -197,7 +201,14 @@ class Pdfs(object):
              \newcommand{\changefont}{%
                 \fontsize{8pt}{10pt}\selectfont
              }
-
+             
+             \newcommand{\fl}[1]{\begin{flushleft}\textcolor{taupe}{#1}\end{flushleft}}
+             \newcommand{\flb}[1]{\begin{flushleft}\textcolor{taupe}{\textbf{#1}}\end{flushleft}}
+             \newcommand{\flbs}[1]{\begin{flushleft}\textcolor{canard}{\textbf{\small#1}}\end{flushleft}}
+             \newcommand{\fr}[1]{\begin{flushright}\textcolor{taupe}{#1}\end{flushright}}
+             \newcommand{\frb}[1]{\begin{flushright}\textcolor{taupe}{\textbf{#1}}\end{flushright}}
+             \newcommand{\frbs}[1]{\begin{flushright}\textcolor{canard}{\textbf{\small#1}}\end{flushright}}
+            
              \renewcommand{\headrulewidth}{0pt}
              \renewcommand{\footrulewidth}{0pt}
              \fancyfoot[L]{\changefont Vice Présidence pour les Finances \\ Contrôle de Gestion}
@@ -211,6 +222,10 @@ class Pdfs(object):
         #     \captionsetup[table]{position=bottom}
         #     \usepackage{float}
         #     \restylefloat{table}
+        if self.imports.logo != "":
+            document += r'''
+                \graphicspath{ {''' + self.imports.chemin_logo + r'''/} }
+                '''
 
         if self.imports.edition.filigrane != "":
             document += r'''
@@ -242,6 +257,13 @@ class Pdfs(object):
             \begin{document}
             \changefont
             '''
+
+        if self.imports.logo != "":
+            document += r'''
+                \begin{flushleft}
+                \includegraphics[height=8mm]{logo}
+                \end{flushleft}
+                '''
 
         document += contenu
 
