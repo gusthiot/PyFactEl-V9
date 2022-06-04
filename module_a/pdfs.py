@@ -71,7 +71,7 @@ class Pdfs(object):
         dico.update({'int_plat': Latex.echappe_caracteres(plateforme['int_plat']),
                      'abrev_plat': plateforme['abrev_plat'], 'numero': compte['numero'],
                      'intitule': Latex.echappe_caracteres(compte['intitule'])})
-        return r'''\begin{flushright}
+        return r''' \begin{flushright}
                     \LARGE \textcolor{taupe}{%(titre1)s} \\
                     \LARGE \textcolor{canard}{\textbf{%(titre2)s}} \\
                     \end{flushright}
@@ -223,10 +223,11 @@ class Pdfs(object):
         #     \captionsetup[table]{position=bottom}
         #     \usepackage{float}
         #     \restylefloat{table}
+        print(Latex.echappe_caracteres(self.imports.chemin_logo + Interface.separateur_os()))
+        print(self.imports.chemin_logo + Interface.separateur_os())
         if self.imports.logo != "":
             document += r'''
-                \graphicspath{ {''' + self.imports.chemin_logo + Interface.separateur_os() + r'''} }
-                '''
+                \graphicspath{ {''' + self.imports.chemin_logo + Interface.separateur_os() + r'''} }'''
 
         if self.imports.edition.filigrane != "":
             document += r'''
