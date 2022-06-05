@@ -94,15 +94,4 @@ class Interface(object):
         if dossier == "":
             Interface.affiche_message("Aucun dossier choisi")
             sys.exit("Aucun dossier choisi")
-        return dossier + Interface.separateur_os()
-
-    @staticmethod
-    def separateur_os():
-        """
-        retourne le séparateur de chemin logique en fonction de l'OS (si windows ou pas)
-        :return: séparateur, string
-        """
-        if sys.platform == "win32":
-            return "\\"
-        else:
-            return "/"
+        return dossier + "/"

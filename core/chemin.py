@@ -12,63 +12,9 @@ class Chemin(object):
     """
 
     @staticmethod
-    def separateur_lien(texte, facturation):
-        """
-        remplace le séparateur de chemin logique en fonction du lien donné dans les paramètres de facturation
-        :param texte: texte à traiter
-        :param facturation: paramètres de facturation
-        :return: séparateur, string
-        """
-        if "\\" in facturation.lien:
-            if "/" in facturation.lien:
-                Interface.affiche_message("'/' et '\\' présents dans le lien des paramètres de facturation !!! ")
-            texte = texte.replace("/", "\\")
-        else:
-            texte = texte.replace("\\", "/")
-        return texte.replace("//", "/").replace("\\" + "\\", "\\")
-
-    @staticmethod
-    def separateur_dossier(texte, edition):
-        """
-        remplace le séparateur de chemin logique en fonction du chemin donné dans les paramètres d'édition
-        :param texte: texte à traiter
-        :param edition: paramètres d'édition
-        :return: séparateur, string
-        """
-        if "\\" in edition.chemin:
-            if "/" in edition.chemin or "/" in edition.chemin_filigrane:
-                Interface.affiche_message("'/' et '\\' présents dans les chemins d'enregistrement' !!! ")
-            texte = texte.replace("/", "\\")
-            """
-            if "\\" != Chemin.separateur_os():
-                Interface.affiche_message_conditionnel("Le chemin d'enregistrement n'utilise pas le même séparateur que"
-                                                    " l'os sur lequel tourne le logiciel. Voulez-vous tout de même "
-                                                    "continuer ?")
-            """
-        else:
-            texte = texte.replace("\\", "/")
-            """
-            if "/" != Chemin.separateur_os():
-                Interface.affiche_message_conditionnel("Le chemin d'enregistrement n'utilise pas le même séparateur que"
-                                                    " l'os sur lequel tourne le logiciel. Voulez-vous tout de même "
-                                                    "continuer ?")
-            """
-        return texte.replace("//", "/").replace("\\" + "\\", "\\")
-
-    @staticmethod
-    def eliminer_double_separateur(texte):
-        """
-        élimine les doubles (back)slashs
-        :param texte: texte à nettoyer
-        :return: texte nettoyé
-        """
-        return texte.replace("//", "/").replace("\\" + "\\", "\\")
-
-    @staticmethod
-    def chemin(structure, edition=None):
+    def chemin(structure):
         """
         construit le chemin pour dossier/fichier
-        :param structure: éléments du chemin
         :param edition: paramètres d'édition
         :return: chemin logique complet pour dossier/fichier
         """
@@ -76,14 +22,11 @@ class Chemin(object):
         first = True
         for element in structure:
             if not first:
-                chemin += Interface.separateur_os()
+                chemin += "/"
             else:
                 first = False
             chemin += str(element)
-        if edition is None:
-            return Chemin.eliminer_double_separateur(chemin)
-        else:
-            return Chemin.eliminer_double_separateur(Chemin.separateur_dossier(chemin, edition))
+        return chemin.replace("//", "/")
 
     @staticmethod
     def existe(chemin, creation=False):

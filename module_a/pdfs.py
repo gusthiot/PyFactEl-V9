@@ -223,11 +223,9 @@ class Pdfs(object):
         #     \captionsetup[table]{position=bottom}
         #     \usepackage{float}
         #     \restylefloat{table}
-        print(Latex.echappe_caracteres(self.imports.chemin_logo + Interface.separateur_os()))
-        print(self.imports.chemin_logo + Interface.separateur_os())
         if self.imports.logo != "":
             document += r'''
-                \graphicspath{ {''' + self.imports.chemin_logo + Interface.separateur_os() + r'''} }'''
+                \graphicspath{ {''' + self.imports.chemin_logo + r'''/} }'''
 
         if self.imports.edition.filigrane != "":
             document += r'''

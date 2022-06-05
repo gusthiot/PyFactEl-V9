@@ -75,9 +75,9 @@ try:
             articles.csv(DossierDestination(imports.chemin_prix))
             tarifs.csv(DossierDestination(imports.chemin_prix))
         else:
-            if not Chemin.existe(Chemin.chemin([imports.chemin_prix, articles.nom], imports.edition), False):
+            if not Chemin.existe(Chemin.chemin([imports.chemin_prix, articles.nom]), False):
                 Interface.fatal(ErreurConsistance(), "le fichier " + articles.nom + " est censé exister !")
-            if not Chemin.existe(Chemin.chemin([imports.chemin_prix, tarifs.nom], imports.edition), False):
+            if not Chemin.existe(Chemin.chemin([imports.chemin_prix, tarifs.nom]), False):
                 Interface.fatal(ErreurConsistance(), "le fichier " + tarifs.nom + " est censé exister !")
         transactions_3 = Transactions3(imports, articles, tarifs)
         transactions_3.csv(DossierDestination(imports.chemin_bilans))

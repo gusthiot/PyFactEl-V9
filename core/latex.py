@@ -4,7 +4,6 @@ import shutil
 import sys
 import subprocess
 from core import Interface
-from PyPDF2 import PdfFileMerger
 
 
 class Latex(object):

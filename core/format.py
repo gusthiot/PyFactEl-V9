@@ -129,7 +129,7 @@ class Format(object):
                 return "", colonne + delaligne + " ne peut être vide\n"
             if any((c in chars) for c in s_d):
                 return "", colonne + delaligne + " n'est pas un chemin valide\n"
-            return s_d, ""
+            return s_d.replace("\\", "/"), ""
         except:
             return "", colonne + delaligne + " doit être un texte\n"
 

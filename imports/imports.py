@@ -51,38 +51,35 @@ class Imports(object):
         # création de l'arobrescence
 
         chemin_fixe_enregistrement = Chemin.chemin([self.edition.chemin, self.edition.plateforme, self.edition.annee,
-                                                    Format.mois_string(self.edition.mois)], self.edition)
+                                                    Format.mois_string(self.edition.mois)])
         self.version = 0
         dossier_fixe = dossier_source
         self.chemin_logo = dossier_source.chemin
         chemin_grille = dossier_source.chemin
-        chemin_fixe_version = Chemin.chemin([chemin_fixe_enregistrement, "V0"], self.edition)
+        chemin_fixe_version = Chemin.chemin([chemin_fixe_enregistrement, "V0"])
         if Chemin.existe(chemin_fixe_enregistrement, False):
             while True:
                 if Chemin.existe(chemin_fixe_version, False):
                     self.version = self.version + 1
-                    chemin_fixe_version = Chemin.chemin([chemin_fixe_enregistrement, "V"+str(self.version)],
-                                                        self.edition)
+                    chemin_fixe_version = Chemin.chemin([chemin_fixe_enregistrement, "V"+str(self.version)])
                 else:
                     break
 
         if self.edition.filigrane != "":
             self.chemin_enregistrement = Chemin.chemin([self.edition.chemin_filigrane, self.edition.plateforme,
-                                                        self.edition.annee, Format.mois_string(self.edition.mois)],
-                                                       self.edition)
-            self.chemin_version = Chemin.chemin([self.chemin_enregistrement, "V" + str(self.version)],
-                                                self.edition)
+                                                        self.edition.annee, Format.mois_string(self.edition.mois)])
+            self.chemin_version = Chemin.chemin([self.chemin_enregistrement, "V" + str(self.version)])
             if Chemin.existe(self.chemin_version, False):
                 Interface.fatal(ErreurConsistance(), "la facturation proforma V" + str(self.version) + " existe déjà !")
         else:
             self.chemin_enregistrement = chemin_fixe_enregistrement
             self.chemin_version = chemin_fixe_version
 
-        self.chemin_in = Chemin.chemin([self.chemin_enregistrement, "IN"], self.edition)
-        self.chemin_prix = Chemin.chemin([self.chemin_enregistrement, "Prix"], self.edition)
+        self.chemin_in = Chemin.chemin([self.chemin_enregistrement, "IN"])
+        self.chemin_prix = Chemin.chemin([self.chemin_enregistrement, "Prix"])
         if self.version > 0:
-            self.chemin_in = Chemin.chemin([chemin_fixe_enregistrement, "IN"], self.edition)
-            self.chemin_prix = Chemin.chemin([chemin_fixe_enregistrement, "Prix"], self.edition)
+            self.chemin_in = Chemin.chemin([chemin_fixe_enregistrement, "IN"])
+            self.chemin_prix = Chemin.chemin([chemin_fixe_enregistrement, "Prix"])
             if not Chemin.existe(self.chemin_in, False):
                 Interface.fatal(ErreurConsistance(), "le dossier " + self.chemin_in + " se doit d'être présent !")
             if not Chemin.existe(self.chemin_prix, False):
@@ -91,10 +88,10 @@ class Imports(object):
             self.chemin_logo = self.chemin_in
             chemin_grille = chemin_fixe_enregistrement
 
-        self.chemin_out = Chemin.chemin([self.chemin_version, "OUT"], self.edition)
-        self.chemin_bilans = Chemin.chemin([self.chemin_version, "Bilans_Stats"], self.edition)
-        self.chemin_cannexes = Chemin.chemin([self.chemin_version, "Annexes_CSV"], self.edition)
-        self.chemin_pannexes = Chemin.chemin([self.chemin_enregistrement, "Annexes_PDF"], self.edition)
+        self.chemin_out = Chemin.chemin([self.chemin_version, "OUT"])
+        self.chemin_bilans = Chemin.chemin([self.chemin_version, "Bilans_Stats"])
+        self.chemin_cannexes = Chemin.chemin([self.chemin_version, "Annexes_CSV"])
+        self.chemin_pannexes = Chemin.chemin([self.chemin_enregistrement, "Annexes_PDF"])
 
         # importation et vérification des données d'entrée
 
@@ -134,18 +131,18 @@ class Imports(object):
             mois_p = 12
 
         old_ver = 0
-        chemin_old = Chemin.chemin([self.edition.chemin, self.edition.plateforme, annee_p, mois_p], self.edition)
+        chemin_old = Chemin.chemin([self.edition.chemin, self.edition.plateforme, annee_p, mois_p])
         if not Chemin.existe(chemin_old, False):
             Interface.fatal(ErreurConsistance(), "le dossier " + chemin_old + " se doit d'être présent !")
         while True:
-            chemin_old_ver = Chemin.chemin([chemin_old, "V"+str(old_ver)], self.edition)
+            chemin_old_ver = Chemin.chemin([chemin_old, "V"+str(old_ver)])
             if Chemin.existe(chemin_old_ver, False):
                 old_ver = old_ver + 1
             else:
                 old_ver = old_ver - 1
                 break
 
-        self.chemin_precedent = Chemin.chemin([chemin_old, "V"+str(old_ver), "OUT"], self.edition)
+        self.chemin_precedent = Chemin.chemin([chemin_old, "V"+str(old_ver), "OUT"])
         if not Chemin.existe(self.chemin_precedent, False):
             Interface.fatal(ErreurConsistance(), "le dossier " + self.chemin_precedent + " se doit d'être présent !")
 
@@ -157,7 +154,7 @@ class Imports(object):
         self.logo = ""
         extensions = [".pdf", ".eps", ".png", ".jpg"]
         for ext in extensions:
-            chemin = Chemin.chemin([self.chemin_logo, "logo" + ext], self.edition)
+            chemin = Chemin.chemin([self.chemin_logo, "logo" + ext])
             if Chemin.existe(chemin, False):
                 self.logo = "logo" + ext
                 break
@@ -165,13 +162,12 @@ class Imports(object):
         # importation des données de la version précédente
         if self.version > 0:
             vprec = self.version-1
-            self.chemin_vprec = Chemin.chemin([chemin_fixe_enregistrement, "V"+str(vprec), "OUT"], self.edition)
+            self.chemin_vprec = Chemin.chemin([chemin_fixe_enregistrement, "V"+str(vprec), "OUT"])
             if not Chemin.existe(self.chemin_vprec, False):
                 Interface.fatal(ErreurConsistance(), "le dossier " + self.chemin_vprec + " se doit d'être présent !")
             self.numeros = Numero(DossierSource(self.chemin_vprec), self.edition, self.comptes, self.clients, vprec)
             self.versions = Version(DossierSource(self.chemin_vprec), self.edition.annee, self.edition.mois, vprec)
-            self.chemin_bilprec = Chemin.chemin([chemin_fixe_enregistrement, "V"+str(vprec), "Bilans_Stats"],
-                                                self.edition)
+            self.chemin_bilprec = Chemin.chemin([chemin_fixe_enregistrement, "V"+str(vprec), "Bilans_Stats"])
             if not Chemin.existe(self.chemin_bilprec, False):
                 Interface.fatal(ErreurConsistance(), "le dossier " + self.chemin_bilprec + " se doit d'être présent !")
             self.transactions_2 = Transactions2(DossierSource(self.chemin_bilprec), self.edition.annee,
@@ -208,7 +204,7 @@ class Imports(object):
             Chemin.copier_dossier("./reveal.js/", "js", self.chemin_enregistrement)
             Chemin.copier_dossier("./reveal.js/", "css", self.chemin_enregistrement)
 
-        chemin_vin = Chemin.chemin([self.chemin_version, "IN"], self.edition)
+        chemin_vin = Chemin.chemin([self.chemin_version, "IN"])
         Chemin.existe(chemin_vin, True)
         dossier_destination = DossierDestination(chemin_vin)
         for fichier in [self.clients, self.subsides, self.plafonds, self.cles, self.comptes, self.users,
