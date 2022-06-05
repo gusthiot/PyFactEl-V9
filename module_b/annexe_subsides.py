@@ -53,21 +53,10 @@ class AnnexeSubsides(object):
 
         for code, cc in clients_comptes.items():
             lignes = []
-            client = imports.clients.donnees[code]
-            nom_csv = "Subsides_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" + \
-                      Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + \
-                      client['abrev_labo'] + ".csv"
-            nom_zip = "Annexes_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" + \
-                      Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + code + "_" + \
-                      client['abrev_labo'] + ".zip"
-            if code not in self.csv_fichiers:
-                self.csv_fichiers[code] = {'nom': nom_zip, 'fichiers': []}
-            self.csv_fichiers[code]['fichiers'].append(nom_csv)
             for id_compte in cc:
                 compte = imports.comptes.donnees[id_compte]
                 type_s = compte['type_subside']
                 subside = imports.subsides.donnees[type_s]
-
                 for id_article, artsap in imports.artsap.donnees.items():
                     plaf = type_s + imports.plateforme['id_plateforme'] + id_article
                     if plaf in imports.plafonds.donnees.keys():
@@ -93,6 +82,16 @@ class AnnexeSubsides(object):
                         lignes.append(ligne)
 
             if len(lignes) > 0:
+                client = imports.clients.donnees[code]
+                nom_csv = "Subsides_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" + \
+                          Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + \
+                          client['abrev_labo'] + ".csv"
+                nom_zip = "Annexes_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" + \
+                          Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + code + "_" + \
+                          client['abrev_labo'] + ".zip"
+                if code not in self.csv_fichiers:
+                    self.csv_fichiers[code] = {'nom': nom_zip, 'fichiers': []}
+                self.csv_fichiers[code]['fichiers'].append(nom_csv)
                 with DossierDestination(imports.chemin_cannexes).writer(nom_csv) as fichier_writer:
                     ligne = []
                     for cle in self.cles:

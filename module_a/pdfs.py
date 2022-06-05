@@ -154,12 +154,21 @@ class Pdfs(object):
                 for par_user in par_item.values():
                     for key in par_user:
                         trans = transactions.valeurs[key]
+                        qqq = 1000 * trans['transac-quantity']
+                        if qqq % 1000 == 0:
+                            quantite = str(int(trans['transac-quantity'])) + r'''\hphantom{.000}'''
+                        elif qqq % 100 == 0:
+                            quantite = str(trans['transac-quantity']) + r'''\hphantom{00}'''
+                        elif qqq % 10 == 0:
+                            quantite = str(trans['transac-quantity']) + r'''\hphantom{0}'''
+                        else:
+                            quantite = str(trans['transac-quantity'])
                         subtot += trans['total-fact']
                         dico.update({'user': trans['user-name-f'], 'start-y': trans['date-start-y'],
                                      'start-m': Format.mois_string(trans['date-start-m']), 'end-y': trans['date-end-y'],
                                      'end-m': Format.mois_string(trans['date-end-m']),
                                      'prest': Latex.echappe_caracteres(trans['item-name']),
-                                     'quant': trans['transac-quantity'], 'unit': trans['item-unit'],
+                                     'quant': quantite, 'unit': trans['item-unit'],
                                      'price': Format.format_2_dec(trans['valuation-price']),
                                      'total': Format.format_2_dec(trans['total-fact'])})
                         contenu += r'''\fl{%(user)s} & \fl{%(start-m)s.%(start-y)s} & \fl{%(end-m)s.%(end-y)s} & 
