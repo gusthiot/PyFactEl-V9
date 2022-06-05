@@ -58,6 +58,13 @@ class Pdfs(object):
         :param intype: GLOB ou CPTE
         :return: entête
         """
+        contenu = ""
+        if self.imports.logo != "":
+            contenu += r'''
+                \begin{flushleft}
+                \includegraphics[height=8mm]{logo}
+                \end{flushleft}
+                '''
         plateforme = self.imports.plateforme
         compte = self.imports.comptes.donnees[id_compte]
         if intype == "GLOB":
@@ -71,7 +78,7 @@ class Pdfs(object):
         dico.update({'int_plat': Latex.echappe_caracteres(plateforme['int_plat']),
                      'abrev_plat': plateforme['abrev_plat'], 'numero': compte['numero'],
                      'intitule': Latex.echappe_caracteres(compte['intitule'])})
-        return r''' \begin{flushright}
+        contenu += r''' \begin{flushright}
                     \LARGE \textcolor{taupe}{%(titre1)s} \\
                     \LARGE \textcolor{canard}{\textbf{%(titre2)s}} \\
                     \end{flushright}
@@ -89,6 +96,7 @@ class Pdfs(object):
                     \end{tabular}
                     \end{flushleft} 
                      ''' % dico
+        return contenu
 
     def echappe(self, valeur):
         """
@@ -257,13 +265,6 @@ class Pdfs(object):
             \begin{document}
             \changefont
             '''
-
-        if self.imports.logo != "":
-            document += r'''
-                \begin{flushleft}
-                \includegraphics[height=8mm]{logo}
-                \end{flushleft}
-                '''
 
         document += contenu
 
