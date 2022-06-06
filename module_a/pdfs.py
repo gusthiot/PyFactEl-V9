@@ -1,6 +1,6 @@
 from core import (Latex,
-                  Interface,
                   Format)
+import math
 
 
 class Pdfs(object):
@@ -21,7 +21,6 @@ class Pdfs(object):
         prefixe = "Annexe_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" + \
                   Format.mois_string(imports.edition.mois) + "_" + str(imports.version)
 
-        ii = 0
         for id_fact, donnee in versions.valeurs.items():
             if donnee['version-change'] == 'NEW' or donnee['version-change'] == 'CORRECTED':
                 par_fact = sommes_2.par_fact[id_fact]
@@ -46,10 +45,6 @@ class Pdfs(object):
                         nom = prefixe + "_" + str(id_fact) + "_" + client['abrev_labo'] + "_" + compte['numero']
                         Latex.creer_latex_pdf(nom, self.canevas(contenu))
                         Latex.finaliser_pdf(nom, imports.chemin_pannexes)
-
-            # ii += 1
-            # if ii > 2:
-            #     break
 
     def entete(self, id_compte, intype):
         """
@@ -132,7 +127,7 @@ class Pdfs(object):
                     'taille': str(139) + "mm"}
         structure += r''' m{25mm}}'''
 
-        contenu = r'''
+        titres = r'''
                  \begin{flushleft}
                  \renewcommand{\arraystretch}{0}
                  \setlength{\arrayrulewidth}{0.5mm}
@@ -142,11 +137,15 @@ class Pdfs(object):
                   \flb{%(user)s} & \flb{%(start)s} & \flb{%(end)s} & \flb{%(prest)s} & \flb{%(quant)s} & 
                   \frb{%(unit)s} & \frb{%(price)s} & ''' % dico
         if intype == "GLOB":
-            contenu += r'''\frb{''' + self.echappe('annex-client-deducted') + r'''} & '''
-        contenu += r''' \frb{%(total)s} \\
+            titres += r'''\frb{''' + self.echappe('annex-client-deducted') + r'''} & '''
+        titres += r''' \frb{%(total)s} \\
                         \hline ''' % dico
 
+        fin = r''' \end{tabular}
+                    \end{flushleft} '''
+
         tot = 0
+        lignes = []
         for id_article, par_article in par_compte.items():
             article = self.imports.artsap.donnees[id_article]
             subtot = 0
@@ -171,24 +170,45 @@ class Pdfs(object):
                                      'quant': quantite, 'unit': trans['item-unit'],
                                      'price': Format.format_2_dec(trans['valuation-price']),
                                      'total': Format.format_2_dec(trans['total-fact'])})
-                        contenu += r'''\fl{%(user)s} & \fl{%(start-m)s.%(start-y)s} & \fl{%(end-m)s.%(end-y)s} & 
+                        ligne = r'''\fl{%(user)s} & \fl{%(start-m)s.%(start-y)s} & \fl{%(end-m)s.%(end-y)s} & 
                                 \fl{%(prest)s} & \fr{%(quant)s} & \fr{%(unit)s} & \fr{%(price)s} & ''' % dico
                         if intype == "GLOB":
-                            contenu += r'''\fr{ ''' + Format.format_2_dec(trans['deduct-CHF']) + r'''} & '''
-                        contenu += r''' \fr{%(total)s} \\''' % dico
+                            ligne += r'''\fr{ ''' + Format.format_2_dec(trans['deduct-CHF']) + r'''} & '''
+                        ligne += r''' \fr{%(total)s} \\''' % dico
+                        lignes.append(ligne)
             tot += subtot
 
             dico.update({'article': Latex.echappe_caracteres(article['intitule']),
                          'subtot': Format.format_2_dec(subtot)})
-            contenu += r''' \hline
+            lignes.append(r''' \hline
                             \multicolumn{%(multi)s}{m{%(taille)s}}{\flbs{%(sub)s %(article)s}} & \frbs{%(subtot)s}\\
-                            \hline ''' % dico
+                            \hline ''' % dico)
+        print(len(lignes))
+        first_max = 18
+        then_max = 25
+        contenu = titres
+        boucle = 0
+        max_page = first_max
+        while 1:
+            if boucle > 0:
+                contenu += fin
+                contenu += titres
+            beg = boucle*max_page
+            if (len(lignes)-beg) > max_page:
+                end = (boucle+1)*max_page
+            else:
+                end = len(lignes)
+            for num in range(beg, end):
+                contenu += lignes[num]
+            if end == len(lignes):
+                break
+            boucle += 1
+            max_page = then_max
 
         dico.update({'total': Format.format_2_dec(tot)})
         contenu += r''' \multicolumn{%(multi)s}{m{%(taille)s}}{\flbs{%(tot)s}} & \frbs{%(total)s} \\ 
-                        \end{tabular}
-                        \end{flushleft} ''' % dico
-
+                    ''' % dico
+        contenu += fin
         return contenu
 
     def canevas(self, contenu):
@@ -201,15 +221,14 @@ class Pdfs(object):
         document = Latex.entete()
         document += r'''
              \usepackage{multirow}
-             \usepackage{dcolumn}
-             \newcolumntype{d}[1]{D{.}{.}{#1}}
              \usepackage[table]{xcolor}
              \definecolor{leman}{RGB}{0, 167, 157}
              \definecolor{taupe}{RGB}{65, 61, 58}
              \definecolor{canard}{RGB}{0, 116, 118}
              \setlength{\tabcolsep}{0pt}
              \usepackage{graphicx}
-             \usepackage{fancyhdr, lastpage}
+             \usepackage{fancyhdr}
+             \usepackage{lastpage}
              
              \pagestyle{fancy}
         
@@ -230,16 +249,9 @@ class Pdfs(object):
              \renewcommand{\headrulewidth}{0pt}
              \renewcommand{\footrulewidth}{0pt}
              \fancyfoot[L]{\changefont Vice Présidence pour les Finances \\ Contrôle de Gestion}
-             \fancyfoot[C]{\changefont Page \thepage  of \pageref{LastPage}}
+             \fancyfoot[C]{\changefont Page \thepage\  of \pageref{LastPage}}
              \fancyfoot[R]{\changefont \today}
              '''
-        #     \usepackage{longtable}
-        #     \usepackage{dcolumn}
-        #     \usepackage{changepage}
-        #     \usepackage[scriptsize]{caption}
-        #     \captionsetup[table]{position=bottom}
-        #     \usepackage{float}
-        #     \restylefloat{table}
         if self.imports.logo != "":
             document += r'''
                 \graphicspath{ {''' + self.imports.chemin_logo + r'''/} }'''
@@ -253,22 +265,6 @@ class Pdfs(object):
                 \SetWatermarkFontSize{2cm}
                 \SetWatermarkText{''' + self.imports.edition.filigrane[:15] + r'''}
                 '''
-
-        # document += r'''
-        #     \pagestyle{fancy}
-        #
-        #     \fancyhead{}
-        #     \fancyfoot{}
-        #
-        #     \renewcommand{\headrulewidth}{0pt}
-        #     \renewcommand{\footrulewidth}{0pt}
-        #
-        #     \fancyhead[L]{\leftmark}
-        #     \fancyhead[R]{\thepage \\ \rightmark}
-        #
-        #     \newcommand{\fakesection}[2]{
-        #         \markboth{#1}{#2}
-        #     }'''
 
         document += r'''
             \begin{document}
