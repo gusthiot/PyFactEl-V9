@@ -168,18 +168,18 @@ class Pdfs(object):
                                      'end-m': Format.mois_string(trans['date-end-m']),
                                      'prest': Latex.echappe_caracteres(trans['item-name']),
                                      'quant': quantite, 'unit': trans['item-unit'],
-                                     'price': Format.format_2_dec(trans['valuation-price']),
-                                     'total': Format.format_2_dec(trans['total-fact'])})
+                                     'price': Format.nombre(trans['valuation-price']),
+                                     'total': Format.nombre(trans['total-fact'])})
                         ligne = r'''\fl{%(user)s} & \fl{%(start-m)s.%(start-y)s} & \fl{%(end-m)s.%(end-y)s} & 
                                 \fl{%(prest)s} & \fr{%(quant)s} & \fr{%(unit)s} & \fr{%(price)s} & ''' % dico
                         if intype == "GLOB":
-                            ligne += r'''\fr{ ''' + Format.format_2_dec(trans['deduct-CHF']) + r'''} & '''
+                            ligne += r'''\fr{ ''' + Format.nombre(trans['deduct-CHF']) + r'''} & '''
                         ligne += r''' \fr{%(total)s} \\''' % dico
                         lignes.append(ligne)
             tot += subtot
 
             dico.update({'article': Latex.echappe_caracteres(article['intitule']),
-                         'subtot': Format.format_2_dec(subtot)})
+                         'subtot': Format.nombre(subtot)})
             lignes.append(r''' \hline
                             \multicolumn{%(multi)s}{m{%(taille)s}}{\flbs{%(sub)s %(article)s}} & \frbs{%(subtot)s}\\
                             \hline ''' % dico)
@@ -205,7 +205,7 @@ class Pdfs(object):
             boucle += 1
             max_page = then_max
 
-        dico.update({'total': Format.format_2_dec(tot)})
+        dico.update({'total': Format.nombre(tot)})
         contenu += r''' \multicolumn{%(multi)s}{m{%(taille)s}}{\flbs{%(tot)s}} & \frbs{%(total)s} \\ 
                     ''' % dico
         contenu += fin

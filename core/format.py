@@ -19,15 +19,15 @@ class Format(object):
             return str(mois)
 
     @staticmethod
-    def format_2_dec(nombre):
+    def nombre(nombre):
         """
-        affiche un nombre en float arrondi avec 2 chiffres après la virgule
+        affiche un nombre en float arrondi avec 2 chiffres après la virgule et avec un séparateur des milliers
         :param nombre: nombre à afficher
         :return: nombre arrondi, avec 2 chiffres après la virgule, en string
         """
         try:
             float(nombre)
-            return "%.2f" % round(nombre, 2)
+            return '{:,.2f}'.format(nombre).replace(",", "'")
         except ValueError:
             return "pas un nombre"
 
