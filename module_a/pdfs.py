@@ -37,13 +37,13 @@ class Pdfs(object):
                     for id_compte, partie in parties.items():
                         contenu += partie
                         contenu += r'''\clearpage '''
-                    Latex.creer_latex_pdf(nom, self.canevas(contenu))
+                    Latex.creer_latex_pdf(nom, self.canevas(contenu, intype))
                     Latex.finaliser_pdf(nom, imports.chemin_pannexes)
                 else:
                     for id_compte, contenu in parties.items():
                         compte = imports.comptes.donnees[id_compte]
                         nom = prefixe + "_" + str(id_fact) + "_" + client['abrev_labo'] + "_" + compte['numero']
-                        Latex.creer_latex_pdf(nom, self.canevas(contenu))
+                        Latex.creer_latex_pdf(nom, self.canevas(contenu, intype))
                         Latex.finaliser_pdf(nom, imports.chemin_pannexes)
 
     def entete(self, id_compte, intype):
@@ -116,7 +116,7 @@ class Pdfs(object):
                     'quant': self.echappe('annex-client-quantity'), 'unit': self.echappe('annex-client-unit'),
                     'price': self.echappe('annex-client-unit-price'), 'total': self.echappe('annex-client-total-CHF'),
                     'sub': self.echappe('annex-client-subtotal'), 'tot': self.echappe('annex-client-total'), 'multi': 8,
-                    'taille': str(156) + "mm"}
+                    'taille': str(156) + "mm", 'deduct': self.echappe('annex-client-deducted')}
             structure += r'''m{17mm} '''
         else:
             dico = {'user': self.echappe('annex-compte-user'), 'start': self.echappe('annex-compte-start'),
@@ -137,7 +137,7 @@ class Pdfs(object):
                   \flb{%(user)s} & \flb{%(start)s} & \flb{%(end)s} & \flb{%(prest)s} & \flb{%(quant)s} & 
                   \frb{%(unit)s} & \frb{%(price)s} & ''' % dico
         if intype == "GLOB":
-            titres += r'''\frb{''' + self.echappe('annex-client-deducted') + r'''} & '''
+            titres += r'''\frb{%(deduct)s} & ''' % dico
         titres += r''' \frb{%(total)s} \\
                         \hline ''' % dico
 
@@ -169,11 +169,12 @@ class Pdfs(object):
                                      'prest': Latex.echappe_caracteres(trans['item-name']),
                                      'quant': quantite, 'unit': trans['item-unit'],
                                      'price': Format.nombre(trans['valuation-price']),
+                                     'deduct': Format.nombre(trans['deduct-CHF']),
                                      'total': Format.nombre(trans['total-fact'])})
                         ligne = r'''\fl{%(user)s} & \fl{%(start-m)s.%(start-y)s} & \fl{%(end-m)s.%(end-y)s} & 
                                 \fl{%(prest)s} & \fr{%(quant)s} & \fr{%(unit)s} & \fr{%(price)s} & ''' % dico
                         if intype == "GLOB":
-                            ligne += r'''\fr{ ''' + Format.nombre(trans['deduct-CHF']) + r'''} & '''
+                            ligne += r'''\fr{ %(deduct)s} & ''' % dico
                         ligne += r''' \fr{%(total)s} \\''' % dico
                         lignes.append(ligne)
             tot += subtot
@@ -211,10 +212,11 @@ class Pdfs(object):
         contenu += fin
         return contenu
 
-    def canevas(self, contenu):
+    def canevas(self, contenu, intype):
         """
         création du canevas latex autour du contenu
         :param contenu: contenu variable du document
+        :param intype: GLOB ou CPTE
         :return: le document latex complet
         """
 
@@ -248,13 +250,21 @@ class Pdfs(object):
             
              \renewcommand{\headrulewidth}{0pt}
              \renewcommand{\footrulewidth}{0pt}
-             \fancyfoot[L]{\changefont Vice Présidence pour les Finances \\ Contrôle de Gestion}
+             '''
+
+        dico = {'pied1': self.echappe('annex-compte-pied-page-g1'), 'pied2': self.echappe('annex-compte-pied-page-g2'),
+                'logo': self.imports.chemin_logo,
+                'filigrane': Latex.echappe_caracteres(self.imports.edition.filigrane[:15])}
+        if intype != "GLOB":
+            document += r'''\fancyfoot[L]{\changefont %(pied1)s \\ %(pied2)s}''' % dico
+
+        document += r'''
              \fancyfoot[C]{\changefont Page \thepage\  of \pageref{LastPage}}
              \fancyfoot[R]{\changefont \today}
              '''
         if self.imports.logo != "":
             document += r'''
-                \graphicspath{ {''' + self.imports.chemin_logo + r'''/} }'''
+                \graphicspath{ {%(logo)s/} }''' % dico
 
         if self.imports.edition.filigrane != "":
             document += r'''
@@ -263,8 +273,8 @@ class Pdfs(object):
                 \SetWatermarkAngle{45}
                 \SetWatermarkScale{2}
                 \SetWatermarkFontSize{2cm}
-                \SetWatermarkText{''' + self.imports.edition.filigrane[:15] + r'''}
-                '''
+                \SetWatermarkText{%(filigrane)s}
+                ''' % dico
 
         document += r'''
             \begin{document}
