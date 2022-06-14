@@ -12,11 +12,11 @@ class Transactions3(CsvDict):
             'proj-id', 'proj-nbr', 'proj-name', 'proj-expl', 'flow-type', 'item-id', 'item-codeK', 'item-textK',
             'item-text2K', 'item-nbr', 'item-name', 'item-unit', 'item-idsap', 'item-codeD', 'item-flag-usage',
             'item-flag-conso', 'item-eligible', 'item-order', 'item-labelcode', 'item-extra', 'platf-code', 'platf-op',
-            'platf-name', 'transac-date', 'transac-quantity', 'transac-usage', 'transac-runtime', 'transac-runcae',
-            'valuation-price', 'valuation-brut', 'discount-type', 'discount-CHF', 'valuation-net', 'subsid-code',
-            'subsid-name', 'subsid-start', 'subsid-end', 'subsid-ok', 'subsid-pourcent', 'subsid-maxproj',
-            'subsid-maxmois', 'subsid-reste', 'subsid-CHF', 'deduct-CHF', 'subsid-deduct', 'total-fact',
-            'discount-bonus', 'subsid-bonus']
+            'platf-name', 'transac-date', 'transac-quantity', 'transac-valid', 'transac-id-staff', 'transac-staff',
+            'transac-usage', 'transac-runtime', 'transac-runcae', 'valuation-price', 'valuation-brut', 'discount-type',
+            'discount-CHF', 'valuation-net', 'subsid-code', 'subsid-name', 'subsid-start', 'subsid-end', 'subsid-ok',
+            'subsid-pourcent', 'subsid-maxproj', 'subsid-maxmois', 'subsid-reste', 'subsid-CHF', 'deduct-CHF',
+            'subsid-deduct', 'total-fact', 'discount-bonus', 'subsid-bonus']
 
     def __init__(self, imports, articles, tarifs):
         """
@@ -35,6 +35,8 @@ class Transactions3(CsvDict):
         transacts = {}
 
         for entree in imports.acces.donnees:
+            if entree['validation'] == '0':
+                continue
             compte = imports.comptes.donnees[entree['id_compte']]
             client = imports.clients.donnees[compte['code_client']]
             id_classe = client['id_classe']
@@ -67,11 +69,14 @@ class Transactions3(CsvDict):
                             else:
                                 runcae = 1
                                 counted = True
+                        elif entree['validation'] == "2":
+                            usage = 0
+                            runcae = ""
                         else:
                             usage = 1
                             runcae = 1
                             counted = True
-                        trans = [entree['date_login'], 1, usage, "", runcae]
+                        trans = [entree['date_login'], 1] + self.__staff(entree) + [usage, "", runcae]
                         val = [tarif['valuation-price'], tarif['valuation-price'], "", 0, tarif['valuation-price']]
                         self.__put_in_transacts(transacts, ref_client, ope, util_proj, art, trans, val)
 
@@ -83,7 +88,8 @@ class Transactions3(CsvDict):
                         ref_client = self.__ref_client(entree['annee'], entree['mois'], classe, client, compte, article)
                         tarif = tarifs.valeurs[id_classe + id_groupe]
                         art = self.__art_plate(article, "K7", pt['item-K7'], pt['item-K7a'])
-                        if article['platf-code'] == compte['code_client'] and compte['exploitation'] == "TRUE":
+                        if ((article['platf-code'] == compte['code_client'] and compte['exploitation'] == "TRUE")
+                                or entree['validation'] == "2"):
                             usage = 0
                             runcae = ""
                         else:
@@ -93,7 +99,7 @@ class Transactions3(CsvDict):
                             else:
                                 runcae = 1
                                 counted = True
-                        trans = [entree['date_login'], 1, usage, "", runcae]
+                        trans = [entree['date_login'], 1] + self.__staff(entree) + [usage, "", runcae]
                         val = [tarif['valuation-price'], tarif['valuation-price'], "", 0, tarif['valuation-price']]
                         self.__put_in_transacts(transacts, ref_client, ope, util_proj, art, trans, val)
 
@@ -108,7 +114,8 @@ class Transactions3(CsvDict):
                                                            article)
                             tarif = tarifs.valeurs[id_classe + id_groupe]
                             duree = duree_hp + duree_hc
-                            if article['platf-code'] == compte['code_client'] and compte['exploitation'] == "TRUE":
+                            if ((article['platf-code'] == compte['code_client'] and compte['exploitation'] == "TRUE")
+                                    or entree['validation'] == "2"):
                                 usage = 0
                                 runcae = ""
                             else:
@@ -118,7 +125,7 @@ class Transactions3(CsvDict):
                                 else:
                                     runcae = 1
                                     counted = True
-                            trans = [entree['date_login'], duree, usage, "", runcae]
+                            trans = [entree['date_login'], duree] + self.__staff(entree) + [usage, "", runcae]
                             art = self.__art_plate(article, "K4", pt['item-K4'], pt['item-K4a'])
                             prix = round(duree * tarif['valuation-price'], 2)
                             val = [tarif['valuation-price'], prix, "", 0, prix]
@@ -134,7 +141,8 @@ class Transactions3(CsvDict):
 
                     # K1 CAE-HP #
                     if duree_hp > 0:
-                        if article['platf-code'] == compte['code_client'] and compte['exploitation'] == "TRUE":
+                        if ((article['platf-code'] == compte['code_client'] and compte['exploitation'] == "TRUE")
+                                or entree['validation'] == "2"):
                             usage = 0
                             runtime = ""
                             runcae = ""
@@ -147,14 +155,15 @@ class Transactions3(CsvDict):
                                 runcae = 1
                                 counted = True
                         art = self.__art_plate(article, "K1", pt['item-K1'], pt['item-K1a'])
-                        trans = [entree['date_login'], duree_hp, usage, runtime, runcae]
+                        trans = [entree['date_login'], duree_hp] + self.__staff(entree) + [usage, runtime, runcae]
                         prix = round(duree_hp * tarif['valuation-price'], 2)
                         val = [tarif['valuation-price'], prix, "", 0, prix]
                         self.__put_in_transacts(transacts, ref_client, ope, util_proj, art, trans, val)
 
                     # K1 CAE-HC #
                     if duree_hc > 0:
-                        if article['platf-code'] == compte['code_client'] and compte['exploitation'] == "TRUE":
+                        if ((article['platf-code'] == compte['code_client'] and compte['exploitation'] == "TRUE")
+                                or entree['validation'] == "2"):
                             usage = 0
                             runtime = ""
                             runcae = ""
@@ -170,7 +179,7 @@ class Transactions3(CsvDict):
                                 runcae = 1
                                 counted = True
                         art = self.__art_plate(article, "K1", pt['item-K1'], pt['item-K1b'])
-                        trans = [entree['date_login'], duree_hc, usage, runtime, runcae]
+                        trans = [entree['date_login'], duree_hc] + self.__staff(entree) + [usage, runtime, runcae]
                         prix = round(duree_hc * tarif['valuation-price'], 2)
                         reduc = round(tarif['valuation-price'] * machine['tx_rabais_hc']/100 * duree_hc, 2)
                         val = [tarif['valuation-price'], prix,
@@ -194,18 +203,23 @@ class Transactions3(CsvDict):
                                 runcae = ""
                             else:
                                 runcae = 1
+                    elif entree['validation'] == "2":
+                        usage = 0
+                        runcae = ""
                     else:
                         usage = duree_op
                         if counted:
                             runcae = ""
                         else:
                             runcae = 1
-                    trans = [entree['date_login'], duree_op, usage, "", runcae]
+                    trans = [entree['date_login'], duree_op] + self.__staff(entree) + [usage, "", runcae]
                     prix = round(duree_op * tarif['valuation-price'], 2)
                     val = [tarif['valuation-price'], prix, "", 0, prix]
                     self.__put_in_transacts(transacts, ref_client, ope, util_proj, art, trans, val)
 
         for entree in imports.noshows.donnees:
+            if entree['validation'] == '0':
+                continue
             compte = imports.comptes.donnees[entree['id_compte']]
             client = imports.clients.donnees[compte['code_client']]
             id_classe = client['id_classe']
@@ -234,12 +248,14 @@ class Transactions3(CsvDict):
                     ope = ["", "", "", "", id_machine, machine['nom'], ""]
                     util_proj = self.__util_proj(entree['id_user'], compte, pt['flow-noshow'])
                     art = self.__art_plate(article, code, texte, texte2)
-                    trans = [entree['date_debut'], entree['penalite'], 0, "", ""]
+                    trans = [entree['date_debut'], entree['penalite']] + self.__staff(entree) + [0, "", ""]
                     prix = round(entree['penalite'] * tarif['valuation-price'], 2)
                     val = [tarif['valuation-price'], prix, "", 0, prix]
                     self.__put_in_transacts(transacts, ref_client, ope, util_proj, art, trans, val)
 
         for entree in imports.livraisons.donnees:
+            if entree['validation'] == '0':
+                continue
             compte = imports.comptes.donnees[entree['id_compte']]
             client = imports.clients.donnees[compte['code_client']]
             id_classe = client['id_classe']
@@ -268,7 +284,7 @@ class Transactions3(CsvDict):
                 ope = [entree['id_operateur'], operateur['prenom'] + " " + operateur['nom'],
                        pt['oper-PO'] + " " + str(entree['date_commande']), entree['remarque'], idm, nm, extra]
                 util_proj = self.__util_proj(entree['id_user'], compte, pt['flow-lvr'])
-                trans = [entree['date_livraison'], entree['quantite'], 0, "", ""]
+                trans = [entree['date_livraison'], entree['quantite']] + self.__staff(entree) + [0, "", ""]
                 if entree['rabais'] > 0:
                     discount = pt['discount-LVR']
                 else:
@@ -279,6 +295,8 @@ class Transactions3(CsvDict):
 
         # SRV
         for entree in imports.services.donnees:
+            if entree['validation'] == '0':
+                continue
             compte = imports.comptes.donnees[entree['id_compte']]
             client = imports.clients.donnees[compte['code_client']]
             id_classe = client['id_classe']
@@ -293,11 +311,12 @@ class Transactions3(CsvDict):
                        "", "", ""]
                 util_proj = self.__util_proj(entree['id_user'], compte, pt['flow-srv'])
                 art = self.__art_plate(article, "", "", "")
-                if article['platf-code'] == compte['code_client'] and compte['exploitation'] == "TRUE":
+                if ((article['platf-code'] == compte['code_client'] and compte['exploitation'] == "TRUE")
+                        or entree['validation'] == "2"):
                     usage = 0
                 else:
                     usage = entree['quantite']
-                trans = [entree['date'], entree['quantite'], usage, "", ""]
+                trans = [entree['date'], entree['quantite']] + self.__staff(entree) + [usage, "", ""]
                 prix = round(entree['quantite'] * tarif['valuation-price'], 2)
                 val = [tarif['valuation-price'], prix, "", 0, prix]
                 self.__put_in_transacts(transacts, ref_client, ope, util_proj, art, trans, val)
@@ -311,18 +330,24 @@ class Transactions3(CsvDict):
                     article = articles.valeurs[transact['art'][0]]
                     subs = self.__subsides(transact, article)
                     if self.imports.classes.donnees[transact['rc'][7]]['subsides'] == "BONUS":
-                        ded_bon = transact['val'][3]
+                        if transact['trans'][2] != "1":
+                            ded_bon = transact['val'][3]
+                        else:
+                            ded_bon = 0
                         ded_rab = 0
                         sub_bon = subs[9]
                         sub_rab = 0
                     else:
                         ded_bon = 0
-                        ded_rab = transact['val'][3]
+                        if transact['trans'][2] != "1":
+                            ded_rab = transact['val'][3]
+                        else:
+                            ded_rab = 0
                         sub_bon = 0
                         sub_rab = subs[9]
                     id_compte = transact['up'][4]
                     compte = imports.comptes.donnees[id_compte]
-                    if article['platf-code'] == compte['code_client']:
+                    if article['platf-code'] == compte['code_client'] and transact['trans'][2] != "1":
                         tot = 0
                     else:
                         tot = transact['val'][1] - ded_rab - sub_rab
@@ -331,6 +356,21 @@ class Transactions3(CsvDict):
                         transact['val'] + subs + mont
                     self._ajouter_valeur(donnee, i)
                     i = i + 1
+
+    def __staff(self, entree):
+        """
+        détermine les paramètres lié au staff de validation
+        :param entree: ligne d'entrée
+        :return: id du staff (vide si "0"), et nom du staff (vide si "0")
+        """
+        if entree['id_staff'] == "0":
+            id_staff = ""
+            staff = ""
+        else:
+            id_staff = entree['id_staff']
+            validateur = self.imports.users.donnees[id_staff]
+            staff = validateur['nom'] + " " + validateur['prenom'][0] + "."
+        return [entree['validation'], id_staff, staff]
 
     def __ref_client(self, annee, mois, classe, client, compte, article):
         """
@@ -394,6 +434,7 @@ class Transactions3(CsvDict):
         montant = transact['val'][4]
         id_machine = transact['ope'][4]
         date = transact['trans'][0]
+        validation = transact['trans'][2]
         type_s = compte['type_subside']
         result = ["", "", "", "", "", 0, 0, 0, 0, 0]
         if type_s != "0":
@@ -405,42 +446,43 @@ class Transactions3(CsvDict):
                     result[2] = subside['debut']
                     result[3] = subside['fin']
                     result[4] = "NO"
-                    plaf = type_s + article['platf-code'] + article['item-idsap']
-                    if plaf in self.imports.plafonds.donnees.keys():
-                        plafond = self.imports.plafonds.donnees[plaf]
-                        result[5] = plafond['pourcentage']
-                        result[6] = plafond['max_compte']
-                        result[7] = plafond['max_mois']
-                        if subside['debut'] == "NULL" or subside['debut'] <= date:
-                            if subside['fin'] == "NULL" or subside['fin'] >= date:
-                                if type_s in self.imports.cles.donnees.keys():
-                                    dict_s = self.imports.cles.donnees[type_s]
-                                    if self.__check_id_classe(dict_s, id_classe, compte['code_client'], id_machine):
-                                        result[4] = "YES"
-                                        cg_id = compte['id_compte'] + article['platf-code'] + article['item-idsap']
-                                        if cg_id in self.imports.grants.donnees.keys():
-                                            grant = self.imports.grants.donnees[cg_id]['subsid-alrdygrant']
-                                        else:
-                                            grant = 0
-                                        if cg_id in self.comptabilises.keys():
-                                            comptabilise = self.comptabilises[cg_id]['subsid-alrdygrant']
-                                        else:
-                                            comptabilise = 0
-                                        res_compte = plafond['max_compte'] - (grant + comptabilise)
-                                        res_mois = plafond['max_mois'] - comptabilise
-                                        res = max(min(res_compte, res_mois), 0)
-                                        max_mo = round(montant * plafond['pourcentage'] / 100, 2)
-                                        mo = min(max_mo, res)
-                                        if cg_id not in self.comptabilises.keys():
-                                            self.comptabilises[cg_id] = {'proj-id': compte['id_compte'],
-                                                                         'platf-code': article['platf-code'],
-                                                                         'item-idsap': article['item-idsap'],
-                                                                         'subsid-alrdygrant': mo}
-                                        else:
-                                            self.comptabilises[cg_id]['subsid-alrdygrant'] = \
-                                                self.comptabilises[cg_id]['subsid-alrdygrant'] + mo
-                                        result[8] = res
-                                        result[9] = mo
+                    if validation == "1":
+                        plaf = type_s + article['platf-code'] + article['item-idsap']
+                        if plaf in self.imports.plafonds.donnees.keys():
+                            plafond = self.imports.plafonds.donnees[plaf]
+                            result[5] = plafond['pourcentage']
+                            result[6] = plafond['max_compte']
+                            result[7] = plafond['max_mois']
+                            if subside['debut'] == "NULL" or subside['debut'] <= date:
+                                if subside['fin'] == "NULL" or subside['fin'] >= date:
+                                    if type_s in self.imports.cles.donnees.keys():
+                                        dict_s = self.imports.cles.donnees[type_s]
+                                        if self.__check_id_classe(dict_s, id_classe, compte['code_client'], id_machine):
+                                            result[4] = "YES"
+                                            cg_id = compte['id_compte'] + article['platf-code'] + article['item-idsap']
+                                            if cg_id in self.imports.grants.donnees.keys():
+                                                grant = self.imports.grants.donnees[cg_id]['subsid-alrdygrant']
+                                            else:
+                                                grant = 0
+                                            if cg_id in self.comptabilises.keys():
+                                                comptabilise = self.comptabilises[cg_id]['subsid-alrdygrant']
+                                            else:
+                                                comptabilise = 0
+                                            res_compte = plafond['max_compte'] - (grant + comptabilise)
+                                            res_mois = plafond['max_mois'] - comptabilise
+                                            res = max(min(res_compte, res_mois), 0)
+                                            max_mo = round(montant * plafond['pourcentage'] / 100, 2)
+                                            mo = min(max_mo, res)
+                                            if cg_id not in self.comptabilises.keys():
+                                                self.comptabilises[cg_id] = {'proj-id': compte['id_compte'],
+                                                                             'platf-code': article['platf-code'],
+                                                                             'item-idsap': article['item-idsap'],
+                                                                             'subsid-alrdygrant': mo}
+                                            else:
+                                                self.comptabilises[cg_id]['subsid-alrdygrant'] = \
+                                                    self.comptabilises[cg_id]['subsid-alrdygrant'] + mo
+                                            result[8] = res
+                                            result[9] = mo
             else:
                 result[4] = "N/A"
         return result

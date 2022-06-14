@@ -10,7 +10,7 @@ class Livraison(CsvImport):
     """
 
     cles = ['annee', 'mois', 'id_compte', 'id_user', 'id_prestation', 'date_livraison', 'quantite', 'rabais',
-            'id_operateur', 'id_livraison', 'date_commande', 'remarque']
+            'id_operateur', 'id_livraison', 'date_commande', 'remarque', 'validation', 'id_staff']
     nom_fichier = "lvr.csv"
     libelle = "Livraison Prestations"
 
@@ -48,6 +48,8 @@ class Livraison(CsvImport):
 
             msg += self._test_id_coherence(donnee['id_operateur'], "l'id opérateur", ligne, users)
 
+            msg += self._test_id_coherence(donnee['id_staff'], "l'id staff", ligne, users, True)
+
             donnee['quantite'], info = Format.est_un_nombre(donnee['quantite'], "la quantité", ligne, 1, 0)
             msg += info
             donnee['rabais'], info = Format.est_un_nombre(donnee['rabais'], "le rabais", ligne, 2, 0)
@@ -61,8 +63,12 @@ class Livraison(CsvImport):
 
             donnee['id_livraison'], info = Format.est_un_texte(donnee['id_livraison'], "l'id livraison", ligne)
             msg += info
+
             donnee['remarque'], info = Format.est_un_texte(donnee['remarque'], "la remarque", ligne, True)
             msg += info
+
+            if donnee['validation'] not in ['0', '1', '2', '3']:
+                msg += "la validation " + str(ligne) + " doit être parmi [0, 1, 2, 3]"
 
             donnees_list.append(donnee)
 

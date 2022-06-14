@@ -103,17 +103,20 @@ class Sommes3(object):
                 if item not in ppi.keys():
                     ppi[item] = {'base': key, 'goops': 0, 'extrops': 0, 'goint': 0, 'extrint': 0}
                 net = transaction['valuation-net']
-                if transaction['client-code'] == transaction['platf-code']:
+
+                if transaction['client-code'] == transaction['platf-code'] and transaction['transac-valid'] != "2":
                     if transaction['item-extra'] == "TRUE":
-                        if transaction['proj-expl'] == "TRUE":
-                            ppi[item]['extrops'] += net
-                        else:
+                        if transaction['proj-expl'] != "TRUE":
                             ppi[item]['extrint'] += net
                     else:
                         if transaction['proj-expl'] == "TRUE":
                             ppi[item]['goops'] += net
                         else:
                             ppi[item]['goint'] += net
+                if transaction['item-extra'] == "TRUE":
+                    if ((transaction['client-code'] == transaction['platf-code'] and transaction['proj-expl'] == "TRUE")
+                            or transaction['transac-valid'] == "2"):
+                        ppi[item]['goops'] += net
                 # => bilan conso
 
                 if item not in self.par_item.keys():

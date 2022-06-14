@@ -10,7 +10,7 @@ class Acces(CsvImport):
     """
 
     cles = ['annee', 'mois', 'id_compte', 'id_user', 'id_machine', 'date_login', 'duree_machine_hp', 'duree_machine_hc',
-            'duree_run', 'duree_operateur', 'id_op', 'remarque_op', 'remarque_staff']
+            'duree_run', 'duree_operateur', 'id_op', 'remarque_op', 'remarque_staff', 'validation', 'id_staff']
     nom_fichier = "cae.csv"
     libelle = "Contrôle Accès Equipement"
 
@@ -48,6 +48,8 @@ class Acces(CsvImport):
 
             msg += self._test_id_coherence(donnee['id_op'], "l'id opérateur", ligne, users)
 
+            msg += self._test_id_coherence(donnee['id_staff'], "l'id staff", ligne, users, True)
+
             donnee['duree_machine_hp'], info = Format.est_un_nombre(donnee['duree_machine_hp'], "la durée machine hp",
                                                                     ligne, 4, 0)
             msg += info
@@ -60,7 +62,7 @@ class Acces(CsvImport):
                                                                    ligne, 4, 0)
             msg += info
             if donnee['duree_run'] < (donnee['duree_machine_hc'] + donnee['duree_machine_hp']):
-                msg += "la durée de run de la ligne " + str(ligne) + "ne peut pas être plus petite que HP + HC"
+                msg += "la durée de run de la ligne " + str(ligne) + " ne peut pas être plus petite que HP + HC"
 
             donnee['date_login'], info = Format.est_une_date(donnee['date_login'], "la date de login", ligne)
             msg += info
@@ -72,6 +74,10 @@ class Acces(CsvImport):
             donnee['remarque_staff'], info = Format.est_un_texte(donnee['remarque_staff'], "la remarque staff", ligne,
                                                                  True)
             msg += info
+
+            if donnee['validation'] not in ['0', '1', '2', '3']:
+                msg += "la validation " + str(ligne) + " doit être parmi [0, 1, 2, 3]"
+
 
             donnees_list.append(donnee)
 

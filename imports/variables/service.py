@@ -9,7 +9,8 @@ class Service(CsvImport):
     Classe pour l'importation des données de Services
     """
 
-    cles = ['annee', 'mois', 'id_compte', 'id_user', 'id_categorie', 'date', 'quantite', 'id_op', 'remarque_staff']
+    cles = ['annee', 'mois', 'id_compte', 'id_user', 'id_categorie', 'date', 'quantite', 'id_op', 'remarque_staff',
+            'validation', 'id_staff']
     nom_fichier = "srv.csv"
     libelle = "Services"
 
@@ -47,6 +48,8 @@ class Service(CsvImport):
 
             msg += self._test_id_coherence(donnee['id_op'], "l'id opérateur", ligne, users)
 
+            msg += self._test_id_coherence(donnee['id_staff'], "l'id staff", ligne, users, True)
+
             donnee['quantite'], info = Format.est_un_nombre(donnee['quantite'], "la quantité", ligne, 3, 0)
             msg += info
 
@@ -56,6 +59,9 @@ class Service(CsvImport):
             donnee['remarque_staff'], info = Format.est_un_texte(donnee['remarque_staff'], "la remarque staff", ligne,
                                                                  True)
             msg += info
+
+            if donnee['validation'] not in ['0', '1', '2', '3']:
+                msg += "la validation " + str(ligne) + " doit être parmi [0, 1, 2, 3]"
 
             donnees_list.append(donnee)
 

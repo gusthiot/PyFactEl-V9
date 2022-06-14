@@ -9,7 +9,8 @@ class NoShow(CsvImport):
     Classe pour l'importation des données de No Show
     """
 
-    cles = ['annee', 'mois', 'date_debut', 'type', 'id_machine', 'id_user', 'id_compte', 'penalite']
+    cles = ['annee', 'mois', 'date_debut', 'type', 'id_machine', 'id_user', 'id_compte', 'penalite', 'validation',
+            'id_staff']
     nom_fichier = "noshow.csv"
     libelle = "Pénalités No Show"
 
@@ -45,6 +46,8 @@ class NoShow(CsvImport):
 
             msg += self._test_id_coherence(donnee['id_user'], "l'id user", ligne, users)
 
+            msg += self._test_id_coherence(donnee['id_staff'], "l'id staff", ligne, users, True)
+
             if donnee['type'] == "":
                 msg += "HP/HC " + str(ligne) + " ne peut être vide\n"
             elif donnee['type'] != "HP" and donnee['type'] != "HC":
@@ -55,6 +58,9 @@ class NoShow(CsvImport):
 
             donnee['date_debut'], info = Format.est_une_date(donnee['date_debut'], "la date de début", ligne)
             msg += info
+
+            if donnee['validation'] not in ['0', '1', '2', '3']:
+                msg += "la validation " + str(ligne) + " doit être parmi [0, 1, 2, 3]"
 
             donnees_list.append(donnee)
 
