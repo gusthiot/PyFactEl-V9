@@ -27,7 +27,14 @@ class Sommes3(object):
             if (imports.edition.annee == transaction['invoice-year'] and
                     imports.edition.mois == transaction['invoice-month']):
                 if code_client not in self.par_client.keys():
-                    self.par_client[code_client] = {'articles': {}, 'projets': {}, 'comptes': {}, 'nb': 0, 'runs': 0}
+                    self.par_client[code_client] = {'articles': {}, 'projets': {}, 'comptes': {}, 'nb': 0, 'runs': 0,
+                                                    'val_2': 0, 'val_3': 0}
+
+                if transaction['transac-valid'] == "2":
+                    self.par_client[code_client]['val_2'] += transaction['total-fact']
+                if transaction['transac-valid'] == "3":
+                    self.par_client[code_client]['val_3'] += transaction['total-fact']
+                # => bilan annulés
 
                 id_compte_fact = transaction['invoice-project']
                 pcp = self.par_client[code_client]['projets']
@@ -90,7 +97,8 @@ class Sommes3(object):
                     imports.edition.mois == transaction['transac-date'].month):
 
                 if code_client not in self.par_client.keys():
-                    self.par_client[code_client] = {'articles': {}, 'projets': {}, 'comptes': {}, 'nb': 0, 'runs': 0}
+                    self.par_client[code_client] = {'articles': {}, 'projets': {}, 'comptes': {}, 'nb': 0, 'runs': 0,
+                                                    'val_2': 0, 'val_3': 0}
                 self.par_client[code_client]['nb'] += 1
                 if str(transaction['transac-runcae']) == "1":
                     self.par_client[code_client]['runs'] += 1

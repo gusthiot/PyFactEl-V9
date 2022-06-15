@@ -26,8 +26,8 @@ class BilanUsages(CsvList):
         for pi in par_item.values():
             base = transactions_3.valeurs[pi['base']]
             if base['item-flag-usage'] == "OUI":
-                ligne = [imports.edition.annee, imports.edition.mois]
-                for cle in range(2, len(self.cles)-5):
+                ligne = []
+                for cle in range(0, len(self.cles)-5):
                     ligne.append(base[self.cles[cle]])
                 runtime = pi['runtime']
                 nn = pi['nn']

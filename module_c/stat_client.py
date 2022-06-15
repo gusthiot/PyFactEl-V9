@@ -11,11 +11,10 @@ class StatClient(CsvList):
             'client-class', 'client-labelclass', 'stat-trans', 'stat-run', 'stat-nbuser-m', 'stat-nbuser-3m',
             'stat-nbuser-6m', 'stat-nbuser-12m']
 
-    def __init__(self, imports, transactions_3, par_ul, par_client):
+    def __init__(self, imports, par_ul, par_client):
         """
         initialisation des données
         :param imports: données importées
-        :param transactions_3: transactions 3 générées
         :param par_ul: tri des users labo
         :param par_client: tri des transactions
         """

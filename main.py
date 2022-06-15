@@ -39,6 +39,7 @@ from module_b import (GrantedNew,
                       Details,
                       AnnexeSubsides,
                       BilanSubsides,
+                      BilanAnnules,
                       Transactions2New)
 from module_a import (VersionNew,
                       Sommes2,
@@ -95,7 +96,7 @@ try:
         stat_nb_user.csv(DossierDestination(imports.chemin_bilans))
         stat_user = StatUser(imports, transactions_3, sommes_3.par_user)
         stat_user.csv(DossierDestination(imports.chemin_bilans))
-        stat_cli = StatClient(imports, transactions_3, sommes_ul.par_ul, sommes_3.par_client)
+        stat_cli = StatClient(imports, sommes_ul.par_ul, sommes_3.par_client)
         stat_cli.csv(DossierDestination(imports.chemin_bilans))
         stat_mach = StatMachine(imports, transactions_3, sommes_3.par_machine)
         stat_mach.csv(DossierDestination(imports.chemin_bilans))
@@ -109,6 +110,8 @@ try:
         ann_subs = AnnexeSubsides(imports, sommes_3.par_client, details.csv_fichiers)
         bil_subs = BilanSubsides(imports, transactions_3, sommes_3.par_client)
         bil_subs.csv(DossierDestination(imports.chemin_bilans))
+        bil_annule = BilanAnnules(imports, sommes_3.par_client)
+        bil_annule.csv(DossierDestination(imports.chemin_bilans))
         new_transactions_2 = Transactions2New(imports, transactions_3, sommes_3.par_client, new_numeros)
         new_transactions_2.csv(DossierDestination(imports.chemin_bilans))
 

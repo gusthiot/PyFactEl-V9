@@ -25,9 +25,9 @@ class StatUser(CsvList):
 
         for par_client in par_user.values():
             for par_code in par_client.values():
-                ligne = [imports.edition.annee, imports.edition.mois]
+                ligne = []
                 base = transactions_3.valeurs[par_code['base']]
-                for cle in range(2, len(self.cles)-2):
+                for cle in range(0, len(self.cles)-2):
                     ligne.append(base[self.cles[cle]])
                 ligne += [par_code['stat_trans'], par_code['stat_run']]
                 self.lignes.append(ligne)

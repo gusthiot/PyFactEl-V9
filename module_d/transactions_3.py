@@ -347,7 +347,7 @@ class Transactions3(CsvDict):
                         sub_rab = subs[9]
                     id_compte = transact['up'][4]
                     compte = imports.comptes.donnees[id_compte]
-                    if article['platf-code'] == compte['code_client'] and transact['trans'][2] != "1":
+                    if article['platf-code'] == compte['code_client'] or transact['trans'][2] != "1":
                         tot = 0
                     else:
                         tot = transact['val'][1] - ded_rab - sub_rab

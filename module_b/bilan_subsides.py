@@ -27,8 +27,8 @@ class BilanSubsides(CsvList):
         for par_code in par_client.values():
             for par_article in par_code['articles'].values():
                 base = transactions_3.valeurs[par_article['base']]
-                ligne = [imports.edition.annee, imports.edition.mois]
-                for cle in range(2, len(self.cles)-7):
+                ligne = []
+                for cle in range(0, len(self.cles)-7):
                     ligne.append(base[self.cles[cle]])
                 ligne += [round(par_article['avant'], 2), round(par_article['compris'], 2),
                           round(par_article['deduit'], 2), round(par_article['sub_ded'], 2),

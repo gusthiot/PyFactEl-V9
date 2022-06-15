@@ -11,11 +11,11 @@ class BilanConsos(CsvList):
             'mach-extra', 'conso-propre-march-expl', 'conso-propre-extra-expl', 'conso-propre-march-proj',
             'conso-propre-extra-proj']
 
-    def __init__(self, imports, transactions, par_projet):
+    def __init__(self, imports, transactions_3, par_projet):
         """
         initialisation des données
         :param imports: données importées
-        :param transactions: transactions générées
+        :param transactions_3: transactions 3 générées
         :param par_projet: tri des transactions
         """
         super().__init__(imports)
@@ -25,10 +25,10 @@ class BilanConsos(CsvList):
 
         for ppi in par_projet.values():
             for par_item in ppi.values():
-                base = transactions.valeurs[par_item['base']]
+                base = transactions_3.valeurs[par_item['base']]
                 if base['item-flag-conso'] == "OUI":
-                    ligne = [imports.edition.annee, imports.edition.mois]
-                    for cle in range(2, len(self.cles) - 4):
+                    ligne = []
+                    for cle in range(0, len(self.cles) - 4):
                         ligne.append(base[self.cles[cle]])
                     goops = par_item['goops']
                     extrops = par_item['extrops']
