@@ -330,7 +330,7 @@ class Transactions3(CsvDict):
                     article = articles.valeurs[transact['art'][0]]
                     subs = self.__subsides(transact, article)
                     if self.imports.classes.donnees[transact['rc'][7]]['subsides'] == "BONUS":
-                        if transact['trans'][2] != "1":
+                        if transact['trans'][2] == "1":
                             ded_bon = transact['val'][3]
                         else:
                             ded_bon = 0
@@ -339,7 +339,7 @@ class Transactions3(CsvDict):
                         sub_rab = 0
                     else:
                         ded_bon = 0
-                        if transact['trans'][2] != "1":
+                        if transact['trans'][2] == "1":
                             ded_rab = transact['val'][3]
                         else:
                             ded_rab = 0
