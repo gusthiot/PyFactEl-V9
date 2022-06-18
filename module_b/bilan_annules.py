@@ -23,5 +23,6 @@ class BilanAnnules(CsvList):
 
         for code, par_code in par_client.items():
             client = imports.clients.donnees[code]
-            self.lignes.append([imports.edition.annee, imports.edition.mois, client['code'], client['abrev_labo'],
-                                par_code['val_2'], par_code['val_3']])
+            if par_code['val_2'] > 0 or par_code['val_3'] > 0:
+                self.lignes.append([imports.edition.annee, imports.edition.mois, client['code'], client['abrev_labo'],
+                                    par_code['val_2'], par_code['val_3']])

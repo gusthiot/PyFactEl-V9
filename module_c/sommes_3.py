@@ -31,9 +31,9 @@ class Sommes3(object):
                                                     'val_2': 0, 'val_3': 0}
 
                 if transaction['transac-valid'] == "2":
-                    self.par_client[code_client]['val_2'] += transaction['total-fact']
+                    self.par_client[code_client]['val_2'] += transaction['valuation-net']
                 if transaction['transac-valid'] == "3":
-                    self.par_client[code_client]['val_3'] += transaction['total-fact']
+                    self.par_client[code_client]['val_3'] += transaction['valuation-net']
                 # => bilan annulés
 
                 id_compte_fact = transaction['invoice-project']

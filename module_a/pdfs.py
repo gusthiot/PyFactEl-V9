@@ -26,6 +26,12 @@ class Pdfs(object):
                 par_fact = sommes_2.par_fact[id_fact]
                 intype = donnee['invoice-type']
                 code = donnee['client-code']
+
+
+                if code != '221640':
+                    continue
+
+
                 client = imports.clients.donnees[code]
                 parties = {}
                 for id_compte, par_compte in par_fact['projets'].items():
@@ -184,7 +190,6 @@ class Pdfs(object):
             lignes.append(r''' \hline
                             \multicolumn{%(multi)s}{m{%(taille)s}}{\flbs{%(sub)s %(article)s}} & \frbs{%(subtot)s}\\
                             \hline ''' % dico)
-        print(len(lignes))
         first_max = 18
         then_max = 25
         contenu = titres
