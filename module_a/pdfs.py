@@ -26,12 +26,6 @@ class Pdfs(object):
                 par_fact = sommes_2.par_fact[id_fact]
                 intype = donnee['invoice-type']
                 code = donnee['client-code']
-
-
-                if code != '221640':
-                    continue
-
-
                 client = imports.clients.donnees[code]
                 parties = {}
                 for id_compte, par_compte in par_fact['projets'].items():
