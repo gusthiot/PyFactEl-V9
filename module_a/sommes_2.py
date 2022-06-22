@@ -16,16 +16,16 @@ class Sommes2(object):
                 self.par_fact[trans['invoice-id']] = {'base': key, 'total': 0, 'projets': {}, 'comptes': {}}
             self.par_fact[trans['invoice-id']]['total'] += trans['total-fact']
             projets = self.par_fact[trans['invoice-id']]['projets']
-            comptes = self.par_fact[trans['invoice-id']]['comptes']
             if trans['proj-id'] not in projets:
-                projets[trans['proj-id']] = {}
-            tp = projets[trans['proj-id']]
-            if trans['item-idsap'] not in tp:
-                tp[trans['item-idsap']] = {'items': {}, 'total': 0, 'base': key}
-            tp[trans['item-idsap']]['total'] += trans['total-fact']
+                projets[trans['proj-id']] = {'transactions': [], 'articles': {}, 'numero': trans['proj-nbr'],
+                                             'intitule': trans['proj-name']}
+            tpa = projets[trans['proj-id']]['articles']
+            if trans['item-idsap'] not in tpa:
+                tpa[trans['item-idsap']] = {'items': {}, 'total': 0, 'base': key}
+            tpa[trans['item-idsap']]['total'] += trans['total-fact']
             # => transactions 1
 
-            tps = tp[trans['item-idsap']]['items']
+            tps = tpa[trans['item-idsap']]['items']
             if trans['item-id'] not in tps:
                 tps[trans['item-id']] = {}
             tpsi = tps[trans['item-id']]
@@ -34,9 +34,7 @@ class Sommes2(object):
             tpsi[trans['user-id']].append(key)
             # => versions / pdfs
 
-            if trans['proj-id'] not in comptes.keys():
-                comptes[trans['proj-id']] = []
-            comptes[trans['proj-id']].append(key)
+            projets[trans['proj-id']]['transactions'].append(key)
             # => annexes
 
     @staticmethod
@@ -52,11 +50,11 @@ class Sommes2(object):
                 arbre[trans['invoice-id']] = {'projets': {}}
             projets = arbre[trans['invoice-id']]['projets']
             if trans['proj-id'] not in projets:
-                projets[trans['proj-id']] = {}
-            tp = projets[trans['proj-id']]
-            if trans['item-idsap'] not in tp:
-                tp[trans['item-idsap']] = {'items': {}}
-            tps = tp[trans['item-idsap']]['items']
+                projets[trans['proj-id']] = {'articles': {}}
+            tpa = projets[trans['proj-id']]['articles']
+            if trans['item-idsap'] not in tpa:
+                tpa[trans['item-idsap']] = {'items': {}}
+            tps = tpa[trans['item-idsap']]['items']
             if trans['item-id'] not in tps:
                 tps[trans['item-id']] = {}
             tpsi = tps[trans['item-id']]

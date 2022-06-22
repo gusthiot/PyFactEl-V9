@@ -99,8 +99,8 @@ class VersionNew(CsvDict):
         for id_compte, par_compte in first['projets'].items():
             if id_compte not in second['projets'].keys():
                 return True
-            sec_compte = second['projets'][id_compte]
-            for id_article, par_article in par_compte.items():
+            sec_compte = second['projets'][id_compte]['articles']
+            for id_article, par_article in par_compte['articles'].items():
                 if id_article not in sec_compte.keys():
                     return True
                 sec_article = sec_compte[id_article]

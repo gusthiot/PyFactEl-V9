@@ -21,12 +21,13 @@ class Sommes1(object):
 
             projets = self.par_fact[trans['invoice-id']]['projets']
             if trans['proj-id'] not in projets:
-                projets[trans['proj-id']] = {}
-            tp = projets[trans['proj-id']]
-            if trans['item-order'] not in tp:
-                tp[trans['item-order']] = {'keys': [], 'id': trans['item-idsap'], 'total': 0}
-            tp[trans['item-order']]['keys'].append(key)
-            tp[trans['item-order']]['total'] += trans['total-fact']
+                projets[trans['proj-id']] = {'items': {}, 'numero': trans['proj-nbr'],
+                                             'intitule': trans['proj-name']}
+            tpi = projets[trans['proj-id']]['items']
+            if trans['item-order'] not in tpi:
+                tpi[trans['item-order']] = {'keys': [], 'id': trans['item-idsap'], 'total': 0}
+            tpi[trans['item-order']]['keys'].append(key)
+            tpi[trans['item-order']]['total'] += trans['total-fact']
             # => factures
 
             if trans['client-code'] not in self.par_client:

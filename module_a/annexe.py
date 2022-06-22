@@ -10,7 +10,7 @@ class Annexe(object):
     cles = ['proj-nbr', 'proj-name', 'item-labelcode', 'user-name-f', 'date-start-y', 'date-start-m', 'date-end-y',
             'date-end-m', 'item-name', 'transac-quantity', 'item-unit', 'valuation-price', 'deduct-CHF', 'total-fact']
 
-    def __init__(self, imports, transactions_2, sommes_2, csv_fichiers):
+    def __init__(self, imports, transactions_2, sommes_2, csv_fichiers=None):
         """
         initialisation des données
         :param imports: données importées
@@ -20,7 +20,10 @@ class Annexe(object):
         """
 
         pt = imports.paramtexte.donnees
-        self.csv_fichiers = csv_fichiers
+        if csv_fichiers is None:
+            self.csv_fichiers = {}
+        else:
+            self.csv_fichiers = csv_fichiers
 
         for id_fact in sommes_2.par_fact.keys():
             base = transactions_2.valeurs[sommes_2.par_fact[id_fact]['base']]
@@ -45,8 +48,8 @@ class Annexe(object):
                 self.csv_fichiers[code] = {'nom': nom_zip, 'fichiers': []}
             self.csv_fichiers[code]['fichiers'].append(nom_csv)
 
-            for pc in sommes_2.par_fact[id_fact]['comptes'].values():
-                for key in pc:
+            for pc in sommes_2.par_fact[id_fact]['projets'].values():
+                for key in pc['transactions']:
                     trans = transactions_2.valeurs[key]
                     ligne = []
                     for cle in range(0, len(self.cles)):

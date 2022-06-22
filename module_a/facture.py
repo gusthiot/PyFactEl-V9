@@ -86,10 +86,9 @@ class Facture(CsvList):
                 date_dernier = str(imports.edition.annee) + Format.mois_string(imports.edition.mois) + \
                     str(imports.edition.dernier_jour)
                 for id_compte, par_compte in sommes_1.par_fact[id_fact]['projets'].items():
-                    compte = imports.comptes.donnees[id_compte]
-                    nom = compte['numero'] + "-" + compte['intitule']
+                    nom = par_compte['numero'] + "-" + par_compte['intitule']
                     poste = inc*10
-                    for ordre, par_article in sorted(par_compte.items()):
+                    for ordre, par_article in sorted(par_compte['items'].items()):
                         article = imports.artsap.donnees[par_article['id']]
                         net = par_article['total']
                         code_op = self.imports.plateforme['code_p'] + classe['code_n'] + str(imports.edition.annee) + \
@@ -107,6 +106,6 @@ class Facture(CsvList):
                                                                            'descr': description,
                                                                            'texte': article['texte_sap'],
                                                                            'net': "%.2f" % net, 'total': net,
-                                                                           'compte': compte['numero']})
+                                                                           'compte': par_compte['numero']})
                         poste += 1
                     inc += 1

@@ -14,10 +14,11 @@ class ArticleSap(CsvImport):
     nom_fichier = "articlesap.csv"
     libelle = "Articles SAP"
 
-    def __init__(self, dossier_source):
+    def __init__(self, dossier_source, module_a=False):
         """
         initialisation et importation des données
         :param dossier_source: Une instance de la classe dossier.DossierSource
+        :param module_a: si on ne traite que le module A
         """
         super().__init__(dossier_source)
         self.id_d1 = None
@@ -59,12 +60,13 @@ class ArticleSap(CsvImport):
             msg += info
             donnee['texte_sap'], info = Format.est_un_texte(donnee['texte_sap'], "le texte sap", ligne, True)
             msg += info
-            if donnee['flag_usage'] != 'OUI' and donnee['flag_usage'] != 'NON':
-                msg += "le flag usage de la ligne " + str(ligne) + " doit être OUI ou NON\n"
-            if donnee['flag_conso'] != 'OUI' and donnee['flag_conso'] != 'NON':
-                msg += "le flag conso de la ligne " + str(ligne) + " doit être OUI ou NON\n"
-            if donnee['eligible'] != 'OUI' and donnee['eligible'] != 'NON':
-                msg += "l'éligible de la ligne " + str(ligne) + " doit être OUI ou NON\n"
+            if not module_a:
+                if donnee['flag_usage'] != 'OUI' and donnee['flag_usage'] != 'NON':
+                    msg += "le flag usage de la ligne " + str(ligne) + " doit être OUI ou NON\n"
+                if donnee['flag_conso'] != 'OUI' and donnee['flag_conso'] != 'NON':
+                    msg += "le flag conso de la ligne " + str(ligne) + " doit être OUI ou NON\n"
+                if donnee['eligible'] != 'OUI' and donnee['eligible'] != 'NON':
+                    msg += "l'éligible de la ligne " + str(ligne) + " doit être OUI ou NON\n"
 
             if donnee['code_d'] == 'C' or donnee['code_d'] == 'X':
                 self.ids_d3.append(donnee['id_article'])

@@ -1,6 +1,5 @@
 from core import (Latex,
                   Format)
-import math
 
 
 class Pdfs(object):
@@ -29,7 +28,8 @@ class Pdfs(object):
                 client = imports.clients.donnees[code]
                 parties = {}
                 for id_compte, par_compte in par_fact['projets'].items():
-                    parties[id_compte] = self.entete(id_compte, intype) + self.table(transactions_2, par_compte, intype)
+                    parties[id_compte] = self.entete(par_compte['numero'], par_compte['intitule'],
+                                                     intype) + self.table(transactions_2, par_compte, intype)
 
                 if intype == "GLOB":
                     nom = prefixe + "_" + str(id_fact) + "_" + client['abrev_labo'] + "_0"
@@ -46,10 +46,11 @@ class Pdfs(object):
                         Latex.creer_latex_pdf(nom, self.canevas(contenu, intype))
                         Latex.finaliser_pdf(nom, imports.chemin_pannexes)
 
-    def entete(self, id_compte, intype):
+    def entete(self, numero, intitule, intype):
         """
         création de l'entête d'annexe
-        :param id_compte: id du compte concernée, pour une annexe compte
+        :param numero: numero du compte concernée
+        :param intitule: numero du compte concernée
         :param intype: GLOB ou CPTE
         :return: entête
         """
@@ -61,7 +62,6 @@ class Pdfs(object):
                 \end{flushleft}
                 '''
         plateforme = self.imports.plateforme
-        compte = self.imports.comptes.donnees[id_compte]
         if intype == "GLOB":
             dico = {'titre1': self.echappe('annex-client-titre1'), 'titre2': self.echappe('annex-client-titre2'),
                     'abrev': self.echappe('annex-client-abrev-platform'),
@@ -71,8 +71,8 @@ class Pdfs(object):
                     'abrev': self.echappe('annex-compte-abrev-platform'),
                     'nom': self.echappe('annex-compte-name-platform'), 'num': self.echappe('annex-compte-proj-no')}
         dico.update({'int_plat': Latex.echappe_caracteres(plateforme['int_plat']),
-                     'abrev_plat': plateforme['abrev_plat'], 'numero': compte['numero'],
-                     'intitule': Latex.echappe_caracteres(compte['intitule'])})
+                     'abrev_plat': plateforme['abrev_plat'], 'numero': numero,
+                     'intitule': Latex.echappe_caracteres(intitule)})
         contenu += r''' \begin{flushright}
                     \LARGE \textcolor{taupe}{%(titre1)s} \\
                     \LARGE \textcolor{canard}{\textbf{%(titre2)s}} \\
@@ -146,7 +146,7 @@ class Pdfs(object):
 
         tot = 0
         lignes = []
-        for id_article, par_article in par_compte.items():
+        for id_article, par_article in par_compte['articles'].items():
             article = self.imports.artsap.donnees[id_article]
             subtot = 0
             for par_item in par_article['items'].values():

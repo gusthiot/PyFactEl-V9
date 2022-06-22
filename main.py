@@ -68,8 +68,9 @@ try:
     if Chemin.existe(Chemin.chemin([dossier_data, Edition.nom_fichier])):
         start_time = time.time()
 
-        # Module D
         imports = Imports(dossier_source)
+
+        # Module D
         articles = Articles(imports)
         tarifs = Tarifs(imports)
         if imports.version == 0:

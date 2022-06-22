@@ -13,10 +13,11 @@ class ClasseClient(CsvImport):
     nom_fichier = "classeclient.csv"
     libelle = "Classes Clients"
 
-    def __init__(self, dossier_source):
+    def __init__(self, dossier_source, module_a=False):
         """
         initialisation et importation des données
         :param dossier_source: Une instance de la classe dossier.DossierSource
+        :param module_a: si on ne traite que le module A
         """
         super().__init__(dossier_source)
 
@@ -42,12 +43,13 @@ class ClasseClient(CsvImport):
             msg += info
             if donnee['ref_fact'] != 'INT' and donnee['ref_fact'] != 'EXT':
                 msg += "le code référence client de la ligne " + str(ligne) + " doit être INT ou EXT\n"
-            if donnee['avantage_HC'] != 'BONUS' and donnee['avantage_HC'] != 'RABAIS':
-                msg += "l'avantage HC de la ligne " + str(ligne) + " doit être BONUS ou RABAIS\n"
-            if donnee['subsides'] != 'BONUS' and donnee['subsides'] != 'RABAIS':
-                msg += "le mode subsides de la ligne " + str(ligne) + " doit être BONUS ou RABAIS\n"
-            if donnee['rabais_excep'] != 'BONUS' and donnee['rabais_excep'] != 'RABAIS':
-                msg += "le mode rabais exceptionnel de la ligne " + str(ligne) + " doit être BONUS ou RABAIS\n"
+            if not module_a:
+                if donnee['avantage_HC'] != 'BONUS' and donnee['avantage_HC'] != 'RABAIS':
+                    msg += "l'avantage HC de la ligne " + str(ligne) + " doit être BONUS ou RABAIS\n"
+                if donnee['subsides'] != 'BONUS' and donnee['subsides'] != 'RABAIS':
+                    msg += "le mode subsides de la ligne " + str(ligne) + " doit être BONUS ou RABAIS\n"
+                if donnee['rabais_excep'] != 'BONUS' and donnee['rabais_excep'] != 'RABAIS':
+                    msg += "le mode rabais exceptionnel de la ligne " + str(ligne) + " doit être BONUS ou RABAIS\n"
             if donnee['grille'] != 'OUI' and donnee['grille'] != 'NON':
                 msg += "la grille tarifaire de la ligne " + str(ligne) + " doit être OUI ou NON\n"
 

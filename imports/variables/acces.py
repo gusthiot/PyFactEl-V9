@@ -78,7 +78,6 @@ class Acces(CsvImport):
             if donnee['validation'] not in ['0', '1', '2', '3']:
                 msg += "la validation " + str(ligne) + " doit être parmi [0, 1, 2, 3]"
 
-
             donnees_list.append(donnee)
 
             ligne += 1

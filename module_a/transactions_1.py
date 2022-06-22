@@ -27,7 +27,7 @@ class Transactions1(CsvDict):
         i = 0
         for id_fact, par_fact in sommes_2.par_fact.items():
             for par_compte in par_fact['projets'].values():
-                for par_article in par_compte.values():
+                for par_article in par_compte['articles'].values():
                     base = transactions_2.valeurs[par_article['base']]
                     total = par_article['total']
                     ligne = []
