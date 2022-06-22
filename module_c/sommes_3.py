@@ -124,7 +124,7 @@ class Sommes3(object):
                 if transaction['item-extra'] == "TRUE":
                     if ((transaction['client-code'] == transaction['platf-code'] and transaction['proj-expl'] == "TRUE")
                             or transaction['transac-valid'] == "2"):
-                        ppi[item]['goops'] += net
+                        ppi[item]['extrops'] += net
                 # => bilan conso
 
                 if item not in self.par_item.keys():
