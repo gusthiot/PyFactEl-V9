@@ -187,22 +187,23 @@ class Pdfs(object):
         first_max = 18
         then_max = 25
         contenu = titres
-        boucle = 0
         max_page = first_max
-        while 1:
-            if boucle > 0:
+        deb = 0
+        reste = len(lignes)
+        do_loop = True
+        while do_loop:
+            if deb > 0:
                 contenu += fin
                 contenu += titres
-            beg = boucle*max_page
-            if (len(lignes)-beg) > max_page:
-                end = (boucle+1)*max_page
+            if (reste-deb) > max_page:
+                taille = max_page
             else:
-                end = len(lignes)
-            for num in range(beg, end):
-                contenu += lignes[num]
-            if end == len(lignes):
-                break
-            boucle += 1
+                taille = reste
+                do_loop = False
+            for num in range(0, taille):
+                contenu += lignes[deb+num]
+            deb += max_page
+            reste -= max_page
             max_page = then_max
 
         dico.update({'total': Format.nombre(tot)})
