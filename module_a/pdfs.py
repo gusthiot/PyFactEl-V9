@@ -71,7 +71,8 @@ class Pdfs(object):
                     'abrev': self.echappe('annex-compte-abrev-platform'),
                     'nom': self.echappe('annex-compte-name-platform'), 'num': self.echappe('annex-compte-proj-no')}
         dico.update({'int_plat': Latex.echappe_caracteres(plateforme['int_plat']),
-                     'abrev_plat': plateforme['abrev_plat'], 'numero': numero,
+                     'abrev_plat': Latex.echappe_caracteres(plateforme['abrev_plat']),
+                     'numero': Latex.echappe_caracteres(numero),
                      'intitule': Latex.echappe_caracteres(intitule)})
         contenu += r''' \begin{flushright}
                     \LARGE \textcolor{taupe}{%(titre1)s} \\
