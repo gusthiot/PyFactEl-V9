@@ -47,11 +47,11 @@ class VersionNew(CsvDict):
                     base_new = self.transactions_new[sommes_2.par_fact[fact_id]['base']]
                     if donnee['client-code'] != base_new['client-code']:
                         Interface.fatal(ErreurConsistance(),
-                                        fact_id + "\n Le id-facture doit être lié au même client dans l'ancienne et "
-                                        "la nouvelle table des versions")
+                                        str(fact_id) + "\n Le id-facture doit être lié au même client dans l'ancienne"
+                                        " et la nouvelle table des versions")
                     if donnee['invoice-type'] != base_new['invoice-type']:
                         Interface.fatal(ErreurConsistance(),
-                                        fact_id + "\n Le type de facture doit être le même dans l'ancienne et "
+                                        str(fact_id) + "\n Le type de facture doit être le même dans l'ancienne et "
                                         "la nouvelle table des versions")
 
                     idem = True

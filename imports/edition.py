@@ -12,10 +12,11 @@ class Edition(object):
     libelle = "Paramètres d'Edition"
     cles = ['chemin', 'Id-Plateforme', 'année', 'mois', 'filigrane', 'chemin_filigrane']
 
-    def __init__(self, dossier_source):
+    def __init__(self, dossier_source, module_a=False):
         """
         initialisation et importation des données
         :param dossier_source: Une instance de la classe dossier.DossierSource
+        :param module_a: si on ne traite que le module A
         """
         donnees_csv = {}
         try:
@@ -38,7 +39,10 @@ class Edition(object):
         self.mois, err = Format.est_un_entier(donnees_csv['mois'], "le mois", mini=1, maxi=12)
         msg += err
 
-        self.plateforme, err = Format.est_un_alphanumerique(donnees_csv['Id-Plateforme'], "l'id plateforme")
+        if module_a:
+            self.plateforme, err = Format.est_un_entier(donnees_csv['Id-Plateforme'], "l'id plateforme", mini=0)
+        else:
+            self.plateforme, err = Format.est_un_alphanumerique(donnees_csv['Id-Plateforme'], "l'id plateforme")
         msg += err
 
         self.filigrane, err = Format.est_un_texte(donnees_csv['filigrane'], "le filigrane", vide=True)

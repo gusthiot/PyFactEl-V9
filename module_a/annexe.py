@@ -31,7 +31,7 @@ class Annexe(object):
             intype = base['invoice-type']
             client = imports.clients.donnees[code]
             nom_zip = "Annexes_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" + \
-                      Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + code + "_" + \
+                      Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + str(code) + "_" + \
                       client['abrev_labo'] + ".zip"
             prefixe = "Annexe_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" + \
                       Format.mois_string(imports.edition.mois) + "_" + str(imports.version)

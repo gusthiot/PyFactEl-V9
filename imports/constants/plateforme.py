@@ -14,13 +14,14 @@ class Plateforme(CsvImport):
     cles = ['id_plateforme', 'code_p', 'centre', 'fonds', 'abrev_plat', 'int_plat', 'grille']
     libelle = "Plateformes"
 
-    def __init__(self, dossier_source, clients, edition, chemin_grille):
+    def __init__(self, dossier_source, clients, edition, chemin_grille, module_a=False):
         """
         initialisation et importation des données
         :param dossier_source: Une instance de la classe dossier.DossierSource
         :param clients: clients importés
         :param edition: paramètres d'édition
         :param chemin_grille: dossier devant contenir la grille tarifaire
+        :param module_a: si on ne traite que le module A
         """
         super().__init__(dossier_source)
 
@@ -32,6 +33,13 @@ class Plateforme(CsvImport):
 
         del self.donnees[0]
         for donnee in self.donnees:
+            if module_a:
+                donnee['id_plateforme'], info = Format.est_un_entier(donnee['id_plateforme'], "l'id plateforme", ligne,
+                                                                     0)
+            else:
+                donnee['id_plateforme'], info = Format.est_un_alphanumerique(donnee['id_plateforme'], "l'id plateforme",
+                                                                             ligne)
+            msg += info
             if donnee['id_plateforme'] == "":
                 msg += "l'id plateforme " + str(ligne) + " ne peut être vide\n"
             elif donnee['id_plateforme'] not in clients.donnees.keys():
@@ -71,5 +79,5 @@ class Plateforme(CsvImport):
 
         if edition.plateforme not in self.donnees.keys():
             Interface.fatal(ErreurConsistance(),
-                            edition.libelle + "\n" + "l'id plateforme '" + edition.plateforme +
+                            edition.libelle + "\n" + "l'id plateforme '" + str(edition.plateforme) +
                             "' n'est pas référencé\n")

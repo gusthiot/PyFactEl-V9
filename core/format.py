@@ -219,9 +219,9 @@ class Format(object):
         try:
             entier = int(donnee)
             if mini is not None and entier < mini:
-                return -1, colonne + delaligne + " doit être un nombre entier >= " + str(min) + "\n"
+                return -1, colonne + delaligne + " doit être un nombre entier >= " + str(mini) + "\n"
             if maxi is not None and entier > maxi:
-                return -1, colonne + delaligne + " doit être un nombre entier <= " + str(max) + "\n"
+                return -1, colonne + delaligne + " doit être un nombre entier <= " + str(maxi) + "\n"
             return entier, ""
         except ValueError:
             return -1, colonne + delaligne + " doit être un nombre entier\n"

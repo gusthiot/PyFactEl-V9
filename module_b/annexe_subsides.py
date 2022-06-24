@@ -58,12 +58,12 @@ class AnnexeSubsides(object):
                 type_s = compte['type_subside']
                 subside = imports.subsides.donnees[type_s]
                 for id_article, artsap in imports.artsap.donnees.items():
-                    plaf = type_s + imports.plateforme['id_plateforme'] + id_article
+                    plaf = type_s + imports.edition.plateforme + id_article
                     if plaf in imports.plafonds.donnees.keys():
                         plafond = imports.plafonds.donnees[plaf]
                         ligne = [compte['intitule'], artsap['intitule'], subside['intitule'], subside['debut'],
                                  subside['fin'], plafond['pourcentage'], plafond['max_compte'], plafond['max_mois']]
-                        g_id = id_compte + imports.plateforme['id_plateforme'] + id_article
+                        g_id = id_compte + imports.edition.plateforme + id_article
                         if g_id in imports.grants.donnees.keys():
                             grant, info = Format.est_un_nombre(imports.grants.donnees[g_id]['subsid-alrdygrant'],
                                                                "le montant de grant", mini=0, arrondi=2)

@@ -29,7 +29,7 @@ class ImportsA(object):
 
         self.dossier_source = dossier_source
 
-        self.edition = Edition(dossier_source)
+        self.edition = Edition(dossier_source, True)
 
         # création de l'arobrescence
 
@@ -81,8 +81,8 @@ class ImportsA(object):
         self.paramtexte = Paramtexte(dossier_fixe)
         self.facturation = Facturation(dossier_fixe)
         self.classes = ClasseClient(dossier_fixe, True)
-        self.clients = Client(dossier_source, self.facturation, self.classes)
-        self.plateformes = Plateforme(dossier_fixe, self.clients, self.edition, chemin_grille)
+        self.clients = Client(dossier_source, self.facturation, self.classes, True)
+        self.plateformes = Plateforme(dossier_fixe, self.clients, self.edition, chemin_grille, True)
         self.artsap = ArticleSap(dossier_fixe, True)
         self.data = Data(dossier_source, self.clients, self.artsap)
 
@@ -102,12 +102,13 @@ class ImportsA(object):
             self.chemin_vprec = Chemin.chemin([chemin_fixe_enregistrement, "V"+str(vprec), "OUT"])
             if not Chemin.existe(self.chemin_vprec, False):
                 Interface.fatal(ErreurConsistance(), "le dossier " + self.chemin_vprec + " se doit d'être présent !")
-            self.versions = Version(DossierSource(self.chemin_vprec), self.edition.annee, self.edition.mois, vprec)
+            self.versions = Version(DossierSource(self.chemin_vprec), self.edition.annee, self.edition.mois, vprec,
+                                    True)
             self.chemin_bilprec = Chemin.chemin([chemin_fixe_enregistrement, "V"+str(vprec), "Bilans_Stats"])
             if not Chemin.existe(self.chemin_bilprec, False):
                 Interface.fatal(ErreurConsistance(), "le dossier " + self.chemin_bilprec + " se doit d'être présent !")
             self.transactions_2 = Transactions2(DossierSource(self.chemin_bilprec), self.edition.annee,
-                                                self.edition.mois, self.plateforme, vprec)
+                                                self.edition.mois, self.plateforme, vprec, True)
 
         # vérification terminée, création des dossiers de sauvegarde
 

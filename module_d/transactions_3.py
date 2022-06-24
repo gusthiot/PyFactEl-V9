@@ -58,7 +58,7 @@ class Transactions3(CsvDict):
                 id_groupe = groupe['id_cat_plat']
                 if id_groupe != '0' and duree_op == 0:
                     article = articles.valeurs[id_groupe]
-                    if imports.plateforme['id_plateforme'] == article['platf-code']:
+                    if imports.edition.plateforme == article['platf-code']:
                         ref_client = self.__ref_client(entree['annee'], entree['mois'], classe, client, compte, article)
                         tarif = tarifs.valeurs[id_classe + id_groupe]
                         art = self.__art_plate(article, "K3", pt['item-K3'], pt['item-K3a'])
@@ -84,7 +84,7 @@ class Transactions3(CsvDict):
                 id_groupe = groupe['id_cat_fixe']
                 if id_groupe != '0':
                     article = articles.valeurs[id_groupe]
-                    if imports.plateforme['id_plateforme'] == article['platf-code']:
+                    if imports.edition.plateforme == article['platf-code']:
                         ref_client = self.__ref_client(entree['annee'], entree['mois'], classe, client, compte, article)
                         tarif = tarifs.valeurs[id_classe + id_groupe]
                         art = self.__art_plate(article, "K7", pt['item-K7'], pt['item-K7a'])
@@ -109,7 +109,7 @@ class Transactions3(CsvDict):
                     prix_extra = imports.categprix.donnees[id_classe + id_groupe]['prix_unit']
                     if prix_extra > 0:
                         article = articles.valeurs[id_groupe]
-                        if imports.plateforme['id_plateforme'] == article['platf-code']:
+                        if imports.edition.plateforme == article['platf-code']:
                             ref_client = self.__ref_client(entree['annee'], entree['mois'], classe, client, compte,
                                                            article)
                             tarif = tarifs.valeurs[id_classe + id_groupe]
@@ -135,7 +135,7 @@ class Transactions3(CsvDict):
             id_groupe = groupe['id_cat_mach']
             if id_groupe != '0':
                 article = articles.valeurs[id_groupe]
-                if imports.plateforme['id_plateforme'] == article['platf-code']:
+                if imports.edition.plateforme == article['platf-code']:
                     ref_client = self.__ref_client(entree['annee'], entree['mois'], classe, client, compte, article)
                     tarif = tarifs.valeurs[id_classe + id_groupe]
 
@@ -190,7 +190,7 @@ class Transactions3(CsvDict):
             id_groupe = groupe['id_cat_mo']
             if id_groupe != '0' and duree_op > 0:
                 article = articles.valeurs[id_groupe]
-                if imports.plateforme['id_plateforme'] == article['platf-code']:
+                if imports.edition.plateforme == article['platf-code']:
                     ref_client = self.__ref_client(entree['annee'], entree['mois'], classe, client, compte, article)
                     tarif = tarifs.valeurs[id_classe + id_groupe]
                     art = self.__art_plate(article, "K2", pt['item-K2'], pt['item-K2a'])
@@ -242,7 +242,7 @@ class Transactions3(CsvDict):
 
             if id_groupe != '0':
                 article = articles.valeurs[id_groupe]
-                if imports.plateforme['id_plateforme'] == article['platf-code']:
+                if imports.edition.plateforme == article['platf-code']:
                     ref_client = self.__ref_client(entree['annee'], entree['mois'], classe, client, compte, article)
                     tarif = tarifs.valeurs[id_classe + id_groupe]
                     ope = ["", "", "", "", id_machine, machine['nom'], ""]
@@ -265,7 +265,7 @@ class Transactions3(CsvDict):
             operateur = imports.users.donnees[entree['id_operateur']]
             id_machine = prestation['id_machine']
             article = articles.valeurs[id_prestation]
-            if imports.plateforme['id_plateforme'] == article['platf-code']:
+            if imports.edition.plateforme == article['platf-code']:
                 ref_client = self.__ref_client(entree['annee'], entree['mois'], classe, client, compte, article)
                 tarif = tarifs.valeurs[id_classe + id_prestation]
                 if id_machine == "0":
@@ -304,7 +304,7 @@ class Transactions3(CsvDict):
             classe = imports.classes.donnees[id_classe]
             operateur = imports.users.donnees[entree['id_op']]
             article = articles.valeurs[id_categorie]
-            if imports.plateforme['id_plateforme'] == article['platf-code']:
+            if imports.edition.plateforme == article['platf-code']:
                 ref_client = self.__ref_client(entree['annee'], entree['mois'], classe, client, compte, article)
                 tarif = tarifs.valeurs[id_classe + id_categorie]
                 ope = [entree['id_op'], operateur['prenom'] + " " + operateur['nom'], "", entree['remarque_staff'],

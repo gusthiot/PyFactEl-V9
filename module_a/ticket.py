@@ -71,7 +71,7 @@ class Ticket(object):
                                         </table>
                                         ''' % dico_contenu
             nom_zip = "Annexes_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" + \
-                      Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + code + "_" + \
+                      Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + str(code) + "_" + \
                       client['abrev_labo'] + ".zip"
             dossier_zip = "./Annexes_CSV/" + nom_zip
             chemin_zip = imports.chemin_cannexes + "/" + nom_zip
@@ -151,7 +151,7 @@ class Ticket(object):
                                 </section>
                                 '''
 
-            self.sections[client['abrev_labo'] + " (" + code + ")"] = contenu_client
+            self.sections[client['abrev_labo'] + " (" + str(code) + ")"] = contenu_client
 
     def creer_html(self, destination):
         """

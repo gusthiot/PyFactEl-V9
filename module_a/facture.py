@@ -59,13 +59,13 @@ class Facture(CsvList):
                         Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + str(id_fact)
 
                     if classe['grille'] == "OUI":
-                        grille = imports.facturation.lien + "/" + imports.edition.plateforme + "/" + \
+                        grille = imports.facturation.lien + "/" + str(imports.edition.plateforme) + "/" + \
                             str(imports.edition.annee) + "/" + Format.mois_string(imports.edition.mois) + "/" + \
                             imports.plateforme['grille'] + '.pdf'
                     else:
                         grille = ""
 
-                    lien = imports.facturation.lien + "/" + imports.edition.plateforme + "/" + \
+                    lien = imports.facturation.lien + "/" + str(imports.edition.plateforme) + "/" + \
                         str(imports.edition.annee) + "/" + Format.mois_string(imports.edition.mois) + "/Annexes_PDF/"
                     lien += "Annexe_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + \
                             "_" + str(donnee['version-last']) + "_" + str(id_fact) + "_" + client['abrev_labo'] + "_"

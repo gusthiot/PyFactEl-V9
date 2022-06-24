@@ -14,12 +14,13 @@ class Client(CsvImport):
     nom_fichier = "client.csv"
     libelle = "Clients"
 
-    def __init__(self, dossier_source, facturation, classes):
+    def __init__(self, dossier_source, facturation, classes, module_a=False):
         """
         initialisation et importation des données
         :param dossier_source: Une instance de la classe dossier.DossierSource
         :param facturation: paramètres de facturation
         :param classes: classes clients importées
+        :param module_a: si on ne traite que le module A
         """
         super().__init__(dossier_source)
 
@@ -33,7 +34,10 @@ class Client(CsvImport):
             donnee['code_sap'], info = Format.est_un_alphanumerique(donnee['code_sap'], "le code client sap", ligne)
             msg += info
 
-            donnee['code'], info = Format.est_un_alphanumerique(donnee['code'], "le code client", ligne)
+            if module_a:
+                donnee['code'], info = Format.est_un_entier(donnee['code'], "le code client", ligne, 0)
+            else:
+                donnee['code'], info = Format.est_un_alphanumerique(donnee['code'], "le code client", ligne)
             msg += info
             if info == "":
                 if donnee['code'] not in codes:

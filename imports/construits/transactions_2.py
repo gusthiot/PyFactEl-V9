@@ -16,7 +16,7 @@ class Transactions2(CsvImport):
             'item-name', 'transac-quantity', 'item-unit', 'valuation-price', 'deduct-CHF', 'total-fact']
     libelle = "Transactions 2"
 
-    def __init__(self, dossier_source, annee, mois, plateforme, version):
+    def __init__(self, dossier_source, annee, mois, plateforme, version, module_a=False):
         """
         initialisation et importation des données
         :param dossier_source: Une instance de la classe dossier.DossierSource
@@ -24,6 +24,7 @@ class Transactions2(CsvImport):
         :param mois: mois du fichier ciblé
         :param plateforme: plateforme traitée
         :param version: version de facturation ciblée
+        :param module_a: si on ne traite que le module A
         """
         self.nom_fichier = "Transaction2_" + plateforme['abrev_plat'] + "_" + str(annee) + "_" + \
                            Format.mois_string(mois) + "_" + str(version) + ".csv"
@@ -43,6 +44,12 @@ class Transactions2(CsvImport):
             donnee['invoice-version'], info = Format.est_un_entier(donnee['invoice-version'], "la version", ligne, 0)
             msg += info
             donnee['invoice-id'], info = Format.est_un_entier(donnee['invoice-id'], "l'id facture", ligne, 1001)
+            msg += info
+            if module_a:
+                donnee['client-code'], info = Format.est_un_entier(donnee['client-code'], "le code client", ligne, 0)
+            else:
+                donnee['client-code'], info = Format.est_un_alphanumerique(donnee['client-code'], "le code client",
+                                                                           ligne)
             msg += info
             donnee['proj-id'], info = Format.est_un_alphanumerique(donnee['proj-id'], "l'id projet", ligne)
             msg += info

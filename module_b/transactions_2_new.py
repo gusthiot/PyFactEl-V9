@@ -62,12 +62,11 @@ class Transactions2New(CsvDict):
                     classe = imports.classes.donnees[id_classe]
                     id_article = donnee['item-idsap']
                     article = imports.artsap.donnees[id_article]
-                    id_plateforme = imports.plateforme['id_plateforme']
-                    if id_plateforme == code:
+                    if imports.edition.plateforme == code:
                         montant = 0
                     else:
                         montant = donnee['transac-quantity'] * donnee['valuation-price'] - donnee['deduct-CHF']
-                    ligne = [imports.edition.annee, imports.edition.mois, imports.version, int(code), "GLOB",
+                    ligne = [imports.edition.annee, imports.edition.mois, imports.version, code, "GLOB",
                              imports.plateforme['abrev_plat'], code, client['code_sap'], client['abrev_labo'],
                              id_classe, classe['code_n'], classe['intitule'], donnee['proj-id'], donnee['proj-nbr'],
                              donnee['proj-name'], donnee['user-id'], donnee['user-name'], donnee['date-start-y'],

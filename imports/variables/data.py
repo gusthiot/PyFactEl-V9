@@ -35,6 +35,8 @@ class Data(CsvImport):
             msg += info
             donnee['invoice-year'], info = Format.est_un_entier(donnee['invoice-year'], "l'annee ", ligne, 2000, 2099)
             msg += info
+            donnee['client-code'], info = Format.est_un_entier(donnee['client-code'], "le code client", ligne, 0)
+            msg += info
             donnee['proj-id'], info = Format.est_un_alphanumerique(donnee['proj-id'], "l'id projet", ligne)
             msg += info
             donnee['user-id'], info = Format.est_un_alphanumerique(donnee['user-id'], "l'id user", ligne)

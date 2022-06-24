@@ -13,13 +13,14 @@ class Version(CsvImport):
             'version-new-amount']
     libelle = "Versions de facture"
 
-    def __init__(self, dossier_source, annee, mois, version):
+    def __init__(self, dossier_source, annee, mois, version, module_a=False):
         """
         initialisation et importation des données
         :param dossier_source: Une instance de la classe dossier.DossierSource
         :param annee: année du fichier ciblé
         :param mois: mois du fichier ciblé
         :param version: version de facturation ciblée
+        :param module_a: si on ne traite que le module A
         """
         self.nom_fichier = "Table-versions-factures_" + str(annee) + "_" + Format.mois_string(mois) + \
                            "_" + str(version) + ".csv"
@@ -32,6 +33,13 @@ class Version(CsvImport):
 
         for donnee in self.donnees:
             donnee['invoice-id'], info = Format.est_un_entier(donnee['invoice-id'], "l'id facture", ligne, 1001)
+            msg += info
+
+            if module_a:
+                donnee['client-code'], info = Format.est_un_entier(donnee['client-code'], "le code client", ligne, 0)
+            else:
+                donnee['client-code'], info = Format.est_un_alphanumerique(donnee['client-code'], "le code client",
+                                                                           ligne)
             msg += info
 
             donnee['version-last'], info = Format.est_un_entier(donnee['version-last'], "la version", ligne, 0)
