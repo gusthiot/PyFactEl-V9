@@ -7,10 +7,10 @@ class Transactions1(CsvDict):
     Classe pour la création des transactions de niveau 1
     """
 
-    cles = ['invoice-year', 'invoice-month', 'invoice-version', 'invoice-id', 'invoice-ref', 'platf-name',
-            'client-code', 'client-sap', 'client-name', 'client-idclass', 'client-class', 'client-labelclass',
-            'proj-id', 'proj-nbr', 'proj-name', 'item-idsap', 'item-codeD', 'item-order', 'item-labelcode',
-            'total-fact']
+    cles = ['invoice-year', 'invoice-month', 'invoice-version', 'invoice-id', 'invoice-ref', 'invoice-type',
+            'platf-name', 'client-code', 'client-sap', 'client-name', 'client-idclass', 'client-class',
+            'client-labelclass', 'proj-id', 'proj-nbr', 'proj-name', 'item-idsap', 'item-codeD', 'item-order',
+            'item-labelcode', 'total-fact']
 
     def __init__(self, imports, transactions_2, sommes_2):
         """

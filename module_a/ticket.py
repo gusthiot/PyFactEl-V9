@@ -52,7 +52,7 @@ class Ticket(object):
                                             </tr>
                                             ''' % dico_contenu
 
-            for ordre, par_article in sorted(par_client.items()):
+            for ordre, par_article in sorted(par_client['articles'].items()):
                 article = imports.artsap.donnees[par_article['id']]
                 total += par_article['total']
                 description = article['code_d'] + " : " + str(article['code_sap'])

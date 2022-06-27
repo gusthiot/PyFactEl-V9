@@ -50,6 +50,7 @@ from module_a import (VersionNew,
                       BilanFactures,
                       Pdfs,
                       Facture,
+                      Total,
                       Ticket)
 from imports import (Edition,
                      Imports)
@@ -123,12 +124,13 @@ try:
         modifications = Modifications(imports, new_versions)
         modifications.csv(DossierDestination(imports.chemin_version))
         annexes = Annexe(imports, new_transactions_2, sommes_2, ann_subs.csv_fichiers)
-        Chemin.csv_files_in_zip(annexes.csv_fichiers, imports.chemin_cannexes)
         transactions_1 = Transactions1(imports, new_transactions_2, sommes_2)
         transactions_1.csv(DossierDestination(imports.chemin_bilans))
         sommes_1 = Sommes1(transactions_1)
         bil_facts = BilanFactures(imports, transactions_1, sommes_1)
         bil_facts.csv(DossierDestination(imports.chemin_bilans))
+        total = Total(imports, transactions_1, sommes_1, annexes.csv_fichiers)
+        Chemin.csv_files_in_zip(total.csv_fichiers, imports.chemin_cannexes)
         if Latex.possibles():
             pdfs = Pdfs(imports, new_transactions_2, sommes_2, new_versions)
         factures = Facture(imports, new_versions, sommes_1)

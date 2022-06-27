@@ -110,7 +110,7 @@ class Pdfs(object):
         :param intype: GLOB ou CPTE
         :return: table
         """
-        structure = r'''{m{21mm} m{15mm} m{15mm} m{41mm} m{17mm} m{13mm} m{17mm}'''
+        structure = r'''{m{24mm} m{15mm} m{15mm} m{41mm} m{16mm} m{12mm} m{17mm}'''
         if intype == "GLOB":
             dico = {'user': self.echappe('annex-client-user'), 'start': self.echappe('annex-client-start'),
                     'end': self.echappe('annex-client-end'), 'prest': self.echappe('annex-client-prestation'),

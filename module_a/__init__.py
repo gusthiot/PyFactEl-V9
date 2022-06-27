@@ -8,3 +8,4 @@ from .bilan_factures import BilanFactures
 from .pdfs import Pdfs
 from .facture import Facture
 from .ticket import Ticket
+from .total import Total

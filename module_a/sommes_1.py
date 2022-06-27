@@ -31,8 +31,15 @@ class Sommes1(object):
             # => factures
 
             if trans['client-code'] not in self.par_client:
-                self.par_client[trans['client-code']] = {}
-            articles = self.par_client[trans['client-code']]
+                self.par_client[trans['client-code']] = {'articles': {}, 'factures': {}}
+            factures = self.par_client[trans['client-code']]['factures']
+            if trans['invoice-id'] not in factures:
+                factures[trans['invoice-id']] = {'transactions': [], 'total': 0}
+            factures[trans['invoice-id']]['transactions'].append(key)
+            factures[trans['invoice-id']]['total'] += trans['total-fact']
+            # => total
+
+            articles = self.par_client[trans['client-code']]['articles']
             if trans['item-order'] not in articles:
                 articles[trans['item-order']] = {'id': trans['item-idsap'], 'total': 0}
             articles[trans['item-order']]['total'] += trans['total-fact']
