@@ -110,7 +110,7 @@ class Pdfs(object):
         :param intype: GLOB ou CPTE
         :return: table
         """
-        structure = r'''{m{24mm} m{15mm} m{15mm} m{41mm} m{16mm} m{12mm} m{17mm}'''
+        structure = r'''{m{21mm} m{15mm} m{15mm} m{41mm} m{17mm} m{13mm} m{17mm}'''
         if intype == "GLOB":
             dico = {'user': self.echappe('annex-client-user'), 'start': self.echappe('annex-client-start'),
                     'end': self.echappe('annex-client-end'), 'prest': self.echappe('annex-client-prestation'),
@@ -177,35 +177,47 @@ class Pdfs(object):
                         if intype == "GLOB":
                             ligne += r'''\fr{ %(deduct)s} & ''' % dico
                         ligne += r''' \fr{%(total)s} \\''' % dico
-                        lignes.append(ligne)
+                        nb = 1
+                        if len(trans['user-name-f']) > 15 or len(Latex.echappe_caracteres(trans['item-name'])) > 32:
+                            nb = 1.5
+                        lignes.append([ligne, nb])
             tot += subtot
 
             dico.update({'article': Latex.echappe_caracteres(article['intitule']),
                          'subtot': Format.nombre(subtot)})
-            lignes.append(r''' \hline
+            lignes.append([r''' \hline
                             \multicolumn{%(multi)s}{m{%(taille)s}}{\flbs{%(sub)s %(article)s}} & \frbs{%(subtot)s}\\
-                            \hline ''' % dico)
+                            \hline ''' % dico, 1])
         first_max = 18
         then_max = 25
         contenu = titres
         max_page = first_max
         deb = 0
-        reste = len(lignes)
+        reste = 0
+        inclus = 0
+        for ligne in lignes:
+            reste += ligne[1]
         do_loop = True
         while do_loop:
             if deb > 0:
                 contenu += fin
                 contenu += titres
-            if (reste-deb) > max_page:
+            if (reste-inclus) > max_page:
                 taille = max_page
             else:
                 taille = reste
                 do_loop = False
-            for num in range(0, taille):
-                contenu += lignes[deb+num]
-            deb += max_page
-            reste -= max_page
-            max_page = then_max
+            pos = 0
+            num = 0
+            while num < taille:
+                contenu += lignes[deb+pos][0]
+                num += lignes[deb+pos][1]
+                pos += 1
+            if deb == 0:
+                max_page = then_max
+            deb += pos
+            inclus += num
+            reste -= num
 
         dico.update({'total': Format.nombre(tot)})
         contenu += r''' \multicolumn{%(multi)s}{m{%(taille)s}}{\flbs{%(tot)s}} & \frbs{%(total)s} \\ 
