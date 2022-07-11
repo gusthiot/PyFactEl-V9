@@ -83,7 +83,7 @@ class Pdfs(object):
                     
                     \begin{flushleft}
                     \renewcommand{\arraystretch}{1.2}
-                    \begin{tabular}{p{109mm} l}
+                    \begin{tabular}{p{103mm} p{77mm}}
                     \small \textcolor{taupe}{%(abrev)s} & \small \textcolor{taupe}{%(num)s}\\
                     \textcolor{canard}{\textbf{%(abrev_plat)s}} & \textcolor{canard}{\textbf{%(numero)s}}\\
                      & \textcolor{canard}{\textbf{%(intitule)s}} \\
@@ -244,6 +244,7 @@ class Pdfs(object):
              \usepackage{graphicx}
              \usepackage{fancyhdr}
              \usepackage{lastpage}
+             \usepackage[none]{hyphenat}
              
              \pagestyle{fancy}
         

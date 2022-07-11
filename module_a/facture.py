@@ -86,7 +86,7 @@ class Facture(CsvList):
                 date_dernier = str(imports.edition.annee) + Format.mois_string(imports.edition.mois) + \
                     str(imports.edition.dernier_jour)
                 for id_compte, par_compte in sommes_1.par_fact[id_fact]['projets'].items():
-                    nom = par_compte['numero'] + "-" + par_compte['intitule']
+                    nom = par_compte['numero']
                     poste = inc*10
                     for ordre, par_article in sorted(par_compte['items'].items()):
                         article = imports.artsap.donnees[par_article['id']]

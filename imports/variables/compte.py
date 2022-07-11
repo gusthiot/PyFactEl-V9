@@ -48,6 +48,9 @@ class Compte(CsvImport):
 
             msg += self._test_id_coherence(donnee['type_subside'], "le type subside", ligne, subsides, True)
 
+            donnee['numero'] = donnee['numero'][0:16]
+            donnee['intitule'] = donnee['intitule'][0:120]
+
             donnees_dict[donnee['id_compte']] = donnee
             ligne += 1
 
