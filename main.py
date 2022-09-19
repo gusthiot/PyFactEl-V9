@@ -49,6 +49,7 @@ from module_a import (VersionNew,
                       Transactions1,
                       BilanFactures,
                       Pdfs,
+                      Journal,
                       Facture,
                       Total,
                       Ticket)
@@ -123,6 +124,9 @@ try:
         new_versions.csv(DossierDestination(imports.chemin_out))
         modifications = Modifications(imports, new_versions)
         modifications.csv(DossierDestination(imports.chemin_version))
+        if imports.version > 0:
+            journal = Journal(imports, new_versions, new_transactions_2)
+            journal.csv(DossierDestination(imports.chemin_bilans))
         annexes = Annexe(imports, new_transactions_2, sommes_2, ann_subs.csv_fichiers)
         transactions_1 = Transactions1(imports, new_transactions_2, sommes_2)
         transactions_1.csv(DossierDestination(imports.chemin_bilans))

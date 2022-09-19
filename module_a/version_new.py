@@ -25,6 +25,8 @@ class VersionNew(CsvDict):
 
         self.transactions_new = transactions_2_new.valeurs
 
+        self.corrections = []
+
         if imports.version == 0:
             for fact_id in sommes_2.par_fact.keys():
                 self.__add_new(fact_id, sommes_2.par_fact[fact_id])
@@ -85,53 +87,76 @@ class VersionNew(CsvDict):
         self._ajouter_valeur([fact_id, base['client-code'], base['invoice-type'], self.imports.version, 'NEW', 0,
                               round(somme_fact['total'], 2)], fact_id)
 
-    @staticmethod
-    def __compare(first, second, comparaison_fine=False, fdata=None, sdata=None):
+    def __ajout_correction(self, par_user, sens):
+        """
+        ajout d'une correction au journal, dans le cas où une des transaction n'existe pas
+        :param par_user: transaction(s) existante(s) pour un utilisateur (normalement une seule)
+        :param sens: si nouvelle ou ancienne transaction
+        """
+        if len(par_user) > 1:
+            Interface.fatal(ErreurConsistance(),
+                            "Peut-on avoir plus d'une entrée par feuille d'arborescence ?")
+        if sens:
+            self.corrections.append([None, par_user[0]])
+        else:
+            self.corrections.append([par_user[0], None])
+
+    def __compare(self, first, second, comparaison_fine=False, fdata=None, sdata=None):
         """
         compare les arborescences d'une facture entre 2 jeux de transactions
         :param first: clés du premier jeu
         :param second: clés du second jeu
-        :param comparaison_fine: si on veut comparer les données en plus de l'arborescence
+        :param comparaison_fine: pour comparer les données en plus de l'arborescence (nouvelles données en premier)
         :param fdata: données du premier jeu
         :param sdata: données du second jeu
         :return: True s'il y a une différence, False autrement
         """
+        diff = False
         for id_compte, par_compte in first['projets'].items():
             if id_compte not in second['projets'].keys():
-                return True
-            sec_compte = second['projets'][id_compte]['articles']
-            for id_article, par_article in par_compte['articles'].items():
-                if id_article not in sec_compte.keys():
-                    return True
-                sec_article = sec_compte[id_article]
-                for id_item, par_item in par_article['items'].items():
-                    if id_item not in sec_article['items'].keys():
-                        return True
-                    sec_item = sec_article['items'][id_item]
-                    for id_user, par_user in par_item.items():
-                        if id_user not in sec_item.keys():
-                            return True
-                        if comparaison_fine:
-                            sec_user = sec_item[id_user]
-                            if len(par_user) > 1 or len(sec_user) > 1:
-                                Interface.fatal(ErreurConsistance(),
-                                                "Peut-on avoir plus d'une entrée par feuille d'arborescence ?")
-                            fd = fdata[par_user[0]]
-                            sd = sdata[sec_user[0]]
-                            if sd['proj-nbr'] != fd['proj-nbr']:
-                                return True
-                            if sd['proj-name'] != fd['proj-name']:
-                                return True
-                            if sd['user-name-f'] != fd['user-name-f']:
-                                return True
-                            if sd['date-start-y'] != fd['date-start-y']:
-                                return True
-                            if sd['date-start-m'] != fd['date-start-m']:
-                                return True
-                            if sd['date-end-y'] != fd['date-end-y']:
-                                return True
-                            if sd['date-end-m'] != fd['date-end-m']:
-                                return True
-                            if sd['total-fact'] != fd['total-fact']:
-                                return True
-        return False
+                diff = True
+                for id_article, par_article in par_compte['articles'].items():
+                    for id_item, par_item in par_article['items'].items():
+                        for id_user, par_user in par_item.items():
+                            self.__ajout_correction(par_user, comparaison_fine)
+            else:
+                sec_compte = second['projets'][id_compte]['articles']
+                for id_article, par_article in par_compte['articles'].items():
+                    if id_article not in sec_compte.keys():
+                        diff = True
+                        for id_item, par_item in par_article['items'].items():
+                            for id_user, par_user in par_item.items():
+                                self.__ajout_correction(par_user, comparaison_fine)
+                    else:
+                        sec_article = sec_compte[id_article]
+                        for id_item, par_item in par_article['items'].items():
+                            if id_item not in sec_article['items'].keys():
+                                diff = True
+                                for id_user, par_user in par_item.items():
+                                    self.__ajout_correction(par_user, comparaison_fine)
+                            else:
+                                sec_item = sec_article['items'][id_item]
+                                for id_user, par_user in par_item.items():
+                                    if id_user not in sec_item.keys():
+                                        diff = True
+                                        self.__ajout_correction(par_user, comparaison_fine)
+                                    else:
+                                        if comparaison_fine:
+                                            sec_user = sec_item[id_user]
+                                            if len(par_user) > 1 or len(sec_user) > 1:
+                                                Interface.fatal(ErreurConsistance(),
+                                                                "Peut-on avoir plus d'une entrée par "
+                                                                "feuille d'arborescence ?")
+                                            fd = fdata[par_user[0]]
+                                            sd = sdata[sec_user[0]]
+                                            if (sd['proj-nbr'] != fd['proj-nbr'] or
+                                                    sd['proj-name'] != fd['proj-name'] or
+                                                    sd['user-name-f'] != fd['user-name-f'] or
+                                                    sd['date-start-y'] != fd['date-start-y'] or
+                                                    sd['date-start-m'] != fd['date-start-m'] or
+                                                    sd['date-end-y'] != fd['date-end-y'] or
+                                                    sd['date-end-m'] != fd['date-end-m'] or
+                                                    sd['total-fact'] != fd['total-fact']):
+                                                diff = True
+                                                self.corrections.append([sec_user[0], par_user[0]])
+        return diff
