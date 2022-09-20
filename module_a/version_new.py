@@ -60,9 +60,8 @@ class VersionNew(CsvDict):
                     if self.__compare(sommes_2.par_fact[fact_id], sommes_2_old[fact_id], True,
                                       self.transactions_new, transactions_old):
                         idem = False
-                    else:
-                        if self.__compare(sommes_2_old[fact_id], sommes_2.par_fact[fact_id]):
-                            idem = False
+                    if self.__compare(sommes_2_old[fact_id], sommes_2.par_fact[fact_id]):
+                        idem = False
 
                     if idem:
                         self._ajouter_valeur([fact_id, donnee['client-code'], donnee['invoice-type'],
