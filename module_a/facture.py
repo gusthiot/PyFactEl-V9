@@ -67,8 +67,9 @@ class Facture(CsvList):
 
                     lien = imports.facturation.lien + "/" + str(imports.edition.plateforme) + "/" + \
                         str(imports.edition.annee) + "/" + Format.mois_string(imports.edition.mois) + "/Annexes_PDF/"
-                    lien += "Annexe_" + str(imports.edition.annee) + "_" + Format.mois_string(imports.edition.mois) + \
-                            "_" + str(donnee['version-last']) + "_" + str(id_fact) + "_" + client['abrev_labo'] + "_"
+                    lien += "Annexe_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" + \
+                            Format.mois_string(imports.edition.mois) + "_" + str(donnee['version-last']) + "_" + \
+                            str(id_fact) + "_" + client['abrev_labo'] + "_"
                     if intype == "GLOB":
                         lien += "0.pdf"
                     else:

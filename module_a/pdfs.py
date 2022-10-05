@@ -193,19 +193,19 @@ class Pdfs(object):
         contenu = titres
         max_page = first_max
         deb = 0
-        reste = 0
+        entier = 0
         inclus = 0
         for ligne in lignes:
-            reste += ligne[1]
+            entier += ligne[1]
         do_loop = True
         while do_loop:
             if deb > 0:
                 contenu += fin
                 contenu += titres
-            if (reste-inclus) > max_page:
+            if (entier-inclus) > max_page:
                 taille = max_page
             else:
-                taille = reste
+                taille = entier-inclus
                 do_loop = False
             pos = 0
             num = 0
@@ -217,7 +217,6 @@ class Pdfs(object):
                 max_page = then_max
             deb += pos
             inclus += num
-            reste -= num
 
         dico.update({'total': Format.nombre(tot)})
         contenu += r''' \multicolumn{%(multi)s}{m{%(taille)s}}{\flbs{%(tot)s}} & \frbs{%(total)s} \\ 
