@@ -12,11 +12,11 @@ class Transactions3(CsvDict):
             'proj-id', 'proj-nbr', 'proj-name', 'proj-expl', 'flow-type', 'item-id', 'item-codeK', 'item-textK',
             'item-text2K', 'item-nbr', 'item-name', 'item-unit', 'item-idsap', 'item-codeD', 'item-flag-usage',
             'item-flag-conso', 'item-eligible', 'item-order', 'item-labelcode', 'item-extra', 'platf-code', 'platf-op',
-            'platf-name', 'transac-date', 'transac-quantity', 'transac-valid', 'transac-id-staff', 'transac-staff',
-            'transac-usage', 'transac-runtime', 'transac-runcae', 'valuation-price', 'valuation-brut', 'discount-type',
-            'discount-CHF', 'valuation-net', 'subsid-code', 'subsid-name', 'subsid-start', 'subsid-end', 'subsid-ok',
-            'subsid-pourcent', 'subsid-maxproj', 'subsid-maxmois', 'subsid-reste', 'subsid-CHF', 'deduct-CHF',
-            'subsid-deduct', 'total-fact', 'discount-bonus', 'subsid-bonus']
+            'platf-name', 'transac-date', 'transac-raw', 'transac-valid', 'transac-id-staff', 'transac-staff',
+            'transac-quantity', 'transac-usage', 'transac-runtime', 'transac-runcae', 'valuation-price',
+            'valuation-brut', 'discount-type', 'discount-CHF', 'valuation-net', 'subsid-code', 'subsid-name',
+            'subsid-start', 'subsid-end', 'subsid-ok', 'subsid-pourcent', 'subsid-maxproj', 'subsid-maxmois',
+            'subsid-reste', 'subsid-CHF', 'deduct-CHF', 'subsid-deduct', 'total-fact', 'discount-bonus', 'subsid-bonus']
 
     def __init__(self, imports, articles, tarifs):
         """
@@ -76,7 +76,7 @@ class Transactions3(CsvDict):
                             usage = 1
                             runcae = 1
                             counted = True
-                        trans = [entree['date_login'], 1] + self.__staff(entree) + [usage, "", runcae]
+                        trans = [entree['date_login'], 1] + self.__staff(entree, 1) + [usage, "", runcae]
                         val = [tarif['valuation-price'], tarif['valuation-price'], "", 0, tarif['valuation-price']]
                         self.__put_in_transacts(transacts, ref_client, ope, util_proj, art, trans, val)
 
@@ -99,7 +99,7 @@ class Transactions3(CsvDict):
                             else:
                                 runcae = 1
                                 counted = True
-                        trans = [entree['date_login'], 1] + self.__staff(entree) + [usage, "", runcae]
+                        trans = [entree['date_login'], 1] + self.__staff(entree, 1) + [usage, "", runcae]
                         val = [tarif['valuation-price'], tarif['valuation-price'], "", 0, tarif['valuation-price']]
                         self.__put_in_transacts(transacts, ref_client, ope, util_proj, art, trans, val)
 
@@ -125,7 +125,7 @@ class Transactions3(CsvDict):
                                 else:
                                     runcae = 1
                                     counted = True
-                            trans = [entree['date_login'], duree] + self.__staff(entree) + [usage, "", runcae]
+                            trans = [entree['date_login'], duree] + self.__staff(entree, duree) + [usage, "", runcae]
                             art = self.__art_plate(article, "K4", pt['item-K4'], pt['item-K4a'])
                             prix = round(duree * tarif['valuation-price'], 2)
                             val = [tarif['valuation-price'], prix, "", 0, prix]
@@ -155,7 +155,8 @@ class Transactions3(CsvDict):
                                 runcae = 1
                                 counted = True
                         art = self.__art_plate(article, "K1", pt['item-K1'], pt['item-K1a'])
-                        trans = [entree['date_login'], duree_hp] + self.__staff(entree) + [usage, runtime, runcae]
+                        trans = [entree['date_login'], duree_hp] + self.__staff(entree, duree_hp) + [usage, runtime,
+                                                                                                     runcae]
                         prix = round(duree_hp * tarif['valuation-price'], 2)
                         val = [tarif['valuation-price'], prix, "", 0, prix]
                         self.__put_in_transacts(transacts, ref_client, ope, util_proj, art, trans, val)
@@ -179,7 +180,8 @@ class Transactions3(CsvDict):
                                 runcae = 1
                                 counted = True
                         art = self.__art_plate(article, "K1", pt['item-K1'], pt['item-K1b'])
-                        trans = [entree['date_login'], duree_hc] + self.__staff(entree) + [usage, runtime, runcae]
+                        trans = [entree['date_login'], duree_hc] + self.__staff(entree, duree_hc) + [usage, runtime,
+                                                                                                     runcae]
                         prix = round(duree_hc * tarif['valuation-price'], 2)
                         reduc = round(tarif['valuation-price'] * machine['tx_rabais_hc']/100 * duree_hc, 2)
                         val = [tarif['valuation-price'], prix,
@@ -212,7 +214,7 @@ class Transactions3(CsvDict):
                             runcae = ""
                         else:
                             runcae = 1
-                    trans = [entree['date_login'], duree_op] + self.__staff(entree) + [usage, "", runcae]
+                    trans = [entree['date_login'], duree_op] + self.__staff(entree, duree_op) + [usage, "", runcae]
                     prix = round(duree_op * tarif['valuation-price'], 2)
                     val = [tarif['valuation-price'], prix, "", 0, prix]
                     self.__put_in_transacts(transacts, ref_client, ope, util_proj, art, trans, val)
@@ -248,7 +250,8 @@ class Transactions3(CsvDict):
                     ope = ["", "", "", "", id_machine, machine['nom'], ""]
                     util_proj = self.__util_proj(entree['id_user'], compte, pt['flow-noshow'])
                     art = self.__art_plate(article, code, texte, texte2)
-                    trans = [entree['date_debut'], entree['penalite']] + self.__staff(entree) + [0, "", ""]
+                    trans = [entree['date_debut'], entree['penalite']] + self.__staff(entree, entree['penalite']) + \
+                            [0, "", ""]
                     prix = round(entree['penalite'] * tarif['valuation-price'], 2)
                     val = [tarif['valuation-price'], prix, "", 0, prix]
                     self.__put_in_transacts(transacts, ref_client, ope, util_proj, art, trans, val)
@@ -284,7 +287,8 @@ class Transactions3(CsvDict):
                 ope = [entree['id_operateur'], operateur['prenom'] + " " + operateur['nom'],
                        pt['oper-PO'] + " " + str(entree['date_commande']), entree['remarque'], idm, nm, extra]
                 util_proj = self.__util_proj(entree['id_user'], compte, pt['flow-lvr'])
-                trans = [entree['date_livraison'], entree['quantite']] + self.__staff(entree) + [0, "", ""]
+                trans = [entree['date_livraison'], entree['quantite']] + self.__staff(entree, entree['quantite']) + \
+                        [0, "", ""]
                 if entree['rabais'] > 0:
                     discount = pt['discount-LVR']
                 else:
@@ -316,7 +320,8 @@ class Transactions3(CsvDict):
                     usage = 0
                 else:
                     usage = entree['quantite']
-                trans = [entree['date'], entree['quantite']] + self.__staff(entree) + [usage, "", ""]
+                trans = [entree['date'], entree['quantite']] + self.__staff(entree, entree['quantite']) + \
+                        [usage, "", ""]
                 prix = round(entree['quantite'] * tarif['valuation-price'], 2)
                 val = [tarif['valuation-price'], prix, "", 0, prix]
                 self.__put_in_transacts(transacts, ref_client, ope, util_proj, art, trans, val)
@@ -357,12 +362,14 @@ class Transactions3(CsvDict):
                     self._ajouter_valeur(donnee, i)
                     i = i + 1
 
-    def __staff(self, entree):
+    def __staff(self, entree, raw):
         """
         détermine les paramètres lié au staff de validation
         :param entree: ligne d'entrée
+        :param raw: quantité non validée
         :return: id du staff (vide si "0"), et nom du staff (vide si "0")
         """
+        quantite = 0
         if entree['id_staff'] == "0":
             id_staff = ""
             staff = ""
@@ -370,7 +377,9 @@ class Transactions3(CsvDict):
             id_staff = entree['id_staff']
             validateur = self.imports.users.donnees[id_staff]
             staff = validateur['nom'] + " " + validateur['prenom'][0] + "."
-        return [entree['validation'], id_staff, staff]
+        if entree['validation'] != "2" and entree['validation'] != "3":
+            quantite = raw
+        return [entree['validation'], id_staff, staff, quantite]
 
     def __ref_client(self, annee, mois, classe, client, compte, article):
         """
