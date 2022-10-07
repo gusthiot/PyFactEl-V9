@@ -59,7 +59,7 @@ class Sommes3(object):
                                           'start': transaction['transac-date'],
                                           'end': transaction['transac-date']}
                 pcpa[nbr][user_id]['quantity'] += transaction['transac-quantity']
-                pcpa[nbr][user_id]['deduct'] += transaction['deduct-CHF']
+                pcpa[nbr][user_id]['deduct'] += transaction['deduct-CHF'] + transaction['subsid-deduct']
                 pcpa[nbr][user_id]['total'] += transaction['total-fact']
                 if transaction['transac-date'] < pcpa[nbr][user_id]['start']:
                     pcpa[nbr][user_id]['start'] = transaction['transac-date']
