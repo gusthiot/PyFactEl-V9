@@ -20,7 +20,7 @@ class Paramtexte(object):
             'item-labelcode', 'item-extra', 'transac-date', 'transac-raw', 'transac-quantity', 'transac-valid',
             'transac-id-staff', 'transac-staff', 'transac-usage', 'transac-runtime', 'transac-runcae',
             'valuation-price', 'valuation-brut', 'discount-type', 'discount-HC', 'discount-LVR', 'discount-CHF',
-            'deduct-CHF', 'valuation-net', 'valuation-net-cancel', 'valuation-net-notbill', 'subsid-code',
+            'deduct-CHF', 'sum-deduct', 'valuation-net', 'valuation-net-cancel', 'valuation-net-notbill', 'subsid-code',
             'subsid-name', 'subsid-start', 'subsid-end', 'subsid-ok', 'subsid-pourcent', 'subsid-maxproj',
             'subsid-maxmois', 'subsid-reste', 'subsid-CHF', 'subsid-deduct', 'discount-bonus', 'subsid-bonus',
             'total-fact', 'runtime-N', 'runtime-avg', 'runtime-stddev', 'conso-propre-march-expl',

@@ -32,7 +32,7 @@ class Pdfs(object):
                                                      intype) + self.table(transactions_2, par_compte, intype)
 
                 if intype == "GLOB":
-                    nom = prefixe + "_" + str(id_fact) + "_" + client['abrev_labo'] + "_0"
+                    nom = prefixe + "_" + str(id_fact)  # + "_" + client['abrev_labo'] + "_0"
                     contenu = ""
                     for id_compte, partie in parties.items():
                         contenu += partie
@@ -42,7 +42,7 @@ class Pdfs(object):
                 else:
                     for id_compte, contenu in parties.items():
                         compte = imports.comptes.donnees[id_compte]
-                        nom = prefixe + "_" + str(id_fact) + "_" + client['abrev_labo'] + "_" + compte['numero']
+                        nom = prefixe + "_" + str(id_fact)  # + "_" + client['abrev_labo'] + "_" + compte['numero']
                         Latex.creer_latex_pdf(nom, self.canevas(contenu, intype))
                         Latex.finaliser_pdf(nom, imports.chemin_pannexes)
 
@@ -170,7 +170,7 @@ class Pdfs(object):
                                      'prest': Latex.echappe_caracteres(trans['item-name']),
                                      'quant': quantite, 'unit': trans['item-unit'],
                                      'price': Format.nombre(trans['valuation-price']),
-                                     'deduct': Format.nombre(trans['deduct-CHF']),
+                                     'deduct': Format.nombre(trans['sum-deduct']),
                                      'total': Format.nombre(trans['total-fact'])})
                         ligne = r'''\fl{%(user)s} & \fl{%(start-m)s.%(start-y)s} & \fl{%(end-m)s.%(end-y)s} & 
                                 \fl{%(prest)s} & \fr{%(quant)s} & \fr{%(unit)s} & \fr{%(price)s} & ''' % dico

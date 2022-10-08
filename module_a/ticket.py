@@ -125,11 +125,12 @@ class Ticket(object):
 
                     prefixe_pdf = "Annexe_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + \
                                   "_" + Format.mois_string(imports.edition.mois) + "_" + str(par_fact['version'])
-                    if par_fact['intype'] == "GLOB":
-                        nom_pdf = prefixe_pdf + "_" + str(id_fact) + "_" + client['abrev_labo'] + "_0.pdf"
-                    else:
-                        nom_pdf = prefixe_pdf + "_" + str(id_fact) + "_" + client['abrev_labo'] + "_" + num_compte\
-                                  + ".pdf"
+                    nom_pdf = prefixe_pdf + "_" + str(id_fact) + ".pdf"
+                    # if par_fact['intype'] == "GLOB":
+                    #     nom_pdf = prefixe_pdf + "_" + str(id_fact) + "_" + client['abrev_labo'] + "_0.pdf"
+                    # else:
+                    #     nom_pdf = prefixe_pdf + "_" + str(id_fact) + "_" + client['abrev_labo'] + "_" + num_compte\
+                    #               + ".pdf"
 
                     dossier_pdf = "../Annexes_PDF/" + nom_pdf
                     chemin_pdf = imports.chemin_pannexes + "/" + nom_pdf

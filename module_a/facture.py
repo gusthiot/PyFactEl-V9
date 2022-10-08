@@ -69,13 +69,13 @@ class Facture(CsvList):
                         str(imports.edition.annee) + "/" + Format.mois_string(imports.edition.mois) + "/Annexes_PDF/"
                     lien += "Annexe_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" + \
                             Format.mois_string(imports.edition.mois) + "_" + str(donnee['version-last']) + "_" + \
-                            str(id_fact) + "_" + client['abrev_labo'] + "_"
-                    if intype == "GLOB":
-                        lien += "0.pdf"
-                    else:
-                        for id_compte in sommes_1.par_fact[id_fact]['projets'].keys():
-                            compte = imports.comptes.donnees[id_compte]
-                            lien += compte['numero'] + ".pdf"
+                            str(id_fact) + ".pdf"  # "_" + client['abrev_labo'] + "_"
+                    # if intype == "GLOB":
+                    #     lien += "0.pdf"
+                    # else:
+                    #     for id_compte in sommes_1.par_fact[id_fact]['projets'].keys():
+                    #         compte = imports.comptes.donnees[id_compte]
+                    #         lien += compte['numero'] + ".pdf"
 
                     self.lignes.append([poste, imports.facturation.origine, genre, imports.facturation.commerciale,
                                         imports.facturation.canal, imports.facturation.secteur, "", "", code_sap,

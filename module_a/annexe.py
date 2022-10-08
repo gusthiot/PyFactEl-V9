@@ -8,7 +8,7 @@ class Annexe(object):
     """
 
     cles = ['proj-nbr', 'proj-name', 'item-labelcode', 'user-name-f', 'date-start-y', 'date-start-m', 'date-end-y',
-            'date-end-m', 'item-name', 'transac-quantity', 'item-unit', 'valuation-price', 'deduct-CHF', 'total-fact']
+            'date-end-m', 'item-name', 'transac-quantity', 'item-unit', 'valuation-price', 'sum-deduct', 'total-fact']
 
     def __init__(self, imports, transactions_2, sommes_2, csv_fichiers=None):
         """

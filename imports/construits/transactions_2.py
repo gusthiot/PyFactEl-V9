@@ -13,7 +13,7 @@ class Transactions2(CsvImport):
             'client-code', 'client-sap', 'client-name', 'client-idclass', 'client-class', 'client-labelclass',
             'proj-id', 'proj-nbr', 'proj-name', 'user-id', 'user-name-f', 'date-start-y', 'date-start-m', 'date-end-y',
             'date-end-m', 'item-idsap', 'item-codeD', 'item-order', 'item-labelcode', 'item-id', 'item-nbr',
-            'item-name', 'transac-quantity', 'item-unit', 'valuation-price', 'deduct-CHF', 'total-fact']
+            'item-name', 'transac-quantity', 'item-unit', 'valuation-price', 'sum-deduct', 'total-fact']
     libelle = "Transactions 2"
 
     def __init__(self, dossier_source, annee, mois, plateforme, version, module_a=False):
