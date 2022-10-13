@@ -333,28 +333,21 @@ class Transactions3(CsvDict):
                 tarray = transacts[trf][trt]
                 for transact in tarray:
                     article = articles.valeurs[transact['art'][0]]
-                    subs = self.__subsides(transact, article)
-                    if self.imports.classes.donnees[transact['rc'][7]]['subsides'] == "BONUS":
-                        if transact['trans'][2] == "1":
-                            ded_bon = transact['val'][3]
-                        else:
-                            ded_bon = 0
-                        ded_rab = 0
-                        sub_bon = subs[9]
-                        sub_rab = 0
-                    else:
-                        ded_bon = 0
-                        if transact['trans'][2] == "1":
-                            ded_rab = transact['val'][3]
-                        else:
-                            ded_rab = 0
-                        sub_bon = 0
-                        sub_rab = subs[9]
                     id_compte = transact['up'][4]
                     compte = imports.comptes.donnees[id_compte]
-                    if article['platf-code'] == compte['code_client'] or transact['trans'][2] != "1":
-                        tot = 0
-                    else:
+                    subs = self.__subsides(transact, article)
+                    tot = 0
+                    ded_bon = 0
+                    sub_bon = 0
+                    ded_rab = 0
+                    sub_rab = 0
+                    if article['platf-code'] != compte['code_client'] and transact['trans'][2] == "1":
+                        if self.imports.classes.donnees[transact['rc'][7]]['subsides'] == "BONUS":
+                            ded_bon = transact['val'][3]
+                            sub_bon = subs[9]
+                        else:
+                            ded_rab = transact['val'][3]
+                            sub_rab = subs[9]
                         tot = transact['val'][1] - ded_rab - sub_rab
                     mont = [ded_rab, sub_rab, tot, ded_bon, sub_bon]
                     donnee = transact['rc'] + transact['ope'] + transact['up'] + transact['art'] + transact['trans'] + \
