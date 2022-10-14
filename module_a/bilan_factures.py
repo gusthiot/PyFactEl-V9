@@ -26,17 +26,11 @@ class BilanFactures(CsvList):
         for id_fact in sommes_1.par_fact.keys():
             par_fact = sommes_1.par_fact[id_fact]['transactions']['keys']
             base = transactions_1.valeurs[par_fact[0]]
-            id_classe = base['client-idclass']
-            classe = imports.classes.donnees[id_classe]
-            ref = classe['ref_fact'] + "_" + str(imports.edition.annee) + "_" + \
-                Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + str(id_fact)
             total = sommes_1.par_fact[id_fact]['transactions']['total']
 
             ligne = []
             for cle in self.cles:
-                if cle == 'invoice-ref':
-                    ligne.append(ref)
-                elif cle == 'total-fact':
+                if cle == 'total-fact':
                     ligne.append(round(2*total, 1)/2)
                 else:
                     ligne.append(base[cle])
