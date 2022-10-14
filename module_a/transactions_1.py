@@ -12,12 +12,13 @@ class Transactions1(CsvDict):
             'client-labelclass', 'proj-id', 'proj-nbr', 'proj-name', 'item-idsap', 'item-codeD', 'item-order',
             'item-labelcode', 'total-fact']
 
-    def __init__(self, imports, transactions_2, sommes_2):
+    def __init__(self, imports, transactions_2, sommes_2, versions):
         """
         initialisation des données
         :param imports: données importées
         :param transactions_2: transactions 2 générées
         :param sommes_2: sommes des transactions 2
+        :param versions: versions des factures générées
         """
         super().__init__(imports)
 
@@ -26,6 +27,7 @@ class Transactions1(CsvDict):
 
         i = 0
         for id_fact, par_fact in sommes_2.par_fact.items():
+            version = versions.valeurs[id_fact]['version-last']
             for par_compte in par_fact['projets'].values():
                 for par_article in par_compte['articles'].values():
                     base = transactions_2.valeurs[par_article['base']]
@@ -36,7 +38,7 @@ class Transactions1(CsvDict):
                     id_classe = client['id_classe']
                     classe = imports.classes.donnees[id_classe]
                     ref = classe['ref_fact'] + "_" + str(imports.edition.annee) + "_" + \
-                        Format.mois_string(imports.edition.mois) + "_" + str(imports.version) + "_" + str(id_fact)
+                        Format.mois_string(imports.edition.mois) + "_" + str(version) + "_" + str(id_fact)
                     for cle in self.cles:
                         if cle == 'invoice-ref':
                             ligne.append(ref)

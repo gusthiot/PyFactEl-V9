@@ -128,7 +128,7 @@ try:
             journal = Journal(imports, new_versions, new_transactions_2)
             journal.csv(DossierDestination(imports.chemin_bilans))
         annexes = Annexe(imports, new_transactions_2, sommes_2, ann_subs.csv_fichiers)
-        transactions_1 = Transactions1(imports, new_transactions_2, sommes_2)
+        transactions_1 = Transactions1(imports, new_transactions_2, sommes_2, new_versions)
         transactions_1.csv(DossierDestination(imports.chemin_bilans))
         sommes_1 = Sommes1(transactions_1)
         bil_facts = BilanFactures(imports, transactions_1, sommes_1)
