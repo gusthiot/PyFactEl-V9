@@ -30,21 +30,22 @@ class Transactions1(CsvDict):
             version = versions.valeurs[id_fact]['version-last']
             for par_compte in par_fact['projets'].values():
                 for par_article in par_compte['articles'].values():
-                    base = transactions_2.valeurs[par_article['base']]
                     total = par_article['total']
-                    ligne = []
-                    code = base['client-code']
-                    client = imports.clients.donnees[code]
-                    id_classe = client['id_classe']
-                    classe = imports.classes.donnees[id_classe]
-                    ref = classe['ref_fact'] + "_" + str(imports.edition.annee) + "_" + \
-                        Format.mois_string(imports.edition.mois) + "_" + str(version) + "_" + str(id_fact)
-                    for cle in self.cles:
-                        if cle == 'invoice-ref':
-                            ligne.append(ref)
-                        elif cle == 'total-fact':
-                            ligne.append(round(2*total, 1)/2)
-                        else:
-                            ligne.append(base[cle])
-                    self._ajouter_valeur(ligne, i)
-                    i += 1
+                    if total != 0:
+                        base = transactions_2.valeurs[par_article['base']]
+                        ligne = []
+                        code = base['client-code']
+                        client = imports.clients.donnees[code]
+                        id_classe = client['id_classe']
+                        classe = imports.classes.donnees[id_classe]
+                        ref = classe['ref_fact'] + "_" + str(imports.edition.annee) + "_" + \
+                            Format.mois_string(imports.edition.mois) + "_" + str(version) + "_" + str(id_fact)
+                        for cle in self.cles:
+                            if cle == 'invoice-ref':
+                                ligne.append(ref)
+                            elif cle == 'total-fact':
+                                ligne.append(round(2*total, 1)/2)
+                            else:
+                                ligne.append(base[cle])
+                        self._ajouter_valeur(ligne, i)
+                        i += 1

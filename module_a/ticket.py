@@ -104,10 +104,10 @@ class Ticket(object):
                                                     </tr>
                                                     '''
                     total = 0
-                    num_compte = 0
+                    # num_compte = 0
                     for dico_fact in par_fact['factures']:
                         total += dico_fact['total']
-                        num_compte = dico_fact['compte']
+                        # num_compte = dico_fact['compte']
                         contenu_client += r'''      <tr>
                                                         <td>%(poste)s</td>
                                                         <td>%(nom)s</td>
