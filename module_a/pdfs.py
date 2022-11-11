@@ -246,7 +246,9 @@ class Pdfs(object):
              \usepackage[none]{hyphenat}
              
              \pagestyle{fancy}
-        
+             
+             \pdfoptionpdfminorversion=7
+         
              \fancyhead{}
              \fancyfoot{}      
              

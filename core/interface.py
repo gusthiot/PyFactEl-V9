@@ -1,8 +1,10 @@
-from tkinter.filedialog import *
-from tkinter.scrolledtext import *
+from tkinter.filedialog import askdirectory
+from tkinter.scrolledtext import ScrolledText
+from tkinter import *
 
 import platform
 import sys
+import os
 
 from core import ErreurConsistance
 
