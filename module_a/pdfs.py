@@ -1,5 +1,6 @@
 from core import (Latex,
                   Format)
+import concurrent.futures
 
 
 class Pdfs(object):
@@ -16,35 +17,43 @@ class Pdfs(object):
         :param versions: versions des factures générées
         """
         self.imports = imports
+        self.transactions = transactions_2
+        self.sommes = sommes_2
 
-        prefixe = "Annexe_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" + \
-                  Format.mois_string(imports.edition.mois) + "_" + str(imports.version)
+        self.prefixe = "Annexe_" + imports.plateforme['abrev_plat'] + "_" + str(imports.edition.annee) + "_" + \
+                       Format.mois_string(imports.edition.mois) + "_" + str(imports.version)
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            for id_fact, donnee in versions.valeurs.items():
+                executor.submit(self.annexe_unique, id_fact, donnee)
+                # self.annexe_unique(id_fact, donnee)
 
-        for id_fact, donnee in versions.valeurs.items():
-            if donnee['version-change'] == 'NEW' or donnee['version-change'] == 'CORRECTED':
-                par_fact = sommes_2.par_fact[id_fact]
-                intype = donnee['invoice-type']
-                code = donnee['client-code']
-                client = imports.clients.donnees[code]
-                parties = {}
-                for id_compte, par_compte in par_fact['projets'].items():
-                    parties[id_compte] = self.entete(par_compte['numero'], par_compte['intitule'],
-                                                     intype) + self.table(transactions_2, par_compte, intype)
+    def annexe_unique(self, id_fact, donnee):
+        """
+        construction d'une annexe
+        :param id_fact: id facture lié à l'annexe donnée
+        :param donnee: données de la facture
+        """
+        if donnee['version-change'] == 'NEW' or donnee['version-change'] == 'CORRECTED':
+            par_fact = self.sommes.par_fact[id_fact]
+            intype = donnee['invoice-type']
+            parties = {}
+            for id_compte, par_compte in par_fact['projets'].items():
+                parties[id_compte] = self.entete(par_compte['numero'], par_compte['intitule'],
+                                                 intype) + self.table(par_compte, intype)
 
-                if intype == "GLOB":
-                    nom = prefixe + "_" + str(id_fact)  # + "_" + client['abrev_labo'] + "_0"
-                    contenu = ""
-                    for id_compte, partie in parties.items():
-                        contenu += partie
-                        contenu += r'''\clearpage '''
+            if intype == "GLOB":
+                nom = self.prefixe + "_" + str(id_fact)
+                contenu = ""
+                for id_compte, partie in parties.items():
+                    contenu += partie
+                    contenu += r'''\clearpage '''
+                Latex.creer_latex_pdf(nom, self.canevas(contenu, intype))
+                Latex.finaliser_pdf(nom, self.imports.chemin_pannexes)
+            else:
+                for id_compte, contenu in parties.items():
+                    nom = self.prefixe + "_" + str(id_fact)
                     Latex.creer_latex_pdf(nom, self.canevas(contenu, intype))
-                    Latex.finaliser_pdf(nom, imports.chemin_pannexes)
-                else:
-                    for id_compte, contenu in parties.items():
-                        compte = imports.comptes.donnees[id_compte]
-                        nom = prefixe + "_" + str(id_fact)  # + "_" + client['abrev_labo'] + "_" + compte['numero']
-                        Latex.creer_latex_pdf(nom, self.canevas(contenu, intype))
-                        Latex.finaliser_pdf(nom, imports.chemin_pannexes)
+                    Latex.finaliser_pdf(nom, self.imports.chemin_pannexes)
 
     def entete(self, numero, intitule, intype):
         """
@@ -102,10 +111,9 @@ class Pdfs(object):
         """
         return Latex.echappe_caracteres(self.imports.paramtexte.donnees[valeur])
 
-    def table(self, transactions, par_compte, intype):
+    def table(self, par_compte, intype):
         """
         création de la table d'annexe
-        :param transactions: transactions 2 générées
         :param par_compte: sommes des transactions 2 par compte
         :param intype: GLOB ou CPTE
         :return: table
@@ -153,7 +161,7 @@ class Pdfs(object):
             for par_item in par_article['items'].values():
                 for par_user in par_item.values():
                     for key in par_user:
-                        trans = transactions.valeurs[key]
+                        trans = self.transactions.valeurs[key]
                         qqq = 1000 * trans['transac-quantity']
                         if qqq % 1000 == 0:
                             quantite = str(int(trans['transac-quantity'])) + r'''\hphantom{.000}'''
