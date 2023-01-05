@@ -7,7 +7,7 @@ class StatClient(CsvList):
     Classe pour la création du csv des stats nombre user
     """
 
-    cles = ['invoice-year', 'invoice-month', 'client-code', 'client-sap', 'client-name', 'client-idclass',
+    cles = ['year', 'month', 'client-code', 'client-sap', 'client-name', 'client-idclass',
             'client-class', 'client-labelclass', 'stat-trans', 'stat-run', 'stat-nbuser-m', 'stat-nbuser-3m',
             'stat-nbuser-6m', 'stat-nbuser-12m']
 

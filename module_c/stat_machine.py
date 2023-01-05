@@ -8,7 +8,7 @@ class StatMachine(CsvList):
     Classe pour la création du csv des stats nombre user
     """
 
-    cles = ['invoice-year', 'invoice-month', 'mach-id', 'mach-name', 'item-id', 'flow-type', 'item-codeK', 'item-textK',
+    cles = ['year', 'month', 'mach-id', 'mach-name', 'item-id', 'flow-type', 'item-codeK', 'item-textK',
             'item-nbr', 'item-name', 'item-unit', 'transac-quantity', 'transac-usage', 'transac-runtime', 'runtime-N',
             'runtime-avg', 'runtime-stddev']
 
@@ -26,9 +26,9 @@ class StatMachine(CsvList):
 
         for pmi in par_machine.values():
             for par_item in pmi.values():
-                ligne = []
+                ligne = [imports.edition.annee, imports.edition.mois]
                 base = transactions_3.valeurs[par_item['base']]
-                for cle in range(0, len(self.cles)-6):
+                for cle in range(2, len(self.cles)-6):
                     ligne.append(base[self.cles[cle]])
                 runtime = par_item['runtime']
                 nn = par_item['nn']

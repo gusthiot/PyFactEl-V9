@@ -8,7 +8,7 @@ class BilanUsages(CsvList):
     Classe pour la création du csv de bilan d'usage
     """
 
-    cles = ['invoice-year', 'invoice-month', 'platf-code', 'platf-name', 'item-id', 'item-nbr', 'item-name',
+    cles = ['year', 'month', 'platf-code', 'platf-name', 'item-id', 'item-nbr', 'item-name',
             'item-unit', 'transac-usage', 'transac-runtime', 'runtime-N', 'runtime-avg', 'runtime-stddev']
 
     def __init__(self, imports, transactions_3, par_item):
@@ -26,8 +26,8 @@ class BilanUsages(CsvList):
         for pi in par_item.values():
             base = transactions_3.valeurs[pi['base']]
             if base['item-flag-usage'] == "OUI":
-                ligne = []
-                for cle in range(0, len(self.cles)-5):
+                ligne = [imports.edition.annee, imports.edition.mois]
+                for cle in range(2, len(self.cles)-5):
                     ligne.append(base[self.cles[cle]])
                 runtime = pi['runtime']
                 nn = pi['nn']

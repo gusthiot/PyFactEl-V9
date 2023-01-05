@@ -6,7 +6,7 @@ class BilanConsos(CsvList):
     Classe pour la création du csv de bilan de consommation propre
     """
 
-    cles = ['invoice-year', 'invoice-month', 'platf-code', 'platf-name', 'proj-id', 'proj-nbr', 'proj-name',
+    cles = ['year', 'month', 'platf-code', 'platf-name', 'proj-id', 'proj-nbr', 'proj-name',
             'proj-expl', 'item-id', 'item-nbr', 'item-name', 'item-unit', 'item-idsap', 'item-codeD', 'item-extra',
             'mach-extra', 'conso-propre-march-expl', 'conso-propre-extra-expl', 'conso-propre-march-proj',
             'conso-propre-extra-proj']
@@ -27,8 +27,8 @@ class BilanConsos(CsvList):
             for par_item in ppi.values():
                 base = transactions_3.valeurs[par_item['base']]
                 if base['item-flag-conso'] == "OUI":
-                    ligne = []
-                    for cle in range(0, len(self.cles) - 4):
+                    ligne = [imports.edition.annee, imports.edition.mois]
+                    for cle in range(2, len(self.cles) - 4):
                         ligne.append(base[self.cles[cle]])
                     goops = par_item['goops']
                     extrops = par_item['extrops']

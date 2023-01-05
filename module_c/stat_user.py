@@ -7,7 +7,7 @@ class StatUser(CsvList):
     Classe pour la création du csv des stats nombre user
     """
 
-    cles = ['invoice-year', 'invoice-month', 'user-id', 'user-sciper', 'user-name', 'user-first', 'client-code',
+    cles = ['year', 'month', 'user-id', 'user-sciper', 'user-name', 'user-first', 'client-code',
             'client-sap', 'client-name', 'client-idclass', 'client-class', 'client-labelclass', 'stat-trans',
             'stat-run']
 
@@ -25,9 +25,9 @@ class StatUser(CsvList):
 
         for par_client in par_user.values():
             for par_code in par_client.values():
-                ligne = []
+                ligne = [imports.edition.annee, imports.edition.mois]
                 base = transactions_3.valeurs[par_code['base']]
-                for cle in range(0, len(self.cles)-2):
+                for cle in range(2, len(self.cles)-2):
                     ligne.append(base[self.cles[cle]])
                 ligne += [par_code['stat_trans'], par_code['stat_run']]
                 self.lignes.append(ligne)
