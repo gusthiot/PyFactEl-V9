@@ -6,17 +6,18 @@ class Transactions3(CsvDict):
     Classe pour la création des transactions de niveau 3
     """
 
-    cles = ['invoice-year', 'invoice-month', 'invoice-version', 'invoice-project', 'client-code', 'client-sap',
-            'client-name', 'client-idclass', 'client-class', 'client-labelclass', 'oper-id', 'oper-name', 'oper-note',
-            'staff-note', 'mach-id', 'mach-name', 'mach-extra', 'user-id', 'user-sciper', 'user-name', 'user-first',
-            'proj-id', 'proj-nbr', 'proj-name', 'proj-expl', 'flow-type', 'item-id', 'item-codeK', 'item-textK',
-            'item-text2K', 'item-nbr', 'item-name', 'item-unit', 'item-idsap', 'item-codeD', 'item-flag-usage',
-            'item-flag-conso', 'item-eligible', 'item-order', 'item-labelcode', 'item-extra', 'platf-code', 'platf-op',
-            'platf-name', 'transac-date', 'transac-raw', 'transac-valid', 'transac-id-staff', 'transac-staff',
-            'transac-quantity', 'transac-usage', 'transac-runtime', 'transac-runcae', 'valuation-price',
-            'valuation-brut', 'discount-type', 'discount-CHF', 'valuation-net', 'subsid-code', 'subsid-name',
-            'subsid-start', 'subsid-end', 'subsid-ok', 'subsid-pourcent', 'subsid-maxproj', 'subsid-maxmois',
-            'subsid-reste', 'subsid-CHF', 'deduct-CHF', 'subsid-deduct', 'total-fact', 'discount-bonus', 'subsid-bonus']
+    cles = ['editing-year', 'editing-month', 'year', 'month', 'invoice-year', 'invoice-month', 'invoice-version',
+            'invoice-project', 'client-code', 'client-sap', 'client-name', 'client-idclass', 'client-class',
+            'client-labelclass', 'oper-id', 'oper-name', 'oper-note', 'staff-note', 'mach-id', 'mach-name',
+            'mach-extra', 'user-id', 'user-sciper', 'user-name', 'user-first', 'proj-id', 'proj-nbr', 'proj-name',
+            'proj-expl', 'flow-type', 'item-id', 'item-codeK', 'item-textK', 'item-text2K', 'item-nbr', 'item-name',
+            'item-unit', 'item-idsap', 'item-codeD', 'item-flag-usage', 'item-flag-conso', 'item-eligible',
+            'item-order', 'item-labelcode', 'item-extra', 'platf-code', 'platf-op', 'platf-name', 'transac-date',
+            'transac-raw', 'transac-valid', 'transac-id-staff', 'transac-staff', 'transac-quantity', 'transac-usage',
+            'transac-runtime', 'transac-runcae', 'valuation-price', 'valuation-brut', 'discount-type', 'discount-CHF',
+            'valuation-net', 'subsid-code', 'subsid-name', 'subsid-start', 'subsid-end', 'subsid-ok', 'subsid-pourcent',
+            'subsid-maxproj', 'subsid-maxmois', 'subsid-reste', 'subsid-CHF', 'deduct-CHF', 'subsid-deduct',
+            'total-fact', 'discount-bonus', 'subsid-bonus']
 
     def __init__(self, imports, articles, tarifs):
         """
@@ -40,7 +41,6 @@ class Transactions3(CsvDict):
             compte = imports.comptes.donnees[entree['id_compte']]
             client = imports.clients.donnees[compte['code_client']]
             id_classe = client['id_classe']
-            classe = imports.classes.donnees[id_classe]
             id_machine = entree['id_machine']
             machine = imports.machines.donnees[id_machine]
             groupe = imports.groupes.donnees[machine['id_groupe']]
@@ -52,6 +52,8 @@ class Transactions3(CsvDict):
             duree_hp = round(entree['duree_machine_hp']/60, 3)
             duree_hc = round(entree['duree_machine_hc']/60, 3)
             duree_op = round(entree['duree_operateur']/60, 3)
+            rc_map = {'annee': entree['annee'], 'mois': entree['mois'], 'classe': imports.classes.donnees[id_classe],
+                      'client': client, 'compte': compte}
 
             if duree_hp > 0 or duree_hc > 0:
                 # K3 CAE-run #
@@ -59,7 +61,7 @@ class Transactions3(CsvDict):
                 if id_groupe != '0' and duree_op == 0:
                     article = articles.valeurs[id_groupe]
                     if imports.edition.plateforme == article['platf-code']:
-                        ref_client = self.__ref_client(entree['annee'], entree['mois'], classe, client, compte, article)
+                        ref_client = self.__ref_client(rc_map, article, entree['date_login'])
                         tarif = tarifs.valeurs[id_classe + id_groupe]
                         art = self.__art_plate(article, "K3", pt['item-K3'], pt['item-K3a'])
                         if article['platf-code'] == compte['code_client']:
@@ -85,7 +87,7 @@ class Transactions3(CsvDict):
                 if id_groupe != '0':
                     article = articles.valeurs[id_groupe]
                     if imports.edition.plateforme == article['platf-code']:
-                        ref_client = self.__ref_client(entree['annee'], entree['mois'], classe, client, compte, article)
+                        ref_client = self.__ref_client(rc_map, article, entree['date_login'])
                         tarif = tarifs.valeurs[id_classe + id_groupe]
                         art = self.__art_plate(article, "K7", pt['item-K7'], pt['item-K7a'])
                         if ((article['platf-code'] == compte['code_client'] and compte['exploitation'] == "TRUE")
@@ -110,8 +112,7 @@ class Transactions3(CsvDict):
                     if prix_extra > 0:
                         article = articles.valeurs[id_groupe]
                         if imports.edition.plateforme == article['platf-code']:
-                            ref_client = self.__ref_client(entree['annee'], entree['mois'], classe, client, compte,
-                                                           article)
+                            ref_client = self.__ref_client(rc_map, article, entree['date_login'])
                             tarif = tarifs.valeurs[id_classe + id_groupe]
                             duree = duree_hp + duree_hc
                             if ((article['platf-code'] == compte['code_client'] and compte['exploitation'] == "TRUE")
@@ -136,7 +137,7 @@ class Transactions3(CsvDict):
             if id_groupe != '0':
                 article = articles.valeurs[id_groupe]
                 if imports.edition.plateforme == article['platf-code']:
-                    ref_client = self.__ref_client(entree['annee'], entree['mois'], classe, client, compte, article)
+                    ref_client = self.__ref_client(rc_map, article, entree['date_login'])
                     tarif = tarifs.valeurs[id_classe + id_groupe]
 
                     # K1 CAE-HP #
@@ -193,7 +194,7 @@ class Transactions3(CsvDict):
             if id_groupe != '0' and duree_op > 0:
                 article = articles.valeurs[id_groupe]
                 if imports.edition.plateforme == article['platf-code']:
-                    ref_client = self.__ref_client(entree['annee'], entree['mois'], classe, client, compte, article)
+                    ref_client = self.__ref_client(rc_map, article, entree['date_login'])
                     tarif = tarifs.valeurs[id_classe + id_groupe]
                     art = self.__art_plate(article, "K2", pt['item-K2'], pt['item-K2a'])
                     if article['platf-code'] == compte['code_client']:
@@ -225,10 +226,11 @@ class Transactions3(CsvDict):
             compte = imports.comptes.donnees[entree['id_compte']]
             client = imports.clients.donnees[compte['code_client']]
             id_classe = client['id_classe']
-            classe = imports.classes.donnees[id_classe]
             id_machine = entree['id_machine']
             machine = imports.machines.donnees[id_machine]
             groupe = imports.groupes.donnees[machine['id_groupe']]
+            rc_map = {'annee': entree['annee'], 'mois': entree['mois'], 'classe': imports.classes.donnees[id_classe],
+                      'client': client, 'compte': compte}
             if entree['type'] == 'HP':
                 # K5 NoShow-HP #
                 id_groupe = groupe['id_cat_hp']
@@ -245,7 +247,7 @@ class Transactions3(CsvDict):
             if id_groupe != '0':
                 article = articles.valeurs[id_groupe]
                 if imports.edition.plateforme == article['platf-code']:
-                    ref_client = self.__ref_client(entree['annee'], entree['mois'], classe, client, compte, article)
+                    ref_client = self.__ref_client(rc_map, article, entree['date_debut'])
                     tarif = tarifs.valeurs[id_classe + id_groupe]
                     ope = ["", "", "", "", id_machine, machine['nom'], ""]
                     util_proj = self.__util_proj(entree['id_user'], compte, pt['flow-noshow'])
@@ -262,14 +264,15 @@ class Transactions3(CsvDict):
             compte = imports.comptes.donnees[entree['id_compte']]
             client = imports.clients.donnees[compte['code_client']]
             id_classe = client['id_classe']
-            classe = imports.classes.donnees[id_classe]
             id_prestation = entree['id_prestation']
             prestation = imports.prestations.donnees[id_prestation]
             operateur = imports.users.donnees[entree['id_operateur']]
             id_machine = prestation['id_machine']
+            rc_map = {'annee': entree['annee'], 'mois': entree['mois'], 'classe': imports.classes.donnees[id_classe],
+                      'client': client, 'compte': compte}
             article = articles.valeurs[id_prestation]
             if imports.edition.plateforme == article['platf-code']:
-                ref_client = self.__ref_client(entree['annee'], entree['mois'], classe, client, compte, article)
+                ref_client = self.__ref_client(rc_map, article, entree['date_livraison'])
                 tarif = tarifs.valeurs[id_classe + id_prestation]
                 if id_machine == "0":
                     # LVR-mag #
@@ -305,11 +308,12 @@ class Transactions3(CsvDict):
             client = imports.clients.donnees[compte['code_client']]
             id_classe = client['id_classe']
             id_categorie = entree['id_categorie']
-            classe = imports.classes.donnees[id_classe]
             operateur = imports.users.donnees[entree['id_op']]
+            rc_map = {'annee': entree['annee'], 'mois': entree['mois'], 'classe': imports.classes.donnees[id_classe],
+                      'client': client, 'compte': compte}
             article = articles.valeurs[id_categorie]
             if imports.edition.plateforme == article['platf-code']:
-                ref_client = self.__ref_client(entree['annee'], entree['mois'], classe, client, compte, article)
+                ref_client = self.__ref_client(rc_map, article, entree['date'])
                 tarif = tarifs.valeurs[id_classe + id_categorie]
                 ope = [entree['id_op'], operateur['prenom'] + " " + operateur['nom'], "", entree['remarque_staff'],
                        "", "", ""]
@@ -342,7 +346,7 @@ class Transactions3(CsvDict):
                     ded_rab = 0
                     sub_rab = 0
                     if article['platf-code'] != compte['code_client'] and transact['trans'][2] == "1":
-                        if self.imports.classes.donnees[transact['rc'][7]]['subsides'] == "BONUS":
+                        if self.imports.classes.donnees[transact['rc'][9]]['subsides'] == "BONUS":
                             ded_bon = transact['val'][3]
                             sub_bon = subs[9]
                         else:
@@ -350,8 +354,8 @@ class Transactions3(CsvDict):
                             sub_rab = subs[9]
                         tot = transact['val'][1] - ded_rab - sub_rab
                     mont = [ded_rab, sub_rab, tot, ded_bon, sub_bon]
-                    donnee = transact['rc'] + transact['ope'] + transact['up'] + transact['art'] + transact['trans'] + \
-                        transact['val'] + subs + mont
+                    donnee = [imports.edition.annee, imports.edition.mois] + transact['rc'] + transact['ope'] + \
+                        transact['up'] + transact['art'] + transact['trans'] + transact['val'] + subs + mont
                     self._ajouter_valeur(donnee, i)
                     i = i + 1
 
@@ -374,27 +378,26 @@ class Transactions3(CsvDict):
             quantite = raw
         return [entree['validation'], id_staff, staff, quantite]
 
-    def __ref_client(self, annee, mois, classe, client, compte, article):
+    def __ref_client(self, data, article, date):
         """
         ajout de la référence et des valeurs issues du client
-        :param annee: année de la transaction
-        :param mois: mois de la transaction
-        :param classe: classe de la transaction
-        :param client: client de la transaction
-        :param compte: compte de la transaction
+        :param data: dictionnaire de données
         :param article: article de la transaction
+        :param date: date effective
         :return tableau contenant la référence et les valeurs du client
         """
         id_artsap = article['item-idsap']
         artsap = self.imports.artsap.donnees[id_artsap]
         plateforme = self.imports.plateforme
-        if (classe['ref_fact'] == 'INT' and classe['avantage_HC'] == 'BONUS' and artsap['eligible'] == 'OUI' and
-                compte['type_subside'] == "0" and plateforme['grille'] != "" and classe['grille'] == 'OUI'):
-            icf = compte['id_compte']
+        if (data['classe']['ref_fact'] == 'INT' and data['classe']['avantage_HC'] == 'BONUS' and
+                artsap['eligible'] == 'OUI' and data['compte']['type_subside'] == "0" and plateforme['grille'] != "" and
+                data['classe']['grille'] == 'OUI'):
+            icf = data['compte']['id_compte']
         else:
             icf = "0"
-        return [annee, mois, self.imports.version, icf, client['code'], client['code_sap'], client['abrev_labo'],
-                client['id_classe'], classe['code_n'], classe['intitule']]
+        return [date.year, date.month, data['annee'], data['mois'], self.imports.version, icf, data['client']['code'],
+                data['client']['code_sap'], data['client']['abrev_labo'], data['client']['id_classe'],
+                data['classe']['code_n'], data['classe']['intitule']]
 
     def __util_proj(self, id_user, compte, flux):
         """
@@ -432,7 +435,7 @@ class Transactions3(CsvDict):
         """
         id_compte = transact['up'][4]
         compte = self.imports.comptes.donnees[id_compte]
-        id_classe = transact['rc'][7]
+        id_classe = transact['rc'][9]
         montant = transact['val'][4]
         id_machine = transact['ope'][4]
         date = transact['trans'][0]
@@ -440,7 +443,7 @@ class Transactions3(CsvDict):
         type_s = compte['type_subside']
         result = ["", "", "", "", "", 0, 0, 0, 0, 0]
         if type_s != "0":
-            if self.imports.edition.annee == transact['rc'][0] and self.imports.edition.mois == transact['rc'][1]:
+            if self.imports.edition.annee == transact['rc'][2] and self.imports.edition.mois == transact['rc'][3]:
                 if type_s in self.imports.subsides.donnees.keys():
                     subside = self.imports.subsides.donnees[type_s]
                     result[0] = subside['type']
@@ -552,7 +555,7 @@ class Transactions3(CsvDict):
         :param trans: valeurs de transaction
         :param val: valeurs d'évaluation
         """
-        fact_date = ref_client[0] + ref_client[1]
+        fact_date = ref_client[2] + ref_client[3]
         if fact_date not in transacts.keys():
             transacts[fact_date] = {}
         if trans[0] not in transacts[fact_date].keys():
