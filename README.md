@@ -1,6 +1,6 @@
 # PyFactEl-V9
 
-- installer Python 3 ( < 3.9) (https://www.python.org/downloads/)
+- installer Python 3 ( > 3.8) (https://www.python.org/downloads/)
     si l'option "rajouter Python au PATH" se présente, la cocher
 - installer TeX Live (https://www.tug.org/texlive/)
 
